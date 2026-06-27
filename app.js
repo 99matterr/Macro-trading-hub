@@ -1,11 +1,14 @@
-// ================= RETRIEVED STATE STORAGE HOOKS =================
+// ================= SYSTEM DATA PIPELINE CONFIGURATIONS =================
+// Active authentication credential bound to account matrix
+const POLYGON_API_KEY = "No0EnBLyugPby70zmXCA0tpUjazFKKcg";
+
 let activeLayout = localStorage.getItem('kairos_layout') || 'single';
 let completedModules = JSON.parse(localStorage.getItem('kairos_completed_modules')) || [];
+const apiCache = {}; // Prevents rate-limiting block failures on mobile browsers
 
 // ================= AUTOMATED FOREX MULTI-ZONE CLOCK SYSTEM =================
 function updateForexClocks() {
     const now = new Date();
-
     const getZoneTimeValues = (tz) => {
         try {
             const formatter = new Intl.DateTimeFormat('en-US', {
@@ -14,40 +17,20 @@ function updateForexClocks() {
             const timeString = formatter.format(now).replace(/[^0-9:]/g, '');
             const currentHour = parseInt(timeString.split(':')[0], 10);
             return { string: timeString, hourNumeric: isNaN(currentHour) ? 0 : currentHour };
-        } catch (e) {
-            return { string: "00:00:00", hourNumeric: 0 };
-        }
+        } catch (e) { return { string: "00:00:00", hourNumeric: 0 }; }
     };
 
     const timeUTC = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
-    const tokyoData = getZoneTimeValues('Asia/Tokyo');
-    const londonData = getZoneTimeValues('Europe/London');
-    const newyorkData = getZoneTimeValues('America/New_York');
+    const liveTimeEl = document.getElementById('live-time');
+    if (liveTimeEl) liveTimeEl.textContent = timeUTC;
 
-    const nodes = {
-        'live-time': timeUTC, 'clock-tokyo': tokyoData.string, 'clock-london': londonData.string, 'clock-newyork': newyorkData.string
-    };
+    const tokyo = getZoneTimeValues('Asia/Tokyo');
+    const london = getZoneTimeValues('Europe/London');
+    const newyork = getZoneTimeValues('America/New_York');
 
-    for (const [id, val] of Object.entries(nodes)) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = val;
-    }
-
-    const toggleStatus = (id, hour) => {
-        const indicator = document.getElementById(`status-${id}`);
-        if (!indicator) return;
-        const dayUTC = now.getUTCDay();
-        const isWeekend = (dayUTC === 6 || dayUTC === 0);
-        if (hour >= 8 && hour < 17 && !isWeekend) {
-            indicator.className = "h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]";
-        } else {
-            indicator.className = "h-1.5 w-1.5 rounded-full bg-zinc-800";
-        }
-    };
-
-    toggleStatus('tokyo', tokyoData.hourNumeric);
-    toggleStatus('london', londonData.hourNumeric);
-    toggleStatus('newyork', newyorkData.hourNumeric);
+    if(document.getElementById('clock-tokyo')) document.getElementById('clock-tokyo').textContent = tokyo.string;
+    if(document.getElementById('clock-london')) document.getElementById('clock-london').textContent = london.string;
+    if(document.getElementById('clock-newyork')) document.getElementById('clock-newyork').textContent = newyork.string;
 }
 
 // ================= CHART WORKSPACE CONFIGURATOR (index.html only) =================
@@ -116,13 +99,8 @@ function toggleModuleMilestone(id, event) {
 
 function calculateProgressMetrics() {
     const targetNode = document.getElementById('portal-progress-metric');
-    if (!targetNode) return;
-    if (typeof KAIROS_ACADEMY_DATABASE === 'undefined') {
-        targetNode.textContent = "DATA PENDING";
-        return;
-    }
+    if (!targetNode || typeof KAIROS_ACADEMY_DATABASE === 'undefined') return;
     const totalModules = KAIROS_ACADEMY_DATABASE.length;
-    if(totalModules === 0) return;
     const ratio = Math.round((completedModules.length / totalModules) * 100);
     targetNode.textContent = `${ratio}% COMPLETE`;
 }
@@ -130,8 +108,7 @@ function calculateProgressMetrics() {
 // ================= RENDER DOM CONTENT CHANNELS =================
 function renderPublicationsFeed() {
     const targetNode = document.getElementById('blog-posts-grid');
-    if(!targetNode) return;
-    if (typeof KAIROS_BLOG_DATABASE === 'undefined') return;
+    if(!targetNode || typeof KAIROS_BLOG_DATABASE === 'undefined') return;
     targetNode.innerHTML = KAIROS_BLOG_DATABASE.map(post => `
         <article onclick="compileAndOpenDocument('blog', '${post.id}')" class="bg-[#08080c] border border-zinc-900 hover:border-zinc-800 transition-all rounded-xl p-6 flex flex-col justify-between cursor-pointer group">
             <div class="space-y-3">
@@ -143,8 +120,7 @@ function renderPublicationsFeed() {
                 <p class="text-xs text-zinc-400 leading-relaxed">${post.summary}</p>
             </div>
             <div class="flex items-center justify-between font-mono text-[10px] text-zinc-600 border-t border-zinc-900 pt-3 mt-4">
-                <span>KAIROS OBSERVER</span>
-                <span>${post.date}</span>
+                <span>KAIROS OBSERVER</span><span>${post.date}</span>
             </div>
         </article>
     `).join('');
@@ -152,8 +128,7 @@ function renderPublicationsFeed() {
 
 function renderAcademyDomElements() {
     const targetNode = document.getElementById('academy-modules-stack');
-    if(!targetNode) return;
-    if (typeof KAIROS_ACADEMY_DATABASE === 'undefined') return;
+    if(!targetNode || typeof KAIROS_ACADEMY_DATABASE === 'undefined') return;
     targetNode.innerHTML = KAIROS_ACADEMY_DATABASE.map(mod => {
         const isFinished = completedModules.includes(mod.id);
         return `
@@ -176,7 +151,7 @@ function renderAcademyDomElements() {
     }).join('');
 }
 
-// ================= DROPDOWN MULTI-ASSET INTERACTIVE LINKAGE ENGINE =================
+// ================= LIVE QUANTITATIVE FINANCIAL DATA ENGINE =================
 function initializeVolatilityControls() {
     const selector = document.getElementById('asset-selector');
     if (!selector || typeof KAIROS_INTERACTIVE_VOLATILITY_DB === 'undefined') return;
@@ -185,8 +160,6 @@ function initializeVolatilityControls() {
     const targetEuro = document.getElementById('opt-euro');
     const targetPound = document.getElementById('opt-pound');
     const targetMinors = document.getElementById('opt-minors');
-
-    if (!targetMajors || !targetEuro || !targetPound || !targetMinors) return;
 
     targetMajors.innerHTML = ""; targetEuro.innerHTML = ""; targetPound.innerHTML = ""; targetMinors.innerHTML = "";
 
@@ -202,98 +175,137 @@ function initializeVolatilityControls() {
     handleAssetChange("GBPJPY");
 }
 
-// PREMIUM IPAD TOUCH INTERACTION ROUTINES
+// PREMIUM TOUCH-FOCUS OVERRIDES FOR IPAD BROWSERS
 function tapHourlyBar(hourIdx, pipValue) {
-    // 1. Reset all hourly bars to secondary opacity states
     const container = document.getElementById('hour-chart-container');
     if (!container) return;
-    const items = container.querySelectorAll('.hourly-bar-node');
-    items.forEach(item => {
+    container.querySelectorAll('.hourly-bar-node').forEach(item => {
         const tip = item.querySelector('.tooltip-bubble');
         const fill = item.querySelector('.bar-fill-element');
         if (tip) tip.className = "absolute -top-7 bg-zinc-950 border border-zinc-800 text-[9px] font-mono font-bold px-1 py-0.5 rounded opacity-0 pointer-events-none text-white z-10 tabular-nums tooltip-bubble transition-all";
-        if (fill) fill.classList.remove('brightness-150', 'shadow-[0_0_12px_#06b6d4]');
+        if (fill) fill.className = "absolute inset-0 bg-gradient-to-t from-cyan-600 to-cyan-400 bar-fill-element";
     });
 
-    // 2. Explode the selected element's visibility parameters
     const targetWrapper = document.getElementById(`h-bar-wrapper-${hourIdx}`);
     if (targetWrapper) {
         const activeTip = targetWrapper.querySelector('.tooltip-bubble');
         const activeFill = targetWrapper.querySelector('.bar-fill-element');
-        if (activeTip) activeTip.className = "absolute -top-7 bg-cyan-950 border border-cyan-500 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded opacity-100 pointer-events-none text-cyan-400 font-extrabold z-10 tabular-nums tooltip-bubble scale-105 shadow-md shadow-cyan-950/50";
-        if (activeFill) activeFill.classList.add('brightness-150', 'shadow-[0_0_12px_#06b6d4]');
+        if (activeTip) activeTip.className = "absolute -top-7 bg-cyan-950 border border-cyan-500 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded opacity-100 pointer-events-none text-cyan-400 font-extrabold z-10 tabular-nums tooltip-bubble scale-105 shadow-md";
+        if (activeFill) activeFill.className = "absolute inset-0 bg-gradient-to-t from-cyan-400 to-cyan-300 shadow-[0_0_12px_#06b6d4] bar-fill-element";
     }
 
-    // 3. Update Title Strip Tracker Header
     const banner = document.getElementById('hourly-focus-readout');
-    if (banner) {
-        const pad = hourIdx < 10 ? `0${hourIdx}` : hourIdx;
-        banner.textContent = `Selected: ${pad}:00 GMT Matrix // Volatility: ${pipValue} Pips`;
-    }
+    if (banner) banner.textContent = `${hourIdx < 10 ? '0'+hourIdx : hourIdx}:00 GMT // Volatility: ${pipValue} Pips`;
 }
 
-function tapWeekdayBar(dayIndex, dayLabel, percentageWeight, basePipsValue) {
-    // 1. Reset all weekday columns
+function tapWeekdayBar(dayIdx, dayLabel, percentage, computedPips) {
     const container = document.getElementById('weekday-chart-container');
     if (!container) return;
-    const elements = container.querySelectorAll('.weekday-bar-node');
-    elements.forEach(el => {
+    container.querySelectorAll('.weekday-bar-node').forEach(el => {
         const tip = el.querySelector('.tooltip-bubble');
         const fill = el.querySelector('.bar-fill-element');
         if (tip) tip.className = "absolute -top-7 bg-zinc-950 border border-zinc-800 text-[9px] font-mono font-bold px-1 py-0.5 rounded opacity-0 pointer-events-none text-white z-10 tabular-nums tooltip-bubble transition-all";
-        if (fill) fill.classList.remove('brightness-150', 'shadow-[0_0_12px_#10b981]');
+        if (fill) fill.className = "absolute inset-0 bg-gradient-to-t from-cyan-600 to-cyan-400 bar-fill-element";
     });
 
-    // 2. Apply active state variables to target card
-    const targetCard = document.getElementById(`w-bar-wrapper-${dayIndex}`);
+    const targetCard = document.getElementById(`w-bar-wrapper-${dayIdx}`);
     if (targetCard) {
         const activeTip = targetCard.querySelector('.tooltip-bubble');
         const activeFill = targetCard.querySelector('.bar-fill-element');
         if (activeTip) activeTip.className = "absolute -top-7 bg-emerald-950 border border-emerald-500 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded opacity-100 pointer-events-none text-emerald-400 font-extrabold z-10 tabular-nums tooltip-bubble scale-105 shadow-md";
-        if (activeFill) activeFill.classList.add('brightness-150', 'shadow-[0_0_12px_#10b981]');
+        if (activeFill) activeFill.className = "absolute inset-0 bg-gradient-to-t from-emerald-400 to-emerald-300 shadow-[0_0_12px_#10b981] bar-fill-element";
     }
 
-    // 3. Calculate absolute layout weights against primary daily parameters
-    const variancePips = Math.round((basePipsValue * percentageWeight) / 100);
     const banner = document.getElementById('weekday-focus-readout');
-    if (banner) {
-        banner.textContent = `Selected: ${dayLabel} // Realized Target: ${variancePips} Absolute Pips (${percentageWeight} Vol)`;
-    }
+    if (banner) banner.textContent = `${dayLabel} // Mean: ${computedPips} Pips (${percentage}% Weight)`;
 }
 
-function handleAssetChange(pairKey) {
+// ASYNC CORE MARKET ENGINE
+async function handleAssetChange(pairKey) {
     if (typeof KAIROS_INTERACTIVE_VOLATILITY_DB === 'undefined' || !KAIROS_INTERACTIVE_VOLATILITY_DB[pairKey]) return;
-    const data = KAIROS_INTERACTIVE_VOLATILITY_DB[pairKey];
+    const fallbackData = KAIROS_INTERACTIVE_VOLATILITY_DB[pairKey];
 
-    // Reset headers status indicators to clean prompts
-    const hb = document.getElementById('hourly-focus-readout'); if (hb) hb.textContent = "TAP A COLUMN BAR";
-    const wb = document.getElementById('weekday-focus-readout'); if (wb) wb.textContent = "TAP A WEEKDAY BAR";
+    let livePips = parseInt(fallbackData.dailyPips, 10);
+    let weekdayWeights = [...fallbackData.days];
 
-    const displayNode = document.getElementById('target-asset-display');
-    const pipsNode = document.getElementById('metric-daily-pips');
-    const rangeNode = document.getElementById('metric-percentage-range');
-    const badgeNode = document.getElementById('metric-regime-badge');
+    // Live execution route utilizing newly mapped endpoints
+    if (POLYGON_API_KEY) {
+        try {
+            if (apiCache[pairKey]) {
+                livePips = apiCache[pairKey].livePips;
+                weekdayWeights = apiCache[pairKey].weekdayWeights;
+            } else {
+                const toDate = new Date().toISOString().split('T')[0];
+                const fromDate = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                const ticker = `C:${pairKey}`;
+                
+                // Mapped to secure parallel massive.com server pipelines
+                const response = await fetch(`https://api.massive.com/v2/aggs/ticker/${ticker}/range/1/day/${fromDate}/${toDate}?adjusted=true&sort=desc&limit=30&apiKey=${POLYGON_API_KEY}`);
+                const data = await response.json();
 
-    if (displayNode) displayNode.textContent = data.pairDisplay;
-    if (pipsNode) pipsNode.textContent = data.dailyPips;
-    if (rangeNode) rangeNode.textContent = data.percentageRange;
-    if (badgeNode) {
-        badgeNode.textContent = data.regime;
-        badgeNode.className = `px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded border ${data.badgeClass}`;
+                if (data && data.results) {
+                    const pipMultiplier = pairKey.includes("JPY") ? 100 : 10000;
+                    let totalPipsSum = 0;
+                    let dayRanges = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+
+                    data.results.forEach(candle => {
+                        const range = (candle.h - candle.l) * pipMultiplier;
+                        totalPipsSum += range;
+                        
+                        const candleDate = new Date(candle.t);
+                        const dayOfWeek = candleDate.getUTCDay();
+                        if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                            dayRanges[dayOfWeek].push(range);
+                        }
+                    });
+
+                    livePips = Math.round(totalPipsSum / data.results.length);
+
+                    const avgDayRanges = Object.keys(dayRanges).map(d => {
+                        if (dayRanges[d].length === 0) return 0;
+                        return dayRanges[d].reduce((a, b) => a + b, 0) / dayRanges[d].length;
+                    });
+                    const sumOfAvgs = avgDayRanges.reduce((a, b) => a + b, 0);
+                    weekdayWeights = avgDayRanges.map(val => sumOfAvgs > 0 ? Math.round((val / sumOfAvgs) * 100) : 20);
+                    
+                    apiCache[pairKey] = { livePips, weekdayWeights };
+                }
+            }
+        } catch (error) {
+            console.log("API pipeline throttle caught. Relying on baseline mapping.", error);
+        }
     }
 
-    // Build and Draw Dynamic Hourly Distribution Graph
+    // Print text updates directly to DOM elements
+    document.getElementById('target-asset-display').textContent = pairKey.substring(0,3) + " / " + pairKey.substring(3) + " VOLATILITY PROFILE";
+    document.getElementById('metric-daily-pips').textContent = livePips;
+    document.getElementById('metric-percentage-range').textContent = fallbackData.percentageRange;
+    
+    const badge = document.getElementById('metric-regime-badge');
+    if(badge) {
+        badge.textContent = fallbackData.regime;
+        badge.className = `px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded border ${fallbackData.badgeClass}`;
+    }
+
+    // Dynamic Hourly Render with active Touch Hooks
     const hourChartContainer = document.getElementById('hour-chart-container');
-    if (hourChartContainer && data.hourly) {
-        const maxVal = Math.max(...data.hourly);
-        hourChartContainer.innerHTML = data.hourly.map((pips, hour) => {
-            const pct = Math.max(8, Math.round((pips / maxVal) * 100));
+    if (hourChartContainer && fallbackData.hourly) {
+        const staticHourlyProfile = [...fallbackData.hourly];
+        const staticTotalHours = staticHourlyProfile.reduce((a, b) => a + b, 0);
+        
+        const realHourlyPipsArray = staticHourlyProfile.map(val => {
+            return Math.max(1, Math.round((val / staticTotalHours) * livePips * 24));
+        });
+        const maxHourlyVal = Math.max(...realHourlyPipsArray);
+
+        hourChartContainer.innerHTML = realHourlyPipsArray.map((pips, hour) => {
+            const pct = Math.max(8, Math.round((pips / maxHourlyVal) * 100));
             const hourString = hour < 10 ? `0${hour}` : hour;
             const barColorClass = (hour >= 8 && hour <= 16) ? 'from-emerald-600 to-emerald-400' : 'from-cyan-600 to-cyan-400';
             return `
-                <div id="h-bar-wrapper-${hour}" onclick="tapHourlyBar(${hour}, '${pips}')" class="flex flex-col items-center justify-end h-full w-full cursor-pointer relative hourly-bar-node group">
+                <div id="h-bar-wrapper-${hour}" onclick="tapHourlyBar(${hour}, ${pips})" class="flex flex-col items-center justify-end h-full w-full cursor-pointer relative hourly-bar-node group">
                     <span class="absolute -top-7 bg-zinc-950 border border-zinc-800 text-[9px] font-mono font-bold px-1 py-0.5 rounded opacity-0 pointer-events-none text-white z-10 tabular-nums tooltip-bubble transition-all">${pips}p</span>
-                    <div class="w-full bg-zinc-950 border border-zinc-900/60 rounded-t transition-all duration-300 ease-out relative" style="height: ${pct}%;">
+                    <div class="w-full bg-zinc-950 border border-zinc-900/60 rounded-t relative" style="height: ${pct}%;">
                         <div class="absolute inset-0 bg-gradient-to-t ${barColorClass} bar-fill-element group-hover:brightness-125"></div>
                     </div>
                     <span class="font-mono text-[8px] text-zinc-600 mt-1.5 select-none font-medium group-hover:text-cyan-400">${hourString}</span>
@@ -302,19 +314,21 @@ function handleAssetChange(pairKey) {
         }).join('');
     }
 
-    // Build and Draw Dynamic Weekday Distribution Graph
+    // Dynamic Weekday Render with active Touch Hooks
     const weekdayContainer = document.getElementById('weekday-chart-container');
-    if (weekdayContainer && data.days) {
+    if (weekdayContainer) {
         const dayLabels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-        weekdayContainer.innerHTML = data.days.map((val, idx) => {
-            const pctWeight = parseInt(val, 10);
-            const calculatedPips = Math.round((data.dailyPips * pctWeight) / 100);
+        const maxWeight = Math.max(...weekdayWeights);
+
+        weekdayContainer.innerHTML = weekdayWeights.map((weight, idx) => {
+            const calculatedPips = Math.round((livePips * weight) / 100);
+            const heightPct = Math.max(12, Math.round((weight / maxWeight) * 100));
             const barColor = idx === 3 ? 'from-emerald-600 to-emerald-400' : 'from-cyan-600 to-cyan-400';
             return `
-                <div id="w-bar-wrapper-${idx}" onclick="tapWeekdayBar(${idx}, '${dayLabels[idx]}', ${pctWeight}, ${data.dailyPips})" class="flex flex-col items-center justify-end h-full space-y-2 cursor-pointer relative weekday-bar-node group">
-                    <span id="txt-day-node-${idx}" class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums select-none group-hover:text-cyan-400">${val}</span>
+                <div id="w-bar-wrapper-${idx}" onclick="tapWeekdayBar(${idx}, '${dayLabels[idx]}', ${weight}, ${calculatedPips})" class="flex flex-col items-center justify-end h-full space-y-2 cursor-pointer relative weekday-bar-node group">
+                    <span class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums select-none group-hover:text-cyan-400">${weight}%</span>
                     <span class="absolute -top-7 bg-zinc-950 border border-zinc-800 text-[9px] font-mono font-bold px-1 py-0.5 rounded opacity-0 pointer-events-none text-white z-10 tabular-nums tooltip-bubble transition-all">${calculatedPips} pips</span>
-                    <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative h-full transition-all duration-300" style="height: ${pctWeight}%;">
+                    <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative" style="height: ${heightPct}%;">
                         <div class="absolute inset-0 bg-gradient-to-t ${barColor} bar-fill-element group-hover:brightness-125"></div>
                     </div>
                     <span class="font-mono text-[9px] text-zinc-500 font-bold tracking-wider pt-1 select-none uppercase group-hover:text-cyan-400">${dayLabels[idx].substring(0,3)}</span>
@@ -331,9 +345,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     renderPublicationsFeed();
     renderAcademyDomElements();
-    calculateProgressMetrics();
+    if (document.getElementById('portal-progress-metric')) calculateProgressMetrics();
     if (document.getElementById('asset-selector')) initializeVolatilityControls();
     if (document.getElementById('workspace-single')) setLayout(activeLayout);
 });
-
-window.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeReader(); });
