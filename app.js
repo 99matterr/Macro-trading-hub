@@ -1,10 +1,9 @@
 // ================= SYSTEM DATA PIPELINE CONFIGURATIONS =================
-// Active authentication credential bound to account matrix
 const POLYGON_API_KEY = "No0EnBLyugPby70zmXCA0tpUjazFKKcg";
 
 let activeLayout = localStorage.getItem('kairos_layout') || 'single';
 let completedModules = JSON.parse(localStorage.getItem('kairos_completed_modules')) || [];
-const apiCache = {}; // Prevents rate-limiting block failures on mobile browsers
+const apiCache = {}; // Mobile caching buffer to protect the free API tier rate limits
 
 // ================= AUTOMATED FOREX MULTI-ZONE CLOCK SYSTEM =================
 function updateForexClocks() {
@@ -151,7 +150,7 @@ function renderAcademyDomElements() {
     }).join('');
 }
 
-// ================= LIVE QUANTITATIVE FINANCIAL DATA ENGINE =================
+// ================= OPTGROUP SELECTION ENGINE INITIALIZER =================
 function initializeVolatilityControls() {
     const selector = document.getElementById('asset-selector');
     if (!selector || typeof KAIROS_INTERACTIVE_VOLATILITY_DB === 'undefined') return;
@@ -175,7 +174,7 @@ function initializeVolatilityControls() {
     handleAssetChange("GBPJPY");
 }
 
-// PREMIUM TOUCH-FOCUS OVERRIDES FOR IPAD BROWSERS
+// ================= INTERACTIVE TOUCH EVENT DISPATCHERS =================
 function tapHourlyBar(hourIdx, pipValue) {
     const container = document.getElementById('hour-chart-container');
     if (!container) return;
@@ -220,35 +219,37 @@ function tapWeekdayBar(dayIdx, dayLabel, percentage, computedPips) {
     if (banner) banner.textContent = `${dayLabel} // Mean: ${computedPips} Pips (${percentage}% Weight)`;
 }
 
-// ASYNC CORE MARKET ENGINE
+// ================= LIVE QUANTITATIVE FINANCIAL DATA ENGINE =================
 async function handleAssetChange(pairKey) {
     if (typeof KAIROS_INTERACTIVE_VOLATILITY_DB === 'undefined' || !KAIROS_INTERACTIVE_VOLATILITY_DB[pairKey]) return;
     const fallbackData = KAIROS_INTERACTIVE_VOLATILITY_DB[pairKey];
 
+    // Default Fallbacks
     let livePips = parseInt(fallbackData.dailyPips, 10);
-    let weekdayWeights = [...fallbackData.days];
+    let weekdayWeights = [16, 16, 23, 23, 22]; // Default placeholder curve weights
+    let hourlyPipsArray = new Array(24).fill(4); // Default placeholder base line
 
-    // Live execution route utilizing newly mapped endpoints
-    if (POLYGON_API_KEY) {
+    if (POLYGON_API_KEY && POLYGON_API_KEY !== "YOUR_POLYGON_API_KEY_HERE") {
         try {
             if (apiCache[pairKey]) {
                 livePips = apiCache[pairKey].livePips;
                 weekdayWeights = apiCache[pairKey].weekdayWeights;
+                hourlyPipsArray = apiCache[pairKey].hourlyPipsArray;
             } else {
                 const toDate = new Date().toISOString().split('T')[0];
-                const fromDate = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                const fromDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
                 const ticker = `C:${pairKey}`;
-                
-                // Mapped to secure parallel massive.com server pipelines
-                const response = await fetch(`https://api.massive.com/v2/aggs/ticker/${ticker}/range/1/day/${fromDate}/${toDate}?adjusted=true&sort=desc&limit=30&apiKey=${POLYGON_API_KEY}`);
-                const data = await response.json();
+                const pipMultiplier = pairKey.includes("JPY") ? 100 : 10000;
 
-                if (data && data.results) {
-                    const pipMultiplier = pairKey.includes("JPY") ? 100 : 10000;
+                // 1. Fetch Daily Data Array (For Daily Mean & Weekday Calculations)
+                const dayResponse = await fetch(`https://api.massive.com/v2/aggs/ticker/${ticker}/range/1/day/${fromDate}/${toDate}?adjusted=true&sort=desc&limit=30&apiKey=${POLYGON_API_KEY}`);
+                const dayData = await dayResponse.json();
+
+                if (dayData && dayData.results) {
                     let totalPipsSum = 0;
-                    let dayRanges = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+                    let dayRanges = { 1: [], 2: [], 3: [], 4: [], 5: [] }; // Mon-Fri
 
-                    data.results.forEach(candle => {
+                    dayData.results.forEach(candle => {
                         const range = (candle.h - candle.l) * pipMultiplier;
                         totalPipsSum += range;
                         
@@ -259,24 +260,56 @@ async function handleAssetChange(pairKey) {
                         }
                     });
 
-                    livePips = Math.round(totalPipsSum / data.results.length);
+                    livePips = Math.round(totalPipsSum / dayData.results.length);
 
+                    // Calculate real weekday distributions mathematically against actual prices
                     const avgDayRanges = Object.keys(dayRanges).map(d => {
                         if (dayRanges[d].length === 0) return 0;
                         return dayRanges[d].reduce((a, b) => a + b, 0) / dayRanges[d].length;
                     });
                     const sumOfAvgs = avgDayRanges.reduce((a, b) => a + b, 0);
                     weekdayWeights = avgDayRanges.map(val => sumOfAvgs > 0 ? Math.round((val / sumOfAvgs) * 100) : 20);
-                    
-                    apiCache[pairKey] = { livePips, weekdayWeights };
                 }
+
+                // 2. Fetch Hourly Data Array (For True Mathematical Intraday Ranges)
+                const hourResponse = await fetch(`https://api.massive.com/v2/aggs/ticker/${ticker}/range/1/hour/${fromDate}/${toDate}?adjusted=true&sort=desc&limit=500&apiKey=${POLYGON_API_KEY}`);
+                const hourData = await hourResponse.json();
+
+                if (hourData && hourData.results) {
+                    let hourlyDistributionSum = new Array(24).fill(0);
+                    let hourlyCounts = new Array(24).fill(0);
+
+                    hourData.results.forEach(candle => {
+                        const candleDate = new Date(candle.t);
+                        const hour = candleDate.getUTCHours();
+                        const range = (candle.h - candle.l) * pipMultiplier;
+                        
+                        hourlyDistributionSum[hour] += range;
+                        hourlyCounts[hour]++;
+                    });
+
+                    // Set precise calculated values directly from raw API entries
+                    for (let h = 0; h < 24; h++) {
+                        if (hourlyCounts[h] > 0) {
+                            hourlyPipsArray[h] = Math.max(1, Math.round(hourlyDistributionSum[h] / hourlyCounts[h]));
+                        } else {
+                            hourlyPipsArray[h] = Math.max(1, Math.round(livePips / 24));
+                        }
+                    }
+                }
+
+                // Commit parameters directly to localized memory cache layer
+                apiCache[pairKey] = { livePips, weekdayWeights, hourlyPipsArray };
             }
         } catch (error) {
-            console.log("API pipeline throttle caught. Relying on baseline mapping.", error);
+            console.log("API Pipeline Throttle Limit Triggered. Deploying structural safety backups.", error);
         }
     }
 
-    // Print text updates directly to DOM elements
+    // Reset status prompts
+    const hb = document.getElementById('hourly-focus-readout'); if (hb) hb.textContent = "TAP A COLUMN BAR";
+    const wb = document.getElementById('weekday-focus-readout'); if (wb) wb.textContent = "TAP A WEEKDAY BAR";
+
     document.getElementById('target-asset-display').textContent = pairKey.substring(0,3) + " / " + pairKey.substring(3) + " VOLATILITY PROFILE";
     document.getElementById('metric-daily-pips').textContent = livePips;
     document.getElementById('metric-percentage-range').textContent = fallbackData.percentageRange;
@@ -287,18 +320,12 @@ async function handleAssetChange(pairKey) {
         badge.className = `px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded border ${fallbackData.badgeClass}`;
     }
 
-    // Dynamic Hourly Render with active Touch Hooks
+    // Render Live Calculated Hourly Chart Bars
     const hourChartContainer = document.getElementById('hour-chart-container');
-    if (hourChartContainer && fallbackData.hourly) {
-        const staticHourlyProfile = [...fallbackData.hourly];
-        const staticTotalHours = staticHourlyProfile.reduce((a, b) => a + b, 0);
-        
-        const realHourlyPipsArray = staticHourlyProfile.map(val => {
-            return Math.max(1, Math.round((val / staticTotalHours) * livePips * 24));
-        });
-        const maxHourlyVal = Math.max(...realHourlyPipsArray);
+    if (hourChartContainer) {
+        const maxHourlyVal = Math.max(...hourlyPipsArray);
 
-        hourChartContainer.innerHTML = realHourlyPipsArray.map((pips, hour) => {
+        hourChartContainer.innerHTML = hourlyPipsArray.map((pips, hour) => {
             const pct = Math.max(8, Math.round((pips / maxHourlyVal) * 100));
             const hourString = hour < 10 ? `0${hour}` : hour;
             const barColorClass = (hour >= 8 && hour <= 16) ? 'from-emerald-600 to-emerald-400' : 'from-cyan-600 to-cyan-400';
@@ -314,7 +341,7 @@ async function handleAssetChange(pairKey) {
         }).join('');
     }
 
-    // Dynamic Weekday Render with active Touch Hooks
+    // Render Live Calculated Weekday Chart Bars
     const weekdayContainer = document.getElementById('weekday-chart-container');
     if (weekdayContainer) {
         const dayLabels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
