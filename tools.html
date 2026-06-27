@@ -1,174 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAIROS GLOBAL RESEARCH // DIAGNOSTICS</title>
-    <!-- Tailwind CSS Engine -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Marked.js Markdown Engine -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <style>
-        /* Modern Obsidian Design Token Resets */
-        body { background-color: #020203; color: #d4d4d8; }
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: #020203; }
-        ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 2px; }
-        ::-webkit-scrollbar-thumb:hover { background: #27272a; }
-        
-        .active-tab {
-            color: #06b6d4 !important;
-            border-bottom: 2px solid #06b6d4;
-        }
-    </style>
-</head>
-<body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
-
-    <!-- GLOBAL STICKY TOP NAVIGATION BAR -->
-    <nav class="sticky top-0 z-50 bg-[#060608]/90 backdrop-blur-md border-b border-zinc-900 px-4 lg:px-8 h-16 flex items-center justify-between">
-        <div class="flex items-center gap-8">
-            <!-- Brand Identity Signature Token -->
-            <div class="flex items-center gap-3">
-                <div class="h-6 w-6 rounded bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-                    <span class="text-[10px] font-mono font-bold text-white">KG</span>
-                </div>
-                <div class="font-mono">
-                    <span class="text-xs font-bold text-white tracking-widest block leading-none">KAIROS GLOBAL</span>
-                    <span class="text-[9px] text-zinc-500 tracking-wider uppercase mt-0.5 block">Research Portal</span>
-                </div>
-            </div>
-            <!-- Navigation Links -->
-            <div class="hidden md:flex items-center gap-6 font-mono text-xs h-16">
-                <a href="index.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Live Intelligence</a>
-                <a href="index.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Research Feed</a>
-                <a href="index.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Quant Academy</a>
-                <a href="tools.html" class="active-tab text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Trading Tools</a>
-            </div>
-        </div>
-        <div class="font-mono text-xs text-zinc-500 flex items-center gap-4">
-            <span class="text-[10px] text-zinc-400 font-mono uppercase hidden lg:inline tracking-widest border border-zinc-900 px-2 py-1 rounded bg-[#040406]/60">Volatility Tools Suite</span>
-            <div class="h-4 w-px bg-zinc-800 hidden sm:block"></div>
-            <span id="live-time" class="text-zinc-400 font-semibold tabular-nums hidden sm:inline">UTC --:--:--</span>
-            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
-        </div>
-    </nav>
-
-    <!-- MOBILE NAVIGATION DROPDOWN TAPE -->
-    <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-4 py-2 flex justify-around font-mono text-xs">
-        <a href="index.html" class="text-zinc-400 py-1 font-medium">Terminal</a>
-        <a href="index.html" class="text-zinc-400 py-1 font-medium">Research</a>
-        <a href="index.html" class="text-zinc-400 py-1 font-medium">Academy</a>
-        <a href="tools.html" class="active-tab text-zinc-400 py-1 font-medium">Tools</a>
-    </div>
-
-    <!-- MAIN DYNAMIC GRAPH COCKPIT ENVIRONMENT -->
-    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        
-        <!-- Header Coupling Controls -->
-        <div class="border-b border-zinc-900 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 font-mono mb-6">
-            <div>
-                <h2 class="text-lg font-bold text-white uppercase tracking-wider">G8 Volatility Realized Diagnostics</h2>
-                <p class="text-sm text-zinc-500 mt-1">Calculates and updates real-time pip variation models directly from live exchange candles.</p>
-            </div>
-            
-            <div class="flex items-center gap-3 bg-[#08080c] border border-zinc-800 rounded-xl px-4 py-2">
-                <label for="asset-selector" class="text-[10px] font-bold text-cyan-400 tracking-wider uppercase">SELECT COUPLING:</label>
-                <select id="asset-selector" onchange="handleAssetChange(this.value)" class="bg-[#020203] text-white border border-zinc-900 rounded-lg px-3 py-1.5 font-bold text-xs focus:outline-none focus:border-cyan-500 font-mono tracking-wide cursor-pointer min-w-[200px]">
-                    <optgroup label="G8 DOLLAR MAJORS" id="opt-majors"></optgroup>
-                    <optgroup label="EURO CROSS RATES" id="opt-euro"></optgroup>
-                    <optgroup label="POUND CROSS RATES" id="opt-pound"></optgroup>
-                    <optgroup label="COMMODITY / MINOR CROSSES" id="opt-minors"></optgroup>
-                </select>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch pb-12">
-            
-            <!-- Volatility Overview Telemetry Panel (Left Side - 4/12 Cols) -->
-            <div class="lg:col-span-4 bg-[#08080c] border border-zinc-900 rounded-xl p-6 font-mono flex flex-col justify-between relative overflow-hidden">
-                <div class="space-y-6">
-                    <div>
-                        <div id="target-asset-display" class="text-sm font-bold text-cyan-400 tracking-widest uppercase">GBPJPY VOLATILITY PROFILE</div>
-                        <p class="text-[11px] text-zinc-500 mt-1 leading-relaxed">Realized variance metrics parsed over a live trailing 30-day lookback window via dynamic currency calculation engines.</p>
-                    </div>
-                    
-                    <div class="space-y-4 pt-4 border-t border-zinc-900/60">
-                        <div>
-                            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider">Average Daily Range (ATR 30)</span>
-                            <div class="text-2xl font-bold text-white tracking-tight tabular-nums mt-0.5"><span id="metric-daily-pips">--</span> <span class="text-xs text-zinc-500 font-normal">PIPS</span></div>
-                        </div>
-                        <div>
-                            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider">Implied Percentage Range</span>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span id="metric-percentage-range" class="text-base font-bold text-zinc-300 tabular-nums">--</span>
-                                <span id="metric-regime-badge" class="px-1.5 py-0.5 text-[8px] font-bold uppercase rounded border">--</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 pt-4 border-t border-zinc-900/40 text-[10px] text-zinc-500 leading-relaxed">
-                    <span class="text-cyan-500 font-bold">// INTERACTION NOTICE:</span><br>
-                    Tapping an individual session or day tracking block locks that element open. Switch your asset dropdown coupling to clear selection overrides.
-                </div>
-            </div>
-
-            <!-- Distribution Charts Column Wrapper (Right Side - 8/12 Cols) -->
-            <div class="lg:col-span-8 space-y-6">
-                
-                <!-- Hourly Bar Component Grid -->
-                <div class="bg-[#08080c] border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
-                    <div class="w-full px-4 py-3 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50 flex justify-between items-center">
-                        <span>Hourly Intraday Session Volatility Distribution</span>
-                        <span id="hourly-focus-readout" class="text-cyan-400 font-mono text-[9px] tracking-wider uppercase bg-cyan-950/40 border border-cyan-900/40 px-2 py-0.5 rounded">TAP A COLUMN BAR</span>
-                    </div>
-                    <div class="p-6 bg-[#030305]/20 flex items-end justify-between h-56 gap-[2px] sm:gap-1.5 pt-10 border-b border-zinc-900/40" id="hour-chart-container">
-                        <!-- Loaded via JavaScript Loop dynamically below -->
-                    </div>
-                    <div class="px-4 py-2 flex justify-between font-mono text-[9px] text-zinc-600 uppercase tracking-wider bg-[#040406]/20">
-                        <span>00:00 Asian Session Open</span>
-                        <span>12:00 London/NY Overlap Crux</span>
-                        <span>23:00 Day Wrap</span>
-                    </div>
-                </div>
-
-                <!-- Weekday Matrix Component Grid -->
-                <div class="bg-[#08080c] border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
-                    <div class="w-full px-4 py-3 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50 flex justify-between items-center">
-                        <span>Weekday Distribution Matrix Allocation Profile</span>
-                        <span id="weekday-focus-readout" class="text-emerald-400 font-mono text-[9px] tracking-wider uppercase bg-emerald-950/40 border border-emerald-900/40 px-2 py-0.5 rounded">TAP A WEEKDAY BAR</span>
-                    </div>
-                    <div class="p-6 bg-[#030305]/20 flex items-end justify-between h-44 gap-4 pt-10" id="weekday-chart-container">
-                        <!-- Loaded via JavaScript Loop dynamically below -->
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </main>
-
-    <!-- FOOTER TELEMETRY LAYER -->
-    <footer class="bg-[#060608] border-t border-zinc-900 py-6 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
-        <div class="max-w-7xl w-full mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px]">
-            <p>&copy; 2026 Kairos Global Research. All quantitative rights reserved.</p>
-            <p class="text-zinc-600 tracking-wide uppercase">Unified interface platform loop.</p>
-        </div>
-    </footer>
-
-    <!-- LIVE CONSOLIDATED CALCULATION PLATFORM MOTOR SCRIPT -->
+    <!-- REAL-TIME MATAF-PARITY DATA CALCULATION MOTOR SCRIPT -->
     <script>
-        // ================= AUTOMATED SYSTEM HARDWARE SETTINGS =================
+        // ================= AUTOMATED SYSTEM PARAMETERS =================
         const POLYGON_API_KEY = "No0EnBLyugPby70zmXCA0tpUjazFKKcg";
         const apiCache = {};
 
-        // Clock Runner Mechanics
+        // Cohesive Platform Clock
         function updatePlatformTime() {
             const timeSpan = document.getElementById('live-time');
             if(timeSpan) timeSpan.textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
         }
         setInterval(updatePlatformTime, 1000);
 
-        // ================= INTERACTIVE CLICK HANDLERS =================
+        // ================= INTERACTIVE CLICK RE-ROUTING HANDLERS =================
         function tapHourlyBar(hourIdx, pipValue) {
             document.querySelectorAll('.hourly-bar-node').forEach(item => {
                 const tip = item.querySelector('.tooltip-bubble');
@@ -185,10 +28,10 @@
                 if (activeFill) activeFill.className = "absolute inset-0 bg-gradient-to-t from-cyan-400 to-cyan-300 shadow-[0_0_12px_#06b6d4] bar-fill-element";
             }
 
-            document.getElementById('hourly-focus-readout').textContent = `${hourIdx < 10 ? '0'+hourIdx : hourIdx}:00 UTC // Mean: ${pipValue} Pips`;
+            document.getElementById('hourly-focus-readout').textContent = `${hourIdx < 10 ? '0'+hourIdx : hourIdx}:00 UTC // Mean Volatility: ${pipValue} Pips`;
         }
 
-        function tapWeekdayBar(dayIdx, dayLabel, percentage, computedPips) {
+        function tapWeekdayBar(dayIdx, dayLabel, computedPips) {
             document.querySelectorAll('.weekday-bar-node').forEach(el => {
                 const tip = el.querySelector('.tooltip-bubble');
                 const fill = el.querySelector('.bar-fill-element');
@@ -204,19 +47,18 @@
                 if (activeFill) activeFill.className = "absolute inset-0 bg-gradient-to-t from-emerald-400 to-emerald-300 shadow-[0_0_12px_#10b981] bar-fill-element";
             }
 
-            document.getElementById('weekday-focus-readout').textContent = `${dayLabel} // Realized Mean: ${computedPips} Pips (${percentage}% Alloc)`;
+            document.getElementById('weekday-focus-readout').textContent = `${dayLabel} // Average True Range: ${computedPips} Pips`;
         }
 
-        // ================= ASSET SWITCH AND REAL MATHEMATICAL EVALUATION =================
+        // ================= ASSET SWITCH AND REAL QUANTITATIVE PARITY CALCULATION =================
         async function handleAssetChange(pairKey) {
             const fallbackData = KAIROS_INTERACTIVE_VOLATILITY_DB[pairKey];
             if (!fallbackData) return;
 
             localStorage.setItem('kairos_active_tool_pair', pairKey);
 
-            // Default fallback matrix shapes if the API encounters cross-origin blockages or throttles
             let liveDailyPips = parseInt(fallbackData.dailyPips, 10);
-            let weekdayWeights = fallbackData.days;
+            let weekdayAbsolutePips = [liveDailyPips, liveDailyPips, liveDailyPips, liveDailyPips, liveDailyPips]; 
             let hourlyPipsArray = fallbackData.hourly;
             const isJpy = pairKey.includes("JPY");
             const pipMultiplier = isJpy ? 100 : 10000;
@@ -225,21 +67,20 @@
                 try {
                     if (apiCache[pairKey]) {
                         liveDailyPips = apiCache[pairKey].liveDailyPips;
-                        weekdayWeights = apiCache[pairKey].weekdayWeights;
+                        weekdayAbsolutePips = apiCache[pairKey].weekdayAbsolutePips;
                         hourlyPipsArray = apiCache[pairKey].hourlyPipsArray;
                     } else {
-                        // Dynamic date limits mapping back exactly 30 calendar days
+                        // 1. Synchronize to 70 Calendar Days (Full 10-Week Tracking Horizon matching Mataf)
                         const toDate = new Date().toISOString().split('T')[0];
-                        const fromDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                        const fromDate = new Date(Date.now() - 70 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
                         const ticker = `C:${pairKey}`;
 
-                        // 1. Fetch Daily Candles & Run True Mathematical ATR Calculations
-                        const dayResponse = await fetch(`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/1/day/${fromDate}/${toDate}?adjusted=true&sort=desc&limit=30&apiKey=${POLYGON_API_KEY}`);
+                        // Fetch Daily Historical Array
+                        const dayResponse = await fetch(`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/1/day/${fromDate}/${toDate}?adjusted=true&sort=desc&limit=60&apiKey=${POLYGON_API_KEY}`);
                         const dayData = await dayResponse.json();
 
                         if (dayData && dayData.results && dayData.results.length > 0) {
                             let totalDailyPipsSum = 0;
-                            // Array maps for Monday=1 to Friday=5
                             let weekdayPipBuckets = { 1: [], 2: [], 3: [], 4: [], 5: [] };
 
                             dayData.results.forEach(candle => {
@@ -254,17 +95,15 @@
 
                             liveDailyPips = Math.round(totalDailyPipsSum / dayData.results.length);
 
-                            // Calculate actual, un-skewed daily variance values
-                            const dailyMeans = Object.keys(weekdayPipBuckets).map(day => {
+                            // Calculate true absolute mean pips per specific weekday rather than percentage splits
+                            weekdayAbsolutePips = Object.keys(weekdayPipBuckets).map(day => {
                                 const bucket = weekdayPipBuckets[day];
-                                return bucket.length > 0 ? (bucket.reduce((a, b) => a + b, 0) / bucket.length) : (liveDailyPips);
+                                return bucket.length > 0 ? Math.round(bucket.reduce((a, b) => a + b, 0) / bucket.length) : liveDailyPips;
                             });
-                            const dailyMeansSum = dailyMeans.reduce((a, b) => a + b, 0);
-                            weekdayWeights = dailyMeans.map(mean => dailyMeansSum > 0 ? Math.round((mean / dailyMeansSum) * 100) : 20);
                         }
 
-                        // 2. Fetch Intraday 1-Hour Aggregates For True Intraday Range Splits
-                        const hourResponse = await fetch(`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/1/hour/${fromDate}/${toDate}?adjusted=true&sort=desc&limit=720&apiKey=${POLYGON_API_KEY}`);
+                        // 2. Fetch Intraday Hourly Array (Lift limit to 2000 bars to capture full 10-week depth)
+                        const hourResponse = await fetch(`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/1/hour/${fromDate}/${toDate}?adjusted=true&sort=desc&limit=2000&apiKey=${POLYGON_API_KEY}`);
                         const hourData = await hourResponse.json();
 
                         if (hourData && hourData.results && hourData.results.length > 0) {
@@ -286,11 +125,10 @@
                             }
                         }
 
-                        // Store to prevent over-fetching on rapid menu switching
-                        apiCache[pairKey] = { liveDailyPips, weekdayWeights, hourlyPipsArray };
+                        apiCache[pairKey] = { liveDailyPips, weekdayAbsolutePips, hourlyPipsArray };
                     }
                 } catch (err) {
-                    console.log("Core API Throttle limit captured. Initializing historical system defaults seamlessly.", err);
+                    console.log("Core API Throttle limit captured. Initializing fallback models.", err);
                 }
             }
 
@@ -308,7 +146,7 @@
                 badge.className = `px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded border ${fallbackData.badgeClass}`;
             }
 
-            // Draw Real-Time Computed Hourly Bars
+            // Draw Real-Time Calculated Hourly Bars
             const hourContainer = document.getElementById('hour-chart-container');
             if (hourContainer) {
                 const extremeHourlyCeiling = Math.max(...hourlyPipsArray);
@@ -328,20 +166,18 @@
                 }).join('');
             }
 
-            // Draw Real-Time Computed Weekday Allocation Columns
+            // Draw Real-Time Computed Weekday Absolute Pip Columns (Matches Mataf Chart Format)
             const dayContainer = document.getElementById('weekday-chart-container');
             if (dayContainer) {
                 const dayLabels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-                const extremeDayCeiling = Math.max(...weekdayWeights);
+                const extremeDayCeiling = Math.max(...weekdayAbsolutePips);
 
-                dayContainer.innerHTML = weekdayWeights.map((weight, dIdx) => {
-                    const finalCalculatedPips = Math.round((liveDailyPips * weight) / 100);
-                    const blockHeightPct = Math.max(12, Math.round((weight / extremeDayCeiling) * 100));
+                dayContainer.innerHTML = weekdayAbsolutePips.map((avgPips, dIdx) => {
+                    const blockHeightPct = Math.max(12, Math.round((avgPips / extremeDayCeiling) * 100));
                     const gradientColors = dIdx === 3 ? 'from-emerald-600 to-emerald-400' : 'from-cyan-600 to-cyan-400';
                     return `
-                        <div id="w-bar-wrapper-${dIdx}" onclick="tapWeekdayBar(${dIdx}, '${dayLabels[dIdx]}', ${weight}, ${finalCalculatedPips})" class="flex flex-col items-center justify-end h-full space-y-2 cursor-pointer relative weekday-bar-node group">
-                            <span class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums select-none group-hover:text-cyan-400">${weight}%</span>
-                            <span class="absolute -top-7 bg-zinc-950 border border-zinc-800 text-[9px] font-mono font-bold px-1 py-0.5 rounded opacity-0 pointer-events-none text-white z-10 tabular-nums tooltip-bubble transition-all">${finalCalculatedPips} pips</span>
+                        <div id="w-bar-wrapper-${dIdx}" onclick="tapWeekdayBar(${dIdx}, '${dayLabels[dIdx]}', ${avgPips})" class="flex flex-col items-center justify-end h-full space-y-2 cursor-pointer relative weekday-bar-node group">
+                            <span class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums select-none group-hover:text-cyan-400">${avgPips}p</span>
                             <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative" style="height: ${blockHeightPct}%;">
                                 <div class="absolute inset-0 bg-gradient-to-t ${gradientColors} bar-fill-element group-hover:brightness-125"></div>
                             </div>
@@ -377,13 +213,12 @@
             handleAssetChange(activePair);
         }
 
-        // Initialize Suite Controls on Content Loaded Pass
         window.addEventListener('DOMContentLoaded', () => {
             updatePlatformTime();
             initializeVolatilityControls();
         });
 
-        // ================= CORE DATA BACKUP RESERVOIRS =================
+        // Backup static structural databases
         const KAIROS_INTERACTIVE_VOLATILITY_DB = {
             "EURUSD": { dailyPips: "78", percentageRange: "0.71%", regime: "STABLE", badgeClass: "text-zinc-400 bg-zinc-900 border-zinc-800", cat: "major", label: "EUR / USD (Euro / US Dollar)", hourly: [12,10,9,8,11,15,35,68,74,70,62,58,84,92,88,72,54,42,30,24,20,18,15,13], days: [16,21,22,23,18] },
             "GBPUSD": { dailyPips: "96", percentageRange: "0.79%", regime: "ELEVATED", badgeClass: "text-amber-500 bg-amber-950/20 border-amber-900/40", cat: "major", label: "GBP / USD (British Pound / US Dollar)", hourly: [15,12,11,10,14,22,42,82,90,88,78,74,102,114,108,90,68,52,38,30,25,22,18,16], days: [15,21,22,24,18] },
@@ -415,5 +250,3 @@
             "NZDCHF": { dailyPips: "50", percentageRange: "0.66%", regime: "MUTED", badgeClass: "text-zinc-500 bg-zinc-950 border-zinc-900", cat: "minors", label: "NZD / Swiss Franc", hourly: [34,38,42,34,28,20,15,24,28,26,22,20,38,46,42,36,25,16,11,10,14,18,24,28], days: [15,21,22,23,19] }
         };
     </script>
-</body>
-</html>
