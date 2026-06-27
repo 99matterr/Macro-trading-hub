@@ -6,37 +6,38 @@ let completedModules = JSON.parse(localStorage.getItem('kairos_completed_modules
 function updateForexClocks() {
     const now = new Date();
 
-    // Cross-browser formatting engine using formatToParts to completely bypass iOS/Safari localization bugs
+    // Bulletproof time calculation engine built to bypass mobile Safari layout string crashes
     const getZoneTimeValues = (tz) => {
         try {
-            const formatter = new Intl.DateTimeFormat('en-GB', {
+            const formatter = new Intl.DateTimeFormat('en-US', {
                 timeZone: tz,
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: false
+                hourCycle: 'h23'
             });
             
-            const parts = formatter.formatToParts(now);
-            const hour = parts.find(p => p.type === 'hour')?.value || "00";
-            const minute = parts.find(p => p.type === 'minute')?.value || "00";
-            const second = parts.find(p => p.type === 'second')?.value || "00";
+            // Format time and strip away any non-numeric localized symbols
+            const timeString = formatter.format(now).replace(/[^0-9:]/g, '');
+            const currentHour = parseInt(timeString.split(':')[0], 10);
             
             return {
-                string: `${hour}:${minute}:${second}`,
-                hourNumeric: parseInt(hour, 10)
+                string: timeString,
+                hourNumeric: isNaN(currentHour) ? 0 : currentHour
             };
         } catch (e) {
+            console.warn(`Telemetry warning for timezone zone calculation: ${tz}`);
             return { string: "00:00:00", hourNumeric: 0 };
         }
     };
 
+    // Generate accurate system time formats
     const timeUTC = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
     const tokyoData = getZoneTimeValues('Asia/Tokyo');
     const londonData = getZoneTimeValues('Europe/London');
     const newyorkData = getZoneTimeValues('America/New_York');
 
-    // Map current local city times safely to DOM targets
+    // Safe defensive DOM string insertion loop
     const nodes = {
         'live-time': timeUTC,
         'clock-tokyo': tokyoData.string,
@@ -49,12 +50,12 @@ function updateForexClocks() {
         if (el) el.textContent = val;
     }
 
-    // Dynamic Session Status Indicator Toggles (Standard 08:00 - 17:00 Weekday Market Rules)
+    // Dynamic Session Status Toggles (Standard 08:00 - 17:00 Weekday Market Window Rules)
     const toggleStatus = (id, hour) => {
         const indicator = document.getElementById(`status-${id}`);
         if (!indicator) return;
 
-        // Detect weekend closure globally (Saturday = 6, Sunday = 0)
+        // Automatically spot weekend closures globally (Saturday = 6, Sunday = 0)
         const dayUTC = now.getUTCDay();
         const isWeekend = (dayUTC === 6 || dayUTC === 0);
 
@@ -81,6 +82,8 @@ function setLayout(layoutFormat) {
     const btnSingle = document.getElementById('layout-btn-single');
     const btnSplit = document.getElementById('layout-btn-split');
     
+    if (!singleView || !splitView || !btnSingle || !btnSplit) return;
+
     btnSingle.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold text-zinc-500 hover:text-zinc-300";
     btnSplit.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold text-zinc-500 hover:text-zinc-300";
 
@@ -104,13 +107,20 @@ function compileAndOpenDocument(type, id) {
     const doc = database.find(item => item.id === id);
     if(!doc) return;
 
-    document.getElementById('modal-badge').textContent = type === 'blog' ? `RESEARCH // ${doc.category}` : `ACADEMY // ${doc.moduleCode}`;
-    document.getElementById('markdown-reader-target').innerHTML = marked.parse(doc.markdown);
-    document.getElementById('immersive-reader').style.display = 'flex';
+    const badge = document.getElementById('modal-badge');
+    const target = document.getElementById('markdown-reader-target');
+    const reader = document.getElementById('immersive-reader');
+
+    if (badge && target && reader) {
+        badge.textContent = type === 'blog' ? `RESEARCH // ${doc.category}` : `ACADEMY // ${doc.moduleCode}`;
+        target.innerHTML = marked.parse(doc.markdown);
+        reader.style.display = 'flex';
+    }
 }
 
 function closeReader() {
-    document.getElementById('immersive-reader').style.display = 'none';
+    const reader = document.getElementById('immersive-reader');
+    if (reader) reader.style.display = 'none';
 }
 
 function toggleModuleMilestone(id, event) {
@@ -198,11 +208,11 @@ function renderAcademyDomElements() {
 
 // ================= SAFE LIFECYCLE INITIALIZATION =================
 window.addEventListener('DOMContentLoaded', () => {
-    // Fire clock loops immediately first to prevent script execution blockages
+    // Fire clock loops immediately to bypass execution bottlenecks
     updateForexClocks();
     setInterval(updateForexClocks, 1000);
 
-    // Populate remaining interface views
+    // Populate data channels defensively
     renderPublicationsFeed();
     renderAcademyDomElements();
     calculateProgressMetrics();
