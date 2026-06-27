@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAIROS GLOBAL RESEARCH // SYSTEM TOOLS</title>
+    <title>KAIROS GLOBAL RESEARCH // DIAGNOSTICS</title>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -38,62 +38,127 @@
         </div>
     </nav>
 
-    <!-- MAIN TERMINAL COCKPIT -->
+    <!-- MOBILE BREAKPOINT NAV INTERFACE TAPE -->
+    <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-4 py-2 flex justify-around font-mono text-xs">
+        <a href="index.html" class="text-zinc-400 py-1 font-medium">Terminal</a>
+        <a href="blog.html" class="text-zinc-400 py-1 font-medium">Research</a>
+        <a href="academy.html" class="text-zinc-400 py-1 font-medium">Academy</a>
+        <a href="tools.html" class="active-tab text-zinc-400 py-1 font-medium">Tools</a>
+    </div>
+
+    <!-- MAIN TWO-COLUMN RESPONSIVE LAYOUT ENGINE -->
     <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
-        <!-- Header Controls Module -->
-        <div class="border-b border-zinc-900 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 font-mono mb-6">
-            <div>
-                <h2 class="text-lg font-bold text-white uppercase tracking-wider">G8 Realized Volatility Diagnostics</h2>
-                <p class="text-sm text-zinc-500 mt-1">Interactive currency distribution charts filtered for global majors and secondary crosses.</p>
-            </div>
-            
-            <!-- Complete 28-Pair Filter Dropdown Selector -->
-            <div class="flex items-center gap-3 bg-[#08080c] border border-zinc-800 rounded-xl px-4 py-2">
-                <label for="asset-selector" class="text-[10px] font-bold text-cyan-400 tracking-wider uppercase">SELECT COUPLING:</label>
-                <select id="asset-selector" onchange="handleAssetChange(this.value)" class="bg-[#020203] text-white border border-zinc-900 rounded-lg px-3 py-1.5 font-bold text-xs focus:outline-none focus:border-cyan-500 font-mono tracking-wide cursor-pointer max-w-xs md:max-w-none">
-                    <optgroup label="G8 DOLLAR MAJORS" id="opt-majors"></optgroup>
-                    <optgroup label="EURO CROSS RATES" id="opt-euro"></optgroup>
-                    <optgroup label="POUND CROSS RATES" id="opt-pound"></optgroup>
-                    <optgroup label="COMMODITY / MINOR CROSSES" id="opt-minors"></optgroup>
-                </select>
-            </div>
+        <div class="border-b border-zinc-900 pb-4 font-mono mb-6">
+            <h2 class="text-lg font-bold text-white uppercase tracking-wider">G8 Volatility Diagnostic Cockpit</h2>
+            <p class="text-sm text-zinc-500 mt-1">Select any asset currency row on the left matrix to dynamically plot its interactive distribution curves.</p>
         </div>
 
-        <!-- MAIN DATA VISUALIZATION MATRIX -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pb-12">
             
-            <!-- Left Data Column: Core Statistics & Historical Trends (5/12 Cols) -->
-            <div class="lg:col-span-5 space-y-6">
-                <!-- Live Analytical Metadata Card -->
-                <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-5 font-mono relative overflow-hidden">
-                    <div id="target-asset-display" class="text-xs font-bold text-cyan-400 tracking-widest uppercase">EUR/USD CORE METRICS</div>
-                    <div class="mt-6 grid grid-cols-2 gap-4">
+            <!-- LEFT COLUMN: INTERACTIVE MATAF-STYLE SELECTION LIST (5/12 Cols) -->
+            <div class="lg:col-span-5 bg-[#08080c] border border-zinc-900 rounded-xl overflow-hidden flex flex-col max-h-[85vh]">
+                <div class="w-full px-4 py-3 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50 flex justify-between items-center shrink-0">
+                    <span>G8 Asset Pricing Crosses</span>
+                    <span class="text-cyan-500 text-[9px]">// CLICK ROW TO PLOT</span>
+                </div>
+                
+                <!-- Dynamic High-Density Scrolling Table Container -->
+                <div class="overflow-y-auto divide-y divide-zinc-900/40 font-mono text-xs selection-list-scrollbar" id="matrix-interactive-list">
+                    <!-- Automatically Injected and organized via app.js -->
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: RESPONSIVE CHARTS GRAPH VIEWPORT HUB (7/12 Cols) -->
+            <div class="lg:col-span-7 space-y-6">
+                
+                <!-- Active Focus Metadata Readout Header -->
+                <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-5 font-mono flex justify-between items-center relative overflow-hidden">
+                    <div>
+                        <div id="target-asset-display" class="text-sm font-bold text-cyan-400 tracking-widest uppercase">GBPJPY CORE METRICS</div>
+                        <p class="text-[11px] text-zinc-500 mt-0.5">Real-time systemic variance calculation arrays</p>
+                    </div>
+                    <div class="flex gap-6 text-right">
                         <div>
-                            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider">Daily Mean Range</span>
-                            <div class="flex items-baseline gap-1 mt-0.5">
-                                <span id="metric-daily-pips" class="text-2xl font-bold text-white tabular-nums">--</span>
-                                <span class="text-[10px] text-zinc-500">PIPS</span>
-                            </div>
+                            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider">Daily Mean</span>
+                            <div class="text-xl font-bold text-white mt-0.5 tabular-nums"><span id="metric-daily-pips">--</span> <span class="text-[10px] text-zinc-500 font-normal">pips</span></div>
                         </div>
                         <div>
-                            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider">Realized Range Matrix</span>
-                            <div class="flex items-baseline gap-1 mt-0.5">
-                                <span id="metric-percentage-range" class="text-2xl font-bold text-white tabular-nums">--</span>
-                                <span id="metric-regime-badge" class="px-1.5 py-0.5 text-[8px] font-bold uppercase rounded border ml-1.5">MUTED</span>
+                            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider">Variance Risk</span>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span id="metric-percentage-range" class="text-sm font-bold text-zinc-300 tabular-nums">--</span>
+                                <span id="metric-regime-badge" class="px-1.5 py-0.5 text-[8px] font-bold uppercase rounded border">--</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Chart Box 1: Multi-Year Historical Volatility Track Line (Mataf Lower Chart) -->
+                <!-- Interactive Chart 1: Hourly Dispersion Bars -->
+                <div class="bg-[#08080c] border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
+                    <div class="w-full px-4 py-3 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50">
+                        <span>Hourly Intraday Session Volatility Curves (00:00 - 23:00 GMT)</span>
+                    </div>
+                    <div class="p-6 bg-[#030305]/20 flex items-end justify-between h-52 gap-[3px] sm:gap-1.5 pt-8 border-b border-zinc-900/40" id="hour-chart-container">
+                        <!-- Injected dynamic columns go here -->
+                    </div>
+                    <div class="px-4 py-2 flex justify-between font-mono text-[9px] text-zinc-600 uppercase tracking-wider shrink-0 bg-[#040406]/20">
+                        <span>00:00 Asian Open</span>
+                        <span>12:00 London/NY Crux</span>
+                        <span>23:00 Day Close</span>
+                    </div>
+                </div>
+
+                <!-- Interactive Chart 2: Weekday Volume Profiles -->
+                <div class="bg-[#08080c] border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
+                    <div class="w-full px-4 py-3 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50">
+                        <span>Weekly Volume Profile Weight Allocation Model</span>
+                    </div>
+                    <div class="p-6 bg-[#030305]/20 grid grid-cols-5 gap-4 items-end h-40 pt-8">
+                        <div class="flex flex-col items-center justify-end h-full space-y-2">
+                            <span id="txt-day-mon" class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums">--</span>
+                            <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative h-0 transition-all duration-500 ease-out" id="bar-day-mon">
+                                <div class="absolute inset-0 bg-gradient-to-t from-cyan-600 to-cyan-400"></div>
+                            </div>
+                            <span class="font-mono text-[9px] text-zinc-500 font-bold tracking-wider pt-1">MON</span>
+                        </div>
+                        <div class="flex flex-col items-center justify-end h-full space-y-2">
+                            <span id="txt-day-tue" class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums">--</span>
+                            <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative h-0 transition-all duration-500 ease-out" id="bar-day-tue">
+                                <div class="absolute inset-0 bg-gradient-to-t from-cyan-600 to-cyan-400"></div>
+                            </div>
+                            <span class="font-mono text-[9px] text-zinc-500 font-bold tracking-wider pt-1">TUE</span>
+                        </div>
+                        <div class="flex flex-col items-center justify-end h-full space-y-2">
+                            <span id="txt-day-wed" class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums">--</span>
+                            <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative h-0 transition-all duration-500 ease-out" id="bar-day-wed">
+                                <div class="absolute inset-0 bg-gradient-to-t from-cyan-600 to-cyan-400"></div>
+                            </div>
+                            <span class="font-mono text-[9px] text-zinc-500 font-bold tracking-wider pt-1">WED</span>
+                        </div>
+                        <div class="flex flex-col items-center justify-end h-full space-y-2">
+                            <span id="txt-day-thu" class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums">--</span>
+                            <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative h-0 transition-all duration-500 ease-out" id="bar-day-thu">
+                                <div class="absolute inset-0 bg-gradient-to-t from-emerald-600 to-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.2)]"></div>
+                            </div>
+                            <span class="font-mono text-[9px] text-zinc-500 font-bold tracking-wider pt-1">THU</span>
+                        </div>
+                        <div class="flex flex-col items-center justify-end h-full space-y-2">
+                            <span id="txt-day-fri" class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums">--</span>
+                            <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative h-0 transition-all duration-500 ease-out" id="bar-day-fri">
+                                <div class="absolute inset-0 bg-gradient-to-t from-cyan-600 to-cyan-400"></div>
+                            </div>
+                            <span class="font-mono text-[9px] text-zinc-500 font-bold tracking-wider pt-1">FRI</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Chart 3: Historical Area Sparkline Baseline -->
                 <div class="bg-[#08080c] border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
                     <div class="w-full px-4 py-3 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50 flex justify-between items-center">
-                        <span>Multi-Year Volatility Baseline Trend</span>
+                        <span>Multi-Year Options-Volatility Baseline Trend Curve</span>
                         <span class="text-zinc-600 text-[9px]">2022 - 2026</span>
                     </div>
-                    <div class="p-6 flex items-center justify-center bg-[#030305]/40 relative h-48">
-                        <!-- Responsive SVG Vector Line Graph Engine -->
+                    <div class="p-6 flex items-center justify-center bg-[#030305]/40 relative h-40">
                         <svg class="w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
                             <defs>
                                 <linearGradient id="chart-glow-gradient" x1="0" y1="0" x2="0" y2="1">
@@ -101,80 +166,9 @@
                                     <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.0"/>
                                 </linearGradient>
                             </defs>
-                            <path id="historical-area-path" d="" fill="url(#chart-glow-gradient)" class="transition-all duration-500"></path>
-                            <path id="historical-line-path" d="" fill="none" stroke="#06b6d4" stroke-width="2" class="transition-all duration-500" stroke-linecap="round"></path>
+                            <path id="historical-area-path" d="" fill="url(#chart-glow-gradient)" class="transition-all duration-500 ease-out"></path>
+                            <path id="historical-line-path" d="" fill="none" stroke="#06b6d4" stroke-width="2" class="transition-all duration-500 ease-out" stroke-linecap="round"></path>
                         </svg>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Data Column: Hourly & Daily Distribution Matrix (7/12 Cols) -->
-            <div class="lg:col-span-7 space-y-6">
-                
-                <!-- Chart Box 2: Hourly Distribution Columns (Mataf Top Chart) -->
-                <div class="bg-[#08080c] border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
-                    <div class="w-full px-4 py-3 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50">
-                        <span>Hourly Session Volatility Dispersion (00:00 - 23:00 GMT)</span>
-                    </div>
-                    <!-- 24-Column Vertical Data Visualization Grid -->
-                    <div class="p-6 bg-[#030305]/20 flex items-end justify-between h-56 gap-[3px] sm:gap-1.5 pt-8 border-b border-zinc-900/40">
-                        <div class="flex flex-col items-center justify-end h-full w-full group relative" id="hour-container">
-                            <!-- Columns appended via JavaScript engine -->
-                        </div>
-                    </div>
-                    <div class="px-4 py-2 flex justify-between font-mono text-[9px] text-zinc-600 uppercase tracking-wider">
-                        <span>00:00 Asian Open</span>
-                        <span>12:00 London/NY Crux</span>
-                        <span>23:00 Day Wrap</span>
-                    </div>
-                </div>
-
-                <!-- Chart Box 3: Weekday Distribution Columns (Mataf Middle Chart) -->
-                <div class="bg-[#08080c] border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
-                    <div class="w-full px-4 py-3 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50">
-                        <span>Daily Weekday Allocation Model (Mon - Fri)</span>
-                    </div>
-                    <div class="p-6 bg-[#030305]/20 grid grid-cols-5 gap-4 items-end h-44 pt-8">
-                        <!-- Mon Bar -->
-                        <div class="flex flex-col items-center justify-end h-full space-y-2">
-                            <span id="txt-day-mon" class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums">0</span>
-                            <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative h-0 transition-all duration-500" id="bar-day-mon">
-                                <div class="absolute inset-0 bg-gradient-to-t from-cyan-600 to-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.3)]"></div>
-                            </div>
-                            <span class="font-mono text-[9px] text-zinc-500 uppercase font-bold tracking-wider pt-1">MON</span>
-                        </div>
-                        <!-- Tue Bar -->
-                        <div class="flex flex-col items-center justify-end h-full space-y-2">
-                            <span id="txt-day-tue" class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums">0</span>
-                            <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative h-0 transition-all duration-500" id="bar-day-tue">
-                                <div class="absolute inset-0 bg-gradient-to-t from-cyan-600 to-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.3)]"></div>
-                            </div>
-                            <span class="font-mono text-[9px] text-zinc-500 uppercase font-bold tracking-wider pt-1">TUE</span>
-                        </div>
-                        <!-- Wed Bar -->
-                        <div class="flex flex-col items-center justify-end h-full space-y-2">
-                            <span id="txt-day-wed" class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums">0</span>
-                            <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative h-0 transition-all duration-500" id="bar-day-wed">
-                                <div class="absolute inset-0 bg-gradient-to-t from-cyan-600 to-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.3)]"></div>
-                            </div>
-                            <span class="font-mono text-[9px] text-zinc-500 uppercase font-bold tracking-wider pt-1">WED</span>
-                        </div>
-                        <!-- Thu Bar -->
-                        <div class="flex flex-col items-center justify-end h-full space-y-2">
-                            <span id="txt-day-thu" class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums">0</span>
-                            <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative h-0 transition-all duration-500" id="bar-day-thu">
-                                <div class="absolute inset-0 bg-gradient-to-t from-emerald-600 to-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.3)]"></div>
-                            </div>
-                            <span class="font-mono text-[9px] text-zinc-500 uppercase font-bold tracking-wider pt-1">THU</span>
-                        </div>
-                        <!-- Fri Bar -->
-                        <div class="flex flex-col items-center justify-end h-full space-y-2">
-                            <span id="txt-day-fri" class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums">0</span>
-                            <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative h-0 transition-all duration-500" id="bar-day-fri">
-                                <div class="absolute inset-0 bg-gradient-to-t from-cyan-600 to-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.3)]"></div>
-                            </div>
-                            <span class="font-mono text-[9px] text-zinc-500 uppercase font-bold tracking-wider pt-1">FRI</span>
-                        </div>
                     </div>
                 </div>
 
@@ -183,10 +177,10 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-[#060608] border-t border-zinc-900 py-12 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
-        <div class="max-w-7xl w-full mx-auto border-t border-zinc-900/60 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px]">
+    <footer class="bg-[#060608] border-t border-zinc-900 py-6 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
+        <div class="max-w-7xl w-full mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px]">
             <p>&copy; 2026 Kairos Global Research. All quantitative rights reserved.</p>
-            <p class="text-zinc-600 tracking-wide uppercase">Built with clean code & strategic purpose.</p>
+            <p class="text-zinc-600 tracking-wide uppercase">Clean code configuration loop.</p>
         </div>
     </footer>
 
