@@ -3,208 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAIROS // GLOBAL QUANTAMENTAL TERMINAL</title>
-    <!-- Tailwind CSS Engine -->
+    <title>KAIROS GLOBAL RESEARCH // SYSTEM SUITE</title>
+    <!-- TradingView Core Library - Placed safely in head to ensure script availability -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <!-- Tailwind CSS Interface Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Marked.js Markdown Engine -->
+    <!-- Marked.js Markdown Processing Core -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        /* Base Obsidian Reset */
+        /* Modern Minimalist Navigation Token Resets */
         body { background-color: #020203; color: #d4d4d8; }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #020203; }
-        ::-webkit-scrollbar-thumb { background: #121218; border-radius: 2px; }
-        ::-webkit-scrollbar-thumb:hover { background: #1e1e2a; }
+        ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #27272a; }
         
-        .active-nav { 
-            background: rgba(6, 182, 212, 0.05); 
-            border-left: 2px solid #06b6d4; 
-            color: #ffffff; 
+        .active-tab {
+            color: #06b6d4 !important;
+            border-bottom: 2px solid #06b6d4;
         }
         
-        /* Markdown Renderer Custom Styling Overrides */
-        .prose-content h1 { font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-top: 1rem; margin-bottom: 0.5rem; font-family: monospace; }
-        .prose-content h2 { font-size: 1rem; font-weight: 700; color: #f4f4f5; margin-top: 1rem; margin-bottom: 0.5rem; font-family: monospace; }
-        .prose-content p { font-size: 0.8rem; color: #a1a1aa; line-height: 1.6; margin-bottom: 0.75rem; }
-        .prose-content code { background: #0c0c12; border: 1px solid #1e1e2f; padding: 0.125rem 0.25rem; border-radius: 3px; font-family: monospace; font-size: 0.75rem; color: #e11d48; }
-        .prose-content pre { background: #050508; border: 1px solid #12121c; padding: 1rem; rounded: 4px; overflow-x: auto; margin: 1rem 0; }
+        /* Markdown Custom Typographic Rendering Configurations */
+        .prose-content h1 { font-size: 1.3rem; font-weight: 700; color: #ffffff; margin-top: 1.25rem; margin-bottom: 0.5rem; font-family: monospace; }
+        .prose-content h2 { font-size: 1.05rem; font-weight: 700; color: #f4f4f5; margin-top: 1.25rem; margin-bottom: 0.5rem; font-family: monospace; }
+        .prose-content p { font-size: 0.85rem; color: #a1a1aa; line-height: 1.6; margin-bottom: 0.85rem; }
+        .prose-content code { background: #09090e; border: 1px solid #1e1e2f; padding: 0.15rem 0.3rem; border-radius: 3px; font-family: monospace; font-size: 0.75rem; color: #e11d48; }
+        .prose-content pre { background: #040406; border: 1px solid #12121c; padding: 1rem; border-radius: 6px; overflow-x: auto; margin: 1rem 0; }
         .prose-content pre code { background: transparent; border: none; padding: 0; color: #e4e4e7; }
-        .prose-content ul { list-style-type: square; padding-left: 1.25rem; margin-bottom: 1rem; font-size: 0.8rem; color: #a1a1aa; }
+        .prose-content ul { list-style-type: square; padding-left: 1.25rem; margin-bottom: 1rem; font-size: 0.85rem; color: #a1a1aa; }
     </style>
 </head>
-<body class="font-sans antialiased select-none overflow-hidden h-screen w-screen flex">
+<body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- SIDEBAR MASTER COMPONENT -->
-    <aside class="w-64 border-r border-zinc-900 bg-[#060608] flex flex-col justify-between z-20 h-full shrink-0">
-        <div>
-            <!-- Corporate Brand Identity Space -->
-            <div class="p-5 border-b border-zinc-900 flex items-center gap-3 bg-[#030304]">
+    <!-- GLOBAL MAIN STICKY TOP NAVIGATION PLATFORM HEADER -->
+    <nav class="sticky top-0 z-50 bg-[#060608]/90 backdrop-blur-md border-b border-zinc-900 px-4 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-8">
+            <!-- Brand Identity Signature Token -->
+            <div class="flex items-center gap-3">
                 <div class="h-6 w-6 rounded bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
                     <span class="text-[10px] font-mono font-bold text-white">KG</span>
                 </div>
-                <div>
-                    <h1 class="text-xs font-mono font-bold tracking-widest text-white">KAIROS GLOBAL</h1>
-                    <p class="text-[9px] font-mono text-zinc-500 tracking-wider">QUANTAMENTAL CORE</p>
+                <div class="font-mono">
+                    <span class="text-xs font-bold text-white tracking-widest block leading-none">KAIROS GLOBAL</span>
+                    <span class="text-[9px] text-zinc-500 tracking-wider uppercase mt-0.5 block">Research Portal</span>
                 </div>
             </div>
-            
-            <!-- Core Navigation Router Matrix -->
-            <nav class="p-3 space-y-1 text-xs font-mono">
-                <p class="text-[9px] text-zinc-600 font-bold tracking-widest uppercase px-3 mb-2 mt-2">Workspace Desks</p>
-                <button onclick="switchView('terminal')" id="nav-terminal" class="w-full flex items-center gap-3 px-3 py-2.5 rounded text-zinc-400 hover:text-white hover:bg-zinc-900/30 transition-all text-left cursor-pointer">
-                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-500/80"></span>
-                    Live Intelligence
-                </button>
-                
-                <p class="text-[9px] text-zinc-600 font-bold tracking-widest uppercase px-3 mb-2 mt-6">Boutique Intelligence</p>
-                <button onclick="switchView('blog')" id="nav-blog" class="w-full flex items-center gap-3 px-3 py-2.5 rounded text-zinc-400 hover:text-white hover:bg-zinc-900/30 transition-all text-left cursor-pointer">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500/80"></span>
-                    Macro Research Feed
-                </button>
-                <button onclick="switchView('academy')" id="nav-academy" class="w-full flex items-center gap-3 px-3 py-2.5 rounded text-zinc-400 hover:text-white hover:bg-zinc-900/30 transition-all text-left cursor-pointer">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500/80"></span>
-                    Quant Academy
-                </button>
-            </nav>
-        </div>
-        
-        <!-- Local Metrics Progress Automation Window -->
-        <div class="p-4 border-t border-zinc-900 font-mono text-[10px] text-zinc-500 bg-[#030304] space-y-1.5">
-            <div class="flex justify-between"><span>CORE_ENGINE:</span><span class="text-emerald-500 font-bold">ACTIVE</span></div>
-            <div class="flex justify-between"><span>ACADEMY_PROGRESS:</span><span id="sidebar-progress-metric" class="text-cyan-400 tabular-nums">0%</span></div>
-        </div>
-    </aside>
 
-    <!-- MAIN INTERFACE WINDOW HOUSING -->
-    <div class="flex-1 flex flex-col overflow-hidden h-full">
-        
-        <!-- TERMINAL GLOBAL HEADER CONTROL LINE -->
-        <header class="h-14 border-b border-zinc-900 bg-[#060608] flex items-center justify-between px-6 z-10 shrink-0">
-            <div class="flex items-center gap-4 text-xs font-mono">
-                <span class="text-zinc-700">/</span>
-                <span id="current-view-title" class="text-zinc-200 uppercase tracking-widest font-bold">Live Market Workspace</span>
+            <!-- Dashboard Modular Menu Links (Desktop) -->
+            <div class="hidden md:flex items-center gap-6 font-mono text-xs h-16">
+                <button onclick="switchView('terminal')" id="tab-terminal" class="nav-trigger text-zinc-400 hover:text-white transition-colors h-full px-1 cursor-pointer font-medium">Live Intelligence</button>
+                <button onclick="switchView('blog')" id="tab-blog" class="nav-trigger text-zinc-400 hover:text-white transition-colors h-full px-1 cursor-pointer font-medium">Research Feed</button>
+                <button onclick="switchView('academy')" id="tab-academy" class="nav-trigger text-zinc-400 hover:text-white transition-colors h-full px-1 cursor-pointer font-medium">Quant Academy</button>
             </div>
-            
-            <!-- Functional Interaction Row: Workspace Controls + Time System -->
-            <div class="flex items-center gap-6 font-mono text-xs">
-                <!-- Workspace Format Matrix Toggles (Visible inside live data layout only) -->
-                <div id="workspace-layout-controls" class="flex border border-zinc-800 rounded p-0.5 bg-[#020203]">
-                    <button onclick="setLayout('single')" id="layout-btn-single" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold">Single Canvas</button>
-                    <button onclick="setLayout('split')" id="layout-btn-split" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold">Split Workspace</button>
-                </div>
-                <div class="h-4 w-px bg-zinc-800"></div>
-                <div class="flex items-center gap-2 text-zinc-400">
-                    <span id="live-time" class="text-zinc-300 font-semibold tabular-nums">UTC --:--:--</span>
-                </div>
-            </div>
-        </header>
+        </div>
 
-        <!-- ROUTED DISPLAY MODULE SPACES -->
-        <div class="flex-1 overflow-y-auto bg-[#020203] relative">
+        <!-- Right System Indicators + Display Configuration Selectors -->
+        <div class="font-mono text-xs text-zinc-500 flex items-center gap-4">
+            <!-- Layout Workspace Toggles -->
+            <div id="workspace-layout-controls" class="flex border border-zinc-800 rounded p-0.5 bg-[#020203] transition-all">
+                <button onclick="setLayout('single')" id="layout-btn-single" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold bg-zinc-900 text-cyan-400 border border-zinc-800">Single view</button>
+                <button onclick="setLayout('split')" id="layout-btn-split" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold text-zinc-500 hover:text-zinc-300">Split Workspace</button>
+            </div>
+            <div class="h-4 w-px bg-zinc-800 hidden sm:block"></div>
+            <span id="live-time" class="text-zinc-400 font-semibold tabular-nums hidden sm:inline">UTC --:--:--</span>
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
+        </div>
+    </nav>
+
+    <!-- MOBILE BREAKPOINT NAV INTERFACE TAPE -->
+    <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-4 py-2 flex justify-around font-mono text-xs">
+        <button onclick="switchView('terminal')" id="mob-tab-terminal" class="nav-trigger text-zinc-400 py-1 font-medium">Terminal</button>
+        <button onclick="switchView('blog')" id="mob-tab-blog" class="nav-trigger text-zinc-400 py-1 font-medium">Research</button>
+        <button onclick="switchView('academy')" id="mob-tab-academy" class="nav-trigger text-zinc-400 py-1 font-medium">Academy</button>
+    </div>
+
+    <!-- MAIN DYNAMIC FLOW GRID ARCHITECTURE -->
+    <main class="flex-grow w-full">
+        
+        <!-- ================= DESK VIEW 1: MARKET ANALYSIS TERMINAL ================= -->
+        <div id="view-terminal" class="view-panel transition-all duration-150">
             
-            <!-- ================= WORKSPACE DESK 1: QUANT TERMINAL ================= -->
-            <div id="view-terminal" class="view-panel p-4 h-full grid grid-cols-1 xl:grid-cols-12 gap-4">
-                
-                <!-- CORES REGIME METRICS CAPTURE CORRIDOR (3/12 Cols) -->
-                <div class="xl:col-span-3 bg-[#08080c] border border-zinc-900 rounded p-4 flex flex-col justify-between font-mono h-full">
-                    <div>
-                        <div class="flex justify-between items-center border-b border-zinc-900 pb-2 mb-3">
-                            <span class="text-xs font-bold text-zinc-300 tracking-wider">LIQUIDITY_MONITOR</span>
-                            <span class="text-[10px] text-emerald-500">LIVE</span>
-                        </div>
-                        <div class="space-y-2.5 text-xs">
-                            <div class="p-2.5 bg-[#030305] border border-zinc-900 rounded hover:border-zinc-800 transition-colors">
-                                <div class="flex justify-between text-[10px] mb-1 text-zinc-500"><span>US Dollar Index (DXY)</span><span class="text-red-500 font-bold">-0.14%</span></div>
-                                <div class="text-base font-bold text-zinc-100 tracking-tight tabular-nums">101.24</div>
-                            </div>
-                            <div class="p-2.5 bg-[#030305] border border-zinc-900 rounded hover:border-zinc-800 transition-colors">
-                                <div class="flex justify-between text-[10px] mb-1 text-zinc-500"><span>US 10Y Yield</span><span class="text-emerald-500 font-bold">+0.62%</span></div>
-                                <div class="text-base font-bold text-zinc-100 tracking-tight tabular-nums">4.118%</div>
-                            </div>
-                        </div>
+            <!-- Standard Centered Metrics Panels Row -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono">
+                    <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
+                        <div class="text-[10px] text-zinc-500 uppercase tracking-wider">US Dollar Index (DXY)</div>
+                        <div class="text-base font-bold text-white mt-1 tabular-nums">101.24 <span class="text-xs text-red-500 font-normal ml-2">-0.14%</span></div>
                     </div>
-                    <div class="text-[10px] text-zinc-600 uppercase font-mono tracking-tight leading-relaxed">
-                        Persistent configuration storage pipeline loaded from edge.
+                    <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
+                        <div class="text-[10px] text-zinc-500 uppercase tracking-wider">US 10Y Treasury Yield</div>
+                        <div class="text-base font-bold text-white mt-1 tabular-nums">4.118% <span class="text-xs text-emerald-500 font-normal ml-2">+0.62%</span></div>
+                    </div>
+                    <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
+                        <div class="text-[10px] text-zinc-500 uppercase tracking-wider">Quant Academy Milestone Track</div>
+                        <div id="portal-progress-metric" class="text-base font-bold text-cyan-400 mt-1 tabular-nums">0% COMPLETE</div>
                     </div>
                 </div>
+            </div>
 
-                <!-- ANALYTICAL PRIMARY VIEWPORT STACK (9/12 Cols) -->
-                <div class="xl:col-span-9 flex flex-col gap-4 h-full">
-                    
-                    <!-- MACRO CHRONOLOGY EVENTS TRACKER CONTAINER -->
-                    <div class="w-full bg-[#08080c] border border-zinc-900 rounded p-1 h-[480px] shrink-0 flex flex-col">
-                        <div class="p-2 font-mono text-[10px] font-bold text-zinc-400 border-b border-zinc-900/80 uppercase tracking-widest">
-                            Live Institutional Macro Catalyst Feed
-                        </div>
-                        <div class="flex-1 relative overflow-hidden rounded">
-                            <div class="tradingview-widget-container h-full">
-                                <div class="tradingview-widget-container__widget h-full"></div>
-                                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+            <!-- UNCONSTRAINED EDGE-TO-EDGE HORIZONTAL ECONOMIC CALENDAR WIDGET -->
+            <div class="w-full bg-[#08080c] border-y border-zinc-900 my-6 flex flex-col h-[480px]">
+                <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex justify-between items-center shrink-0">
+                    <span>Institutional Macro Catalyst Feed</span>
+                    <span class="text-cyan-500 font-normal text-[9px]">// REAL-TIME WEB WIDGET DEPLOYMENT</span>
+                </div>
+                <div class="flex-grow relative border-t border-zinc-900 bg-[#020203]">
+                    <div class="tradingview-widget-container h-full w-full">
+                        <div class="tradingview-widget-container__widget h-full w-full"></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+                        {
+                            "colorTheme": "dark", "isTransparent": true, "width": "100%", "height": "100%",
+                            "locale": "en", "importanceFilter": "0,1", "currencyFilter": "USD,EUR,GBP,JPY,AUD"
+                        }
+                        </script>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Central Analytical Base Processing Layer -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-6 pb-12">
+                
+                <!-- Left Working Block: Dynamic Chart Slots Layout Canvas (8/12 Cols) -->
+                <div class="lg:col-span-8 flex flex-col">
+                    <div id="chart-workspace-wrapper" class="h-[580px] w-full relative">
+                        
+                        <!-- 1. SINGLE CANVAS VIEW CONTAINER -->
+                        <div id="workspace-single" class="h-full w-full bg-[#08080c] border border-zinc-900 rounded-xl p-1">
+                            <div class="tradingview-widget-container h-full w-full">
+                                <div class="tradingview-widget-container__widget h-full w-full"></div>
+                                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
                                 {
-                                    "colorTheme": "dark", "isTransparent": true, "width": "100%", "height": "100%",
-                                    "locale": "en", "importanceFilter": "0,1", "currencyFilter": "USD,EUR,GBP,JPY,AUD"
+                                    "autosize": true, "symbol": "FX:EURUSD", "interval": "240", "timezone": "Etc/UTC",
+                                    "theme": "dark", "style": "1", "locale": "en", "allow_symbol_change": true,
+                                    "calendar": false, "support_host": "https://www.tradingview.com"
                                 }
                                 </script>
                             </div>
                         </div>
+
+                        <!-- 2. SPLIT WORKSPACE GRID CONTAINER -->
+                        <div id="workspace-split" class="h-full w-full grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+                            <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-1 h-full w-full">
+                                <div class="tradingview-widget-container h-full w-full">
+                                    <div class="tradingview-widget-container__widget h-full w-full"></div>
+                                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                                    {
+                                        "autosize": true, "symbol": "FX:EURUSD", "interval": "240", "timezone": "Etc/UTC",
+                                        "theme": "dark", "style": "1", "locale": "en", "allow_symbol_change": true,
+                                        "calendar": false, "support_host": "https://www.tradingview.com"
+                                    }
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-1 h-full w-full">
+                                <div class="tradingview-widget-container h-full w-full">
+                                    <div class="tradingview-widget-container__widget h-full w-full"></div>
+                                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                                    {
+                                        "autosize": true, "symbol": "TVC:US10Y", "interval": "D", "timezone": "Etc/UTC",
+                                        "theme": "dark", "style": "1", "locale": "en", "allow_symbol_change": true,
+                                        "calendar": false, "support_host": "https://www.tradingview.com"
+                                    }
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right Working Block: Tactical Risk Control Log Panel (4/12 Cols) -->
+                <div class="lg:col-span-4 bg-[#08080c] border border-zinc-900 rounded-xl p-5 flex flex-col h-auto lg:h-[580px] justify-between">
+                    <div class="w-full">
+                        <div class="font-mono text-xs font-bold tracking-wider uppercase text-zinc-300 border-b border-zinc-900 pb-2 mb-4 flex items-center justify-between">
+                            <span>Tactical Workspace Log</span>
+                            <span class="text-zinc-600 font-normal text-[10px]">v2.2</span>
+                        </div>
+                        
+                        <form id="workspace-form" class="space-y-4 text-xs font-mono">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-zinc-500 mb-1 text-[10px]">PAIR / ASSET</label>
+                                    <input type="text" placeholder="e.g., GBPJPY" class="w-full bg-[#030305] border border-zinc-900 rounded px-2.5 py-2 text-zinc-200 focus:outline-none focus:border-cyan-500 transition-colors uppercase font-semibold">
+                                </div>
+                                <div>
+                                    <label class="block text-zinc-500 mb-1 text-[10px]">EXECUTION BIAS</label>
+                                    <select class="w-full bg-[#030305] border border-zinc-900 rounded px-2 py-2 text-zinc-200 focus:outline-none focus:border-cyan-500 transition-colors font-semibold">
+                                        <option class="text-red-400">SHORT / SELL</option>
+                                        <option class="text-emerald-400">LONG / BUY</option>
+                                        <option class="text-zinc-400">NEUTRAL / WATCH</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-zinc-500 mb-1 text-[10px]">MACRO REGIME REGULATOR THESIS</label>
+                                <textarea rows="6" placeholder="Identify monetary divergence models, swap anomalies, or incoming central bank catalyst parameters mapping structural asymmetry entries..." class="w-full bg-[#030305] border border-zinc-900 rounded px-2.5 py-2 text-zinc-200 focus:outline-none focus:border-cyan-500 transition-colors resize-none leading-relaxed text-xs"></textarea>
+                            </div>
+                        </form>
                     </div>
 
-                    <!-- RE-ENGINEERED DYNAMIC DUAL CONFIGURABLE CHARTING PLATFORM ARRAYS -->
-                    <div id="chart-workspace-container" class="flex-1 grid grid-cols-1 gap-4 min-h-[400px]">
-                        <!-- Chart Workspace Slot A -->
-                        <div class="bg-[#08080c] border border-zinc-900 rounded p-1 flex flex-col relative h-full w-full">
-                            <div id="tv-canvas-slot-a" class="w-full h-full rounded overflow-hidden"></div>
-                        </div>
-                        <!-- Chart Workspace Slot B (Managed on the fly via JS state execution triggers) -->
-                        <div id="tv-canvas-slot-b-holder" class="bg-[#08080c] border border-zinc-900 rounded p-1 flex flex-col relative h-full w-full hidden">
-                            <div id="tv-canvas-slot-b" class="w-full h-full rounded overflow-hidden"></div>
-                        </div>
-                    </div>
-
+                    <button type="button" class="w-full bg-zinc-900 border border-zinc-800 hover:border-cyan-500/40 text-zinc-300 hover:text-cyan-400 transition-all rounded-lg py-2.5 text-xs font-mono tracking-wider font-medium cursor-pointer mt-6">
+                        LOCK CONTEXT LOG ENTRY
+                    </button>
                 </div>
-            </div>
 
-            <!-- ================= WORKSPACE DESK 2: DYNAMIC INTEL PUBLICATIONS ================= -->
-            <div id="view-blog" class="view-panel p-6 hidden max-w-5xl mx-auto space-y-6">
-                <div class="border-b border-zinc-900 pb-4 font-mono">
-                    <h2 class="text-sm font-bold text-white uppercase tracking-wider">// System Intelligence Pipeline</h2>
-                    <p class="text-xs text-zinc-500 mt-1">Cross-asset divergence monitoring and liquidity models.</p>
-                </div>
-                <!-- Dynamic Research Post Target Injection Loop -->
-                <div id="blog-posts-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
-
-            <!-- ================= WORKSPACE DESK 3: SYSTEMATIC QUANT ACADEMY ================= -->
-            <div id="view-academy" class="view-panel p-6 hidden max-w-5xl mx-auto space-y-6">
-                <div class="border-b border-zinc-900 pb-4 font-mono">
-                    <h2 class="text-sm font-bold text-white uppercase tracking-wider">// Mathematical & Structural Training Systems</h2>
-                    <p class="text-xs text-zinc-500 mt-1">Modules detailing systematic allocation strategies and statistical frameworks.</p>
-                </div>
-                <!-- Dynamic Academy Module Target Injection Loop -->
-                <div id="academy-modules-stack" class="space-y-3"></div>
-            </div>
-            
         </div>
-    </div>
 
-    <!-- IMMERSIVE SUBSTANTIVE DOCUMENT PARSING READER INTERFACE OVERLAY -->
+        <!-- ================= DESK VIEW 2: MONETARY INTELLIGENCE REPOSITORY ================= -->
+        <div id="view-blog" class="view-panel space-y-6 hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="border-b border-zinc-900 pb-4 font-mono">
+                <h2 class="text-lg font-bold text-white uppercase tracking-wider">Boutique Intelligence Logs</h2>
+                <p class="text-sm text-zinc-500 mt-1">Cross-border flow matrices and central bank liquidity breakdowns.</p>
+            </div>
+            <!-- Targeted Injection Destination Matrix -->
+            <div id="blog-posts-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </div>
+
+        <!-- ================= DESK VIEW 3: SYSTEMATIC QUANT TRAINING SYSTEMS ================= -->
+        <div id="view-academy" class="view-panel space-y-6 hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="border-b border-zinc-900 pb-4 font-mono">
+                <h2 class="text-lg font-bold text-white uppercase tracking-wider">Quantitative Allocation Frameworks</h2>
+                <p class="text-sm text-zinc-500 mt-1">Structured modules exploring statistical variance management and position geometry.</p>
+            </div>
+            <!-- Targeted Injection Destination Matrix -->
+            <div id="academy-modules-stack" class="space-y-4"></div>
+        </div>
+
+    </main>
+
+    <!-- TRADITIONAL MULTI-COLUMN CORPORATE WEB FOOTER HOUSING -->
+    <footer class="bg-[#060608] border-t border-zinc-900 py-12 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
+        <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div class="space-y-3">
+                <p class="text-zinc-300 font-bold tracking-wider uppercase">Kairos Global Research</p>
+                <p class="text-zinc-500 leading-relaxed max-w-sm text-[11px]">
+                    An independent research cockpit engineered to track global macroeconomic cycles, inter-market yield alignments, and structural trend asymmetries.
+                </p>
+            </div>
+            <div class="space-y-2">
+                <p class="text-zinc-400 font-bold uppercase tracking-wider">Portal Core Navigation</p>
+                <ul class="space-y-1 text-[11px]">
+                    <li><button onclick="switchView('terminal')" class="text-zinc-500 hover:text-cyan-400 transition-colors cursor-pointer text-left">Live Analytics Console</button></li>
+                    <li><button onclick="switchView('blog')" class="text-zinc-500 hover:text-cyan-400 transition-colors cursor-pointer text-left">Macro Intelligence Logs</button></li>
+                    <li><button onclick="switchView('academy')" class="text-zinc-500 hover:text-cyan-400 transition-colors cursor-pointer text-left">Systematic Course Workspace</button></li>
+                </ul>
+            </div>
+            <div class="space-y-2">
+                <p class="text-zinc-400 font-bold uppercase tracking-wider">System Telemetry</p>
+                <div class="text-[11px] space-y-1 text-zinc-500 uppercase">
+                    <div>Interface Protocol: <span class="text-zinc-400">HTTPS / STATIC WIDGET EDGE</span></div>
+                    <div>Data Status: <span class="text-emerald-500 font-bold">NOMINAL / STABLE</span></div>
+                    <div>Deployment Grid: <span class="text-zinc-400">GitHub Pages v2.2</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl w-full mx-auto border-t border-zinc-900/60 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px]">
+            <p>&copy; 2026 Kairos Global Research. All quantitative rights reserved.</p>
+            <p class="text-zinc-600 tracking-wide uppercase">Built with clean code & strategic purpose.</p>
+        </div>
+    </footer>
+
+    <!-- IMMERSIVE INTERFACE TEXT INSIGHTS OVERLAY MODAL MASK -->
     <div id="immersive-reader" class="fixed inset-0 bg-[#020203]/95 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-[#08080c] border border-zinc-900 rounded max-w-3xl w-full flex flex-col max-h-[85vh] shadow-[0_0_60px_rgba(0,0,0,0.9)]">
+        <div class="bg-[#08080c] border border-zinc-900 rounded-xl max-w-3xl w-full flex flex-col max-h-[85vh] shadow-2xl">
             <div class="p-4 border-b border-zinc-900 flex justify-between items-center bg-[#050507]">
-                <span id="modal-badge" class="font-mono text-[9px] text-cyan-400 font-bold tracking-widest border border-cyan-500/20 px-2 py-0.5 rounded bg-cyan-500/5">INTEL_LOG // ENGINE</span>
+                <span id="modal-badge" class="font-mono text-[9px] text-cyan-400 font-bold tracking-widest border border-cyan-500/20 px-2 py-0.5 rounded bg-cyan-500/5">INTEL_LOG</span>
                 <button onclick="closeReader()" class="text-zinc-500 hover:text-white font-mono text-xs bg-zinc-950 border border-zinc-900 px-2 py-1 rounded cursor-pointer transition-colors">CLOSE [ESC]</button>
             </div>
-            <!-- The Content Insertion Node targeted by Marked Parser -->
-            <div class="p-8 overflow-y-auto prose-content">
-                <div id="markdown-reader-target"></div>
+            <div class="p-6 overflow-y-auto max-w-none border-t border-zinc-900/40">
+                <div id="markdown-reader-target" class="text-zinc-300 space-y-4 prose-content"></div>
             </div>
         </div>
     </div>
 
-    <!-- CORE INTEGRATED SCRIPT LOGIC FRAMEWORK MACHINE -->
-    <script src="https://s3.tradingview.com/tv.js"></script>
+    <!-- MAIN EXECUTABLE OPERATIONAL HANDLING LOGIC SCRIPT ENGINE -->
     <script>
-        // ================= INTERNAL DATA CORES (Written in clean structural formats) =================
+        // ================= CONSOLIDATED CORE DATABASES =================
         const KAIROS_BLOG_DATABASE = [
             {
                 id: "blog-01",
@@ -213,7 +289,7 @@
                 readTime: "6 MIN READ",
                 date: "JUN 26, 2026",
                 summary: "An in-depth tracking analysis of Federal Reserve swap line balances and sovereign currency pricing anomalies.",
-                markdown: `# G10 Swap Lines & Cross-Border Dollar Divergence\n\n### Structural Risk Parameters Overview\nWhen foreign institutional money managers experience severe dollar sourcing pressure, standard cross-currency basis swaps fall past historical standard deviation models.\n\n## The Core Divergence Equation\nTo identify pricing gaps across money market pipelines, we map the **Cross-Currency Basis Swap Spread** using standard structural constraints:\n\n\`\`\`text\nBasis Spread = Implied Foreign Rate - Actual Foreign Rate\n\`\`\`\n\n*   When this spread dips deeply negative, it reveals high dollar demand inside overseas wholesale banking hubs.\n*   Central bank swap interventions act as structural safety valves, capping potential volatility spikes before they bleed into spot asset exchange mechanisms.\n\n### Tactical Trading Takeaway\nTrack negative basin movements across major currency pairs. Sudden spikes signals near-term upside exhaustion loops for higher-yielding cross-assets.`
+                markdown: `# G10 Swap Lines & Cross-Border Dollar Divergence\n\n### Structural Risk Parameters Overview\nWhen foreign institutional money managers experience severe dollar sourcing pressure, standard cross-currency basis swaps fall past historical standard deviation models.\n\n## The Core Divergence Equation\nTo identify pricing gaps across money market pipelines, we map the **Cross-Currency Basis Swap Spread** using standard structural constraints:\n\n\`\`\`text\nBasis Spread = Implied Foreign Rate - Actual Foreign Rate\n\`\`\`\n\n* When this spread dips deeply negative, it reveals high dollar demand inside overseas wholesale banking hubs.\n* Central bank swap interventions act as structural safety valves, capping potential volatility spikes before they bleed into spot asset exchange mechanisms.\n\n### Tactical Trading Takeaway\nTrack negative basin movements across major currency pairs. Sudden spikes signals near-term upside exhaustion loops for higher-yielding cross-assets.`
             },
             {
                 id: "blog-02",
@@ -223,6 +299,24 @@
                 date: "JUN 22, 2026",
                 summary: "Isolating asymmetric trading bands ahead of macroeconomic policy shifts using option volatility metrics.",
                 markdown: `# Asymmetric Volatility Modeling Across Central Bank Pivots\n\n## Regime Parameterization\nOptions matrices pricing distributions often show heavy skew variations prior to high-impact economic prints or policy updates.\n\n### Volatility Smile Dynamics\nBy extracting data across multi-strike setups, we can accurately track directional biases inside the institutional workspace:\n\n1.  **Call Skew Superiority:** Signals speculative spot accumulation plays across primary dealers.\n2.  **Put Implied Dominance:** Indicates massive macro delta hedging configurations are locking in asset baselines.\n\nUse this information alongside macroeconomic data lines to position risk ahead of major market moves.`
+            },
+            {
+                id: "blog-03",
+                title: "The Q3 Global Liquidity Crux: Re-anchoring G10 Expectations",
+                category: "LIQUIDITY RECON",
+                readTime: "4 MIN READ",
+                date: "JUN 20, 2026",
+                summary: "Systemic tightening pressures easing across major cross-border corridors. Exploring reverse-repo adjustments and yield curves.",
+                markdown: `# The Q3 Global Liquidity Crux: Re-anchoring G10 Expectations\n\nCentral bank metrics indicate systemic tightening pressures easing across major cross-border corridors. As global yield shifts align, trade structures must recalculate the true risk premium across FX safe-havens.`
+            },
+            {
+                id: "blog-04",
+                title: "Asymmetric Setups in G3 Yield Divergence Models",
+                category: "CENTRAL BANKS",
+                readTime: "7 MIN READ",
+                date: "JUN 18, 2026",
+                summary: "A structural breakdown mapping policy trajectories across European and Federal Reserve financial models.",
+                markdown: `# Asymmetric Setups in G3 Yield Divergence Models\n\nA structural breakdown mapping the policy trajectories between the Federal Reserve and European institutions. We isolate specific technical execution bands where volatility curves present heavy pricing asymmetries.`
             }
         ];
 
@@ -233,7 +327,7 @@
                 track: "FOUNDATIONS",
                 title: "Systematic Capital Allocation & Variance Positioning Models",
                 description: "A complete framework for managing risk parameters, size controls, and portfolio variance parameters.",
-                markdown: `# Systematic Capital Allocation Models\n\n## Core Position Sizing Methodology\nTo preserve risk allocation parameters under heavy tail-risk conditions, we use fixed variance controls across our positions.\n\n### The Position Dimension Formulation\nPosition sizes are mathematically determined by scaling target portfolio risk allocations against asset historical variance:\n\n\`\`\`text\nPosition Size = (Target Portfolio Risk Coefficient) / (Asset Historical Rolling Variance)\n\`\`\`\n\n*   This approach automatically scales back exposure sizes when market conditions turn highly volatile.\n*   It preserves performance metrics and prevents catastrophic losses during unexpected regime shifts.\n\n### Milestone Checklist\n* Identify rolling 22-day historical standard deviation levels.\n* Set absolute portfolio failure thresholds at 1.5% max capital impact.\n* Execute structural position adjustments across changing volatility environments.`
+                markdown: `# Systematic Capital Allocation Models\n\n## Core Position Sizing Methodology\nTo preserve risk allocation parameters under heavy tail-risk conditions, we use fixed variance controls across our positions.\n\n### The Position Dimension Formulation\nPosition sizes are mathematically determined by scaling target portfolio risk allocations against asset historical variance:\n\n\`\`\`text\nPosition Size = (Target Portfolio Risk Coefficient) / (Asset Historical Rolling Variance)\n\`\`\`\n\n* This approach automatically scales back exposure sizes when market conditions turn highly volatile.\n* It preserves performance metrics and prevents catastrophic losses during unexpected regime shifts.\n\n### Milestone Checklist\n* Identify rolling 22-day historical standard deviation levels.\n* Set absolute portfolio failure thresholds at 1.5% max capital impact.\n* Execute structural position adjustments across changing volatility environments.`
             },
             {
                 id: "acad-02",
@@ -245,25 +339,32 @@
             }
         ];
 
-        // ================= STATE ENGINE HOOKS (Managed cleanly via LocalStorage trackers) =================
+        // ================= RETRIEVED STATE STORAGE HOOKS =================
         let activeView = localStorage.getItem('kairos_view') || 'terminal';
         let activeLayout = localStorage.getItem('kairos_layout') || 'single';
         let completedModules = JSON.parse(localStorage.getItem('kairos_completed_modules')) || [];
 
-        // ================= COMPONENT INTERACTION CONTROLLERS =================
+        // ================= UNIFIED ROUTER CONTROLLER =================
         function switchView(viewName) {
             activeView = viewName;
             localStorage.setItem('kairos_view', viewName);
             
-            // UI visibility management loops
+            // Hide all views first
             document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-nav'));
             
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            const targetNav = document.getElementById(`nav-${viewName}`);
-            if(targetNav) targetNav.classList.add('active-nav');
+            // Unhide target view node
+            const targetViewContainer = document.getElementById(`view-${viewName}`);
+            if (targetViewContainer) targetViewContainer.classList.remove('hidden');
             
-            // Adjust title configurations dynamically
+            // Sync active navigation tab styles (Desktop & Mobile)
+            document.querySelectorAll('.nav-trigger').forEach(btn => {
+                if(btn.id === `tab-${viewName}` || btn.id === `mob-tab-${viewName}`) {
+                    btn.classList.add('active-tab');
+                } else {
+                    btn.classList.remove('active-tab');
+                }
+            });
+            
             const titleMap = {
                 'terminal': 'Live Market Workspace',
                 'blog': 'Systematic Intelligence Pipeline',
@@ -271,17 +372,13 @@
             };
             document.getElementById('current-view-title').textContent = titleMap[viewName];
             
-            // Only reveal layout optimization tools inside live data terminal layouts
             const layoutTools = document.getElementById('workspace-layout-controls');
             if(viewName === 'terminal') {
-                layoutTools.classList.remove('opacity-0', 'pointer-events-none');
+                layoutTools.style.opacity = '1';
+                layoutTools.style.pointerEvents = 'auto';
             } else {
-                layoutTools.classList.add('opacity-0', 'pointer-events-none');
-            }
-            
-            // Core chart refreshes to ensure wrapper alignment metrics match
-            if(viewName === 'terminal') {
-                initTradingViewWorkspace();
+                layoutTools.style.opacity = '0';
+                layoutTools.style.pointerEvents = 'none';
             }
         }
 
@@ -289,62 +386,33 @@
             activeLayout = layoutFormat;
             localStorage.setItem('kairos_layout', layoutFormat);
             
-            const slotB = document.getElementById('tv-canvas-slot-b-holder');
-            const gridContainer = document.getElementById('chart-workspace-container');
+            const singleView = document.getElementById('workspace-single');
+            const splitView = document.getElementById('workspace-split');
             const btnSingle = document.getElementById('layout-btn-single');
             const btnSplit = document.getElementById('layout-btn-split');
             
-            // Reset layout selector aesthetics
             btnSingle.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold text-zinc-500 hover:text-zinc-300";
             btnSplit.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold text-zinc-500 hover:text-zinc-300";
 
             if(layoutFormat === 'split') {
-                gridContainer.classList.replace('grid-cols-1', 'grid-cols-2');
-                slotB.classList.remove('hidden');
-                btnSplit.classList.add('bg-zinc-900', 'text-cyan-400', 'border', 'border-zinc-800');
+                singleView.classList.add('hidden');
+                splitView.classList.remove('hidden');
+                btnSplit.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold bg-zinc-900 text-cyan-400 border border-zinc-800";
             } else {
-                gridContainer.classList.replace('grid-cols-2', 'grid-cols-1');
-                slotB.classList.add('hidden');
-                btnSingle.classList.add('bg-zinc-900', 'text-cyan-400', 'border', 'border-zinc-800');
-            }
-            
-            // Re-fire initialization frames across targets
-            initTradingViewWorkspace();
-        }
-
-        // ================= TRADINGVIEW IFRAME SYSTEM BOOTING =================
-        function initTradingViewWorkspace() {
-            // Unmount and flush prior container element instances to maintain active performance allocations
-            document.getElementById('tv-canvas-slot-a').innerHTML = '';
-            document.getElementById('tv-canvas-slot-b').innerHTML = '';
-
-            new TradingView.widget({
-                "width": "100%", "height": "100%", "symbol": "FX:EURUSD",
-                "interval": "240", "timezone": "Etc/UTC", "theme": "dark",
-                "style": "1", "locale": "en", "container_id": "tv-canvas-slot-a",
-                "backgroundColor": "#08080c", "gridColor": "rgba(20, 20, 30, 0.4)"
-            });
-
-            if(activeLayout === 'split') {
-                new TradingView.widget({
-                    "width": "100%", "height": "100%", "symbol": "TVC:US10Y",
-                    "interval": "D", "timezone": "Etc/UTC", "theme": "dark",
-                    "style": "1", "locale": "en", "container_id": "tv-canvas-slot-b",
-                    "backgroundColor": "#08080c", "gridColor": "rgba(20, 20, 30, 0.4)"
-                });
+                singleView.classList.remove('hidden');
+                splitView.classList.add('hidden');
+                btnSingle.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold bg-zinc-900 text-cyan-400 border border-zinc-800";
             }
         }
 
-        // ================= PUBLICATIONS & ACADEMY RENDERING ENGINES =================
+        // ================= POPULATION & COMPILATION RENDERING =================
         function compileAndOpenDocument(type, id) {
             const database = type === 'blog' ? KAIROS_BLOG_DATABASE : KAIROS_ACADEMY_DATABASE;
-            const documentObject = database.find(item => item.id === id);
-            if(!documentObject) return;
+            const doc = database.find(item => item.id === id);
+            if(!doc) return;
 
-            document.getElementById('modal-badge').textContent = type === 'blog' ? `RESEARCH_LOG // ${documentObject.category}` : `ACADEMY_LOG // ${documentObject.moduleCode}`;
-            
-            // Call Marked parsing logic to transform markdown content into standard layout containers
-            document.getElementById('markdown-reader-target').innerHTML = marked.parse(documentObject.markdown);
+            document.getElementById('modal-badge').textContent = type === 'blog' ? `RESEARCH // ${doc.category}` : `ACADEMY // ${doc.moduleCode}`;
+            document.getElementById('markdown-reader-target').innerHTML = marked.parse(doc.markdown);
             document.getElementById('immersive-reader').style.display = 'flex';
         }
 
@@ -353,7 +421,7 @@
         }
 
         function toggleModuleMilestone(id, event) {
-            event.stopPropagation(); // Block secondary evaluation clicks from routing into main modal expansion panes
+            event.stopPropagation();
             if(completedModules.includes(id)) {
                 completedModules = completedModules.filter(mId => mId !== id);
             } else {
@@ -368,19 +436,20 @@
             const totalModules = KAIROS_ACADEMY_DATABASE.length;
             if(totalModules === 0) return;
             const ratio = Math.round((completedModules.length / totalModules) * 100);
-            document.getElementById('sidebar-progress-metric').textContent = `${ratio}%`;
+            document.getElementById('portal-progress-metric').textContent = `${ratio}% COMPLETE`;
         }
 
         function renderPublicationsFeed() {
-            const targetGrid = document.getElementById('blog-posts-grid');
-            targetGrid.innerHTML = KAIROS_BLOG_DATABASE.map(post => `
-                <article onclick="compileAndOpenDocument('blog', '${post.id}')" class="bg-[#08080c] border border-zinc-900 hover:border-zinc-800 transition-all rounded p-5 flex flex-col justify-between cursor-pointer group">
+            const targetNode = document.getElementById('blog-posts-grid');
+            if(!targetNode) return;
+            targetNode.innerHTML = KAIROS_BLOG_DATABASE.map(post => `
+                <article onclick="compileAndOpenDocument('blog', '${post.id}')" class="bg-[#08080c] border border-zinc-900 hover:border-zinc-800 transition-all rounded-xl p-6 flex flex-col justify-between cursor-pointer group">
                     <div class="space-y-3">
                         <div class="flex justify-between items-center font-mono text-[10px]">
                             <span class="text-amber-500 font-bold tracking-wider">${post.category}</span>
                             <span class="text-zinc-500">${post.readTime}</span>
                         </div>
-                        <h3 class="text-sm font-bold text-white group-hover:text-cyan-400 transition-colors tracking-tight font-mono">${post.title}</h3>
+                        <h3 class="text-base font-bold text-white group-hover:text-cyan-400 transition-colors tracking-tight font-mono">${post.title}</h3>
                         <p class="text-xs text-zinc-400 leading-relaxed">${post.summary}</p>
                     </div>
                     <div class="flex items-center justify-between font-mono text-[10px] text-zinc-600 border-t border-zinc-900 pt-3 mt-4">
@@ -392,47 +461,51 @@
         }
 
         function renderAcademyDomElements() {
-            const targetStack = document.getElementById('academy-modules-stack');
-            targetStack.innerHTML = KAIROS_ACADEMY_DATABASE.map(mod => {
+            const targetNode = document.getElementById('academy-modules-stack');
+            if(!targetNode) return;
+            targetNode.innerHTML = KAIROS_ACADEMY_DATABASE.map(mod => {
                 const isFinished = completedModules.includes(mod.id);
                 return `
-                    <div onclick="compileAndOpenDocument('academy', '${mod.id}')" class="bg-[#08080c] border border-zinc-900 hover:border-zinc-800 rounded p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all cursor-pointer group">
+                    <div onclick="compileAndOpenDocument('academy', '${mod.id}')" class="bg-[#08080c] border border-zinc-900 hover:border-zinc-800 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all cursor-pointer group">
                         <div class="space-y-1.5">
                             <div class="flex items-center gap-3 font-mono text-[10px]">
                                 <span class="px-2 py-0.5 rounded bg-zinc-950 border border-zinc-900 text-zinc-400 font-bold">${mod.moduleCode}</span>
                                 <span class="text-emerald-500 uppercase tracking-wider font-semibold">${mod.track}</span>
                             </div>
                             <h4 class="text-sm font-bold text-white tracking-tight font-mono group-hover:text-emerald-400 transition-colors">${mod.title}</h4>
-                            <p class="text-xs text-zinc-400 max-w-2xl">${mod.description}</p>
+                            <p class="text-xs text-zinc-400 max-w-3xl">${mod.description}</p>
                         </div>
-                        <button onclick="toggleModuleMilestone('${mod.id}', event)" class="px-3 py-1.5 border font-mono text-[10px] rounded transition-all cursor-pointer ${
+                        <button onclick="toggleModuleMilestone('${mod.id}', event)" class="px-3 py-1.5 border font-mono text-[10px] rounded-lg transition-all cursor-pointer ${
                             isFinished 
                             ? 'bg-emerald-950/20 text-emerald-400 border-emerald-500/30 font-bold' 
                             : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:border-zinc-600'
                         }">
-                            ${isFinished ? '✓ COMPLETION_SECURED' : 'MARK COMPLETE'}
+                            ${isFinished ? '✓ SECURED' : 'MARK COMPLETE'}
                         </button>
                     </div>
                 `;
             }).join('');
         }
 
-        // ================= GLOBAL PLATFORM INITIALIZATION SYSTEMS =================
-        window.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeReader(); });
-        
-        // Operational core ticker system
-        setInterval(() => {
-            document.getElementById('live-time').textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
-        }, 1000);
+        // ================= SAFE LIFECYCLE ENGINE BOOT =================
+        window.addEventListener('DOMContentLoaded', () => {
+            // Populate data containers cleanly before updating visibility states
+            renderPublicationsFeed();
+            renderAcademyDomElements();
+            calculateProgressMetrics();
+            
+            // Set layout routing profiles safely
+            switchView(activeView);
+            setLayout(activeLayout);
+            
+            // Running system clock
+            setInterval(() => {
+                const timeSpan = document.getElementById('live-time');
+                if(timeSpan) timeSpan.textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+            }, 1000);
+        });
 
-        // System boot execution sequence
-        renderPublicationsFeed();
-        renderAcademyDomElements();
-        calculateProgressMetrics();
-        
-        // Restore verified active routing layouts dynamically on platform init
-        switchView(activeView);
-        setLayout(activeLayout);
+        window.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeReader(); });
     </script>
 </body>
 </html>
