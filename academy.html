@@ -10,7 +10,6 @@
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- GLOBAL MAIN STICKY TOP NAVIGATION PLATFORM HEADER -->
     <nav class="sticky top-0 z-50 bg-[#060608]/90 backdrop-blur-md border-b border-zinc-900 px-4 lg:px-8 h-16 flex items-center justify-between">
         <div class="flex items-center gap-8">
             <div class="flex items-center gap-3">
@@ -36,14 +35,53 @@
         </div>
     </nav>
 
-    <!-- MOBILE BREAKPOINT NAV INTERFACE TAPE -->
     <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-4 py-2 flex justify-around font-mono text-xs">
         <a href="index.html" class="text-zinc-400 py-1 font-medium">Terminal</a>
         <a href="blog.html" class="text-zinc-400 py-1 font-medium">Research</a>
         <a href="academy.html" class="active-tab text-zinc-400 py-1 font-medium">Academy</a>
     </div>
 
-    <!-- MAIN INTERACTIVE HUB -->
+    <div class="w-full bg-[#060608] border-b border-zinc-900 overflow-hidden h-[46px] flex items-center shrink-0">
+        <div class="tradingview-widget-container w-full h-full">
+            <div class="tradingview-widget-container__widget h-full w-full"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+            {
+                "symbols": [
+                    { "proName": "FX:EURUSD", "title": "EUR/USD" }, { "proName": "FX:GBPUSD", "title": "GBP/USD" },
+                    { "proName": "FX:USDJPY", "title": "USD/JPY" }, { "proName": "FX:USDCAD", "title": "USD/CAD" },
+                    { "proName": "FX:USDCHF", "title": "USD/CHF" }, { "proName": "FX:AUDUSD", "title": "AUD/USD" },
+                    { "proName": "FX:NZDUSD", "title": "NZD/USD" }, { "proName": "FX:EURGBP", "title": "EUR/GBP" },
+                    { "proName": "FX:EURJPY", "title": "EUR/JPY" }, { "proName": "FX:GBPJPY", "title": "GBP/JPY" }
+                ],
+                "showSymbolLogo": true, "colorTheme": "dark", "isTransparent": true, "displayMode": "regular", "locale": "en"
+            }
+            </script>
+        </div>
+    </div>
+
+    <div class="w-full bg-[#030305] border-b border-zinc-900/60 px-4 lg:px-8 py-1.5 flex flex-wrap items-center justify-between font-mono text-[10px] text-zinc-500 select-none">
+        <div class="flex items-center gap-2">
+            <span class="text-zinc-400 font-bold uppercase tracking-wider text-[9px] text-cyan-500">// SESSION MONITOR:</span>
+        </div>
+        <div class="flex items-center gap-6 flex-wrap">
+            <div class="flex items-center gap-2">
+                <span class="text-zinc-400 font-medium">TOKYO (JST):</span>
+                <span id="clock-tokyo" class="text-white font-semibold tabular-nums">00:00:00</span>
+                <span id="status-tokyo" class="h-1.5 w-1.5 rounded-full bg-zinc-700"></span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-zinc-400 font-medium">LONDON (BST):</span>
+                <span id="clock-london" class="text-white font-semibold tabular-nums">00:00:00</span>
+                <span id="status-london" class="h-1.5 w-1.5 rounded-full bg-zinc-700"></span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-zinc-400 font-medium">NEW YORK (EDT):</span>
+                <span id="clock-newyork" class="text-white font-semibold tabular-nums">00:00:00</span>
+                <span id="status-newyork" class="h-1.5 w-1.5 rounded-full bg-zinc-700"></span>
+            </div>
+        </div>
+    </div>
+
     <main class="flex-grow w-full">
         <div id="view-academy" class="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="border-b border-zinc-900 pb-4 font-mono flex justify-between items-end">
@@ -59,7 +97,6 @@
         </div>
     </main>
 
-    <!-- TRADITIONAL MULTI-COLUMN CORPORATE WEB FOOTER HOUSING -->
     <footer class="bg-[#060608] border-t border-zinc-900 py-12 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
         <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div class="space-y-3">
@@ -91,7 +128,6 @@
         </div>
     </footer>
 
-    <!-- OVERLAY MODAL -->
     <div id="immersive-reader" class="fixed inset-0 bg-[#020203]/95 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-[#08080c] border border-zinc-900 rounded-xl max-w-3xl w-full flex flex-col max-h-[85vh] shadow-2xl">
             <div class="p-4 border-b border-zinc-900 flex justify-between items-center bg-[#050507]">
