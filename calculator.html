@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAIROS GLOBAL // RISK & LOT SIZING CALCULATOR</title>
+    <!-- Tailwind CSS Interface Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body { background-color: #020203; color: #d4d4d8; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #020203; }
+        ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #27272a; }
+    </style>
+</head>
+<body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- NAVIGATION APP BAR -->
+    <nav class="bg-[#060608] border-b border-zinc-900 px-4 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="h-6 w-6 rounded bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                <span class="text-[10px] font-mono font-bold text-white">KG</span>
+            </div>
+            <div class="font-mono">
+                <span class="text-xs font-bold text-white tracking-widest block leading-none">KAIROS GLOBAL</span>
+                <span class="text-[9px] text-zinc-500 tracking-wider uppercase mt-0.5 block">Risk Architecture Desk</span>
+            </div>
+        </div>
+        <!-- Return Anchor Route -->
+        <a href="index.html" class="font-mono text-xs text-zinc-400 hover:text-cyan-400 transition-colors border border-zinc-800 bg-[#020203] px-3 py-1.5 rounded-lg">
+            &larr; RETURN TO TERMINAL
+        </a>
+    </nav>
+
+    <!-- MAIN COCKPIT MATRIX CONTENT -->
+    <main class="flex-grow max-w-5xl w-full mx-auto px-4 py-12">
+        <div class="space-y-6">
+            
+            <!-- Page Title Block Identity -->
+            <div class="border-b border-zinc-900 pb-4 font-mono">
+                <h1 class="text-lg font-bold text-white uppercase tracking-wider">// Tactical Lot Sizing & Multi-Currency Risk Calculator</h1>
+                <p class="text-xs text-zinc-500 mt-1">Determine exact contract sizing limits across cross-border cash positions while optimizing variance safety limits.</p>
+            </div>
+
+            <!-- Double-Column Execution Workspace Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                
+                <!-- Left Input Parameter Configuration Form Panel (7/12 Cols) -->
+                <div class="lg:col-span-7 bg-[#08080c] border border-zinc-900 rounded-xl p-6 font-mono text-xs space-y-4">
+                    <h3 class="text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-900 pb-1.5 flex justify-between items-center">
+                        <span>1. Risk Input Constraints</span>
+                        <span class="text-[9px] text-zinc-600 font-normal uppercase tracking-wider text-cyan-500">// Real-Time Math Engine</span>
+                    </h3>
+
+                    <!-- Input Fields Layout Component Rows -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-zinc-500 mb-1.5 text-[10px] tracking-wider uppercase">Account Base Currency</label>
+                            <select id="account-currency" onchange="computePositionSizing()" class="w-full bg-[#030305] border border-zinc-900 rounded-lg px-3 py-2.5 text-white font-bold focus:outline-none focus:border-cyan-500 cursor-pointer">
+                                <option value="USD">USD - US Dollar</option>
+                                <option value="EUR">EUR - Euro</option>
+                                <option value="GBP">GBP - British Pound</option>
+                                <option value="AUD">AUD - Australian Dollar</option>
+                                <option value="JPY">JPY - Japanese Yen</option>
+                                <option value="CAD">CAD - Canadian Dollar</option>
+                                <option value="CHF">CHF - Swiss Franc</option>
+                                <option value="NZD">NZD - New Zealand Dollar</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-zinc-500 mb-1.5 text-[10px] tracking-wider uppercase">Account Balance</label>
+                            <input id="acc-balance" type="number" value="10000" oninput="computePositionSizing()" class="w-full bg-[#030305] border border-zinc-900 rounded-lg px-3 py-2.5 text-zinc-200 font-bold focus:outline-none focus:border-cyan-500 tabular-nums">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-zinc-500 mb-1.5 text-[10px] tracking-wider uppercase">Risk Ratio (%)</label>
+                            <input id="risk-percentage" type="number" value="1.0" step="0.1" oninput="computePositionSizing()" class="w-full bg-[#030305] border border-zinc-900 rounded-lg px-3 py-2.5 text-zinc-200 font-bold focus:outline-none focus:border-cyan-500 tabular-nums">
+                        </div>
+                        <div>
+                            <label class="block text-zinc-500 mb-1.5 text-[10px] tracking-wider uppercase">Stop Loss (Pips)</label>
+                            <input id="stop-loss-pips" type="number" value="20" oninput="computePositionSizing()" class="w-full bg-[#030305] border border-zinc-900 rounded-lg px-3 py-2.5 text-zinc-200 font-bold focus:outline-none focus:border-cyan-500 tabular-nums">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-zinc-500 mb-1.5 text-[10px] tracking-wider uppercase">Currency Pair Token (Alphabetical G8 Matrix)</label>
+                        <select id="calc-asset-pair" onchange="computePositionSizing()" class="w-full bg-[#030305] border border-zinc-900 rounded-lg px-3 py-2.5 text-zinc-200 font-bold focus:outline-none focus:border-cyan-500 cursor-pointer">
+                            <option value="AUDCAD">AUD / CAD (Australian Dollar / Canadian Dollar)</option>
+                            <option value="AUDCHF">AUD / CHF (Australian Dollar / Swiss Franc)</option>
+                            <option value="AUDJPY">AUD / JPY (Australian Dollar / Japanese Yen)</option>
+                            <option value="AUDNZD">AUD / NZD (Australian Dollar / New Zealand Dollar)</option>
+                            <option value="AUDUSD">AUD / USD (Australian Dollar / US Dollar)</option>
+                            <option value="CADCHF">CAD / CHF (Canadian Dollar / Swiss Franc)</option>
+                            <option value="CADJPY">CAD / JPY (Canadian Dollar / Japanese Yen)</option>
+                            <option value="CHFJPY">CHF / JPY (Swiss Franc / Japanese Yen)</option>
+                            <option value="EURAUD">EUR / AUD (Euro / Australian Dollar)</option>
+                            <option value="EURCAD">EUR / CAD (Euro / Canadian Dollar)</option>
+                            <option value="EURCHF">EUR / CHF (Euro / Swiss Franc)</option>
+                            <option value="EURGBP">EUR / GBP (Euro / British Pound)</option>
+                            <option value="EURJPY">EUR / JPY (Euro / Japanese Yen)</option>
+                            <option value="EURNZD">EUR / NZD (Euro / New Zealand Dollar)</option>
+                            <option value="EURUSD">EUR / USD (Euro / US Dollar)</option>
+                            <option value="GBPAUD">GBP / AUD (British Pound / Australian Dollar)</option>
+                            <option value="GBPCAD">GBP / CAD (British Pound / Canadian Dollar)</option>
+                            <option value="GBPCHF">GBP / CHF (British Pound / Swiss Franc)</option>
+                            <option value="GBPJPY">GBP / JPY (British Pound / Japanese Yen)</option>
+                            <option value="GBPNZD">GBP / NZD (British Pound / New Zealand Dollar)</option>
+                            <option value="GBPUSD">GBP / USD (British Pound / US Dollar)</option>
+                            <option value="NZDCAD">NZD / CAD (New Zealand Dollar / Canadian Dollar)</option>
+                            <option value="NZDCHF">NZD / CHF (New Zealand Dollar / Swiss Franc)</option>
+                            <option value="NZDJPY">NZD / JPY (New Zealand Dollar / Japanese Yen)</option>
+                            <option value="NZDUSD">NZD / USD (New Zealand Dollar / US Dollar)</option>
+                            <option value="USDCAD">USD / CAD (US Dollar / Canadian Dollar)</option>
+                            <option value="USDCHF">USD / CHF (US Dollar / Swiss Franc)</option>
+                            <option value="USDJPY">USD / JPY (US Dollar / Japanese Yen)</option>
+                        </select>
+                    </div>
+
+                    <!-- Manual Fallback Input Override -->
+                    <div id="manual-rate-container" class="hidden pt-2">
+                        <label id="manual-label" class="block text-amber-500 mb-1.5 text-[10px] tracking-wider uppercase">// Exchange Conversion Override Rate</label>
+                        <input id="manual-conversion-rate" type="number" value="1.0000" step="0.0001" oninput="computePositionSizing()" class="w-full bg-[#0d0905] border border-amber-900/40 rounded-lg px-3 py-2.5 text-amber-400 font-bold focus:outline-none focus:border-amber-500">
+                    </div>
+                </div>
+
+                <!-- Right Mathematical Telemetry Diagnostic Panel (5/12 Cols) -->
+                <div class="lg:col-span-5 bg-[#08080c] border border-zinc-900 rounded-xl p-6 font-mono flex flex-col justify-between relative overflow-hidden">
+                    <div class="space-y-5">
+                        <h3 class="text-cyan-400 font-bold uppercase tracking-wider border-b border-zinc-900 pb-1.5 text-xs">// Calculated Risk Metrics Output</h3>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <span class="block text-[9px] text-zinc-500 uppercase tracking-wider">Capital Value At Risk</span>
+                                <div id="out-risk-cash" class="text-xl font-bold text-white mt-0.5 tabular-nums">$100.00</div>
+                            </div>
+                            <div>
+                                <span class="block text-[9px] text-zinc-500 uppercase tracking-wider">Pip Value (1 Standard Lot)</span>
+                                <div id="out-pip-value" class="text-xl font-bold text-zinc-400 mt-0.5 tabular-nums">$10.00</div>
+                            </div>
+                        </div>
+
+                        <!-- Main Lot Metric Banner Frame -->
+                        <div class="bg-[#030305] border border-zinc-900 rounded-xl p-4 text-center mt-2">
+                            <span class="block text-[9px] text-zinc-500 uppercase tracking-widest font-bold">Total Max Allocation Volume</span>
+                            <div id="out-lots-standard" class="text-4xl font-extrabold text-cyan-400 tracking-tight my-1 tabular-nums">0.50</div>
+                            <span class="block text-[10px] text-zinc-400 font-semibold tracking-wider">STANDARD LOTS</span>
+                        </div>
+
+                        <!-- Secondary Volume Unit Translations -->
+                        <div class="grid grid-cols-2 gap-2 text-[11px] pt-1">
+                            <div class="bg-[#040406]/50 p-2.5 border border-zinc-900 rounded-lg text-center">
+                                <span class="text-zinc-500 block text-[9px]">MINI CONTRACTS</span>
+                                <span id="out-lots-mini" class="text-sm font-bold text-white tabular-nums">5.0</span>
+                            </div>
+                            <div class="bg-[#040406]/50 p-2.5 border border-zinc-900 rounded-lg text-center">
+                                <span class="text-zinc-500 block text-[9px]">TOTAL NOMINAL UNITS</span>
+                                <span id="out-units" class="text-sm font-bold text-white tabular-nums">50,000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-[9px] text-zinc-500 mt-6 pt-3 border-t border-zinc-900/60 leading-relaxed uppercase">
+                        <span class="text-cyan-500 font-bold">// Risk Management Rule:</span> Sizing calculations map portfolio variance boundaries to avoid liquidation risk.
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER TELEMETRY LAYER -->
+    <footer class="bg-[#060608] border-t border-zinc-900 py-6 px-4 font-mono text-[11px] text-zinc-600 text-center select-none w-full shrink-0">
+        &copy; 2026 Kairos Global Research // Quantitative Risk Management Engine.
+    </footer>
+
+    <!-- RISK CALCULATION AND PIP EXTRACTION SCRIPT MOTOR -->
+    <script>
+        const POLYGON_API_KEY = "No0EnBLyugPby70zmXCA0tpUjazFKKcg";
+
+        async function computePositionSizing() {
+            // 1. Gather User Interface Input Parameters
+            const accountCurrency = document.getElementById('account-currency').value;
+            const balance = parseFloat(document.getElementById('acc-balance').value) || 0;
+            const riskPct = parseFloat(document.getElementById('risk-percentage').value) || 0;
+            const stopLoss = parseFloat(document.getElementById('stop-loss-pips').value) || 0;
+            const pair = document.getElementById('calc-asset-pair').value;
+
+            // Isolate Base/Quote structure configurations
+            const baseCurr = pair.substring(0, 3);
+            const quoteCurr = pair.substring(3, 6);
+            const isJpy = (quoteCurr === "JPY");
+
+            // 2. Render Capital Value at Risk Cash Allocation
+            const riskAmountMoney = balance * (riskPct / 100);
+            document.getElementById('out-risk-cash').textContent = `${accountCurrency} ${riskAmountMoney.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+            if (stopLoss <= 0 || riskAmountMoney <= 0) {
+                updateOutputDisplay(0);
+                return;
+            }
+
+            // Raw pip value calculation constants for a standard 100,000 unit lot size
+            const rawPipValueInQuote = isJpy ? 1000 : 10;
+            let finalPipValueInAccountCurrency = rawPipValueInQuote;
+            
+            const manualRateContainer = document.getElementById('manual-rate-container');
+            const manualLabel = document.getElementById('manual-label');
+
+            // 3. Process Multi-Currency Conversion Logic
+            if (quoteCurr === accountCurrency) {
+                // If quote currency matches account base currency, conversion is direct
+                finalPipValueInAccountCurrency = rawPipValueInQuote;
+                manualRateContainer.classList.add('hidden');
+            } else {
+                try {
+                    let rate = 0;
+                    
+                    // Case A: Look for Account Currency as Base, Quote as counter (e.g., USDJPY)
+                    let ticker1 = `${accountCurrency}${quoteCurr}`;
+                    let price1 = await fetchLiveMarketPrice(ticker1);
+                    if (price1 > 0) {
+                        rate = 1 / price1;
+                        manualRateContainer.classList.add('hidden');
+                    } else {
+                        // Case B: Look for Quote Currency as Base, Account as counter (e.g., GBPUSD)
+                        let ticker2 = `${quoteCurr}${accountCurrency}`;
+                        let price2 = await fetchLiveMarketPrice(ticker2);
+                        if (price2 > 0) {
+                            rate = price2;
+                            manualRateContainer.classList.add('hidden');
+                        } else {
+                            // Case C: Indirect G8 calculation via cross-border paths
+                            let tokenToUsd = await fetchLiveMarketPrice(`${quoteCurr}USD`) || (1 / await fetchLiveMarketPrice(`USD${quoteCurr}`));
+                            let accountToUsd = await fetchLiveMarketPrice(`${accountCurrency}USD`) || (1 / await fetchLiveMarketPrice(`USD${accountCurrency}`));
+                            if (tokenToUsd > 0 && accountToUsd > 0) {
+                                rate = tokenToUsd / accountToUsd;
+                                manualRateContainer.classList.add('hidden');
+                            } else {
+                                throw new Error("Exchange pricing path outside standard parameters.");
+                            }
+                        }
+                    }
+
+                    finalPipValueInAccountCurrency = rawPipValueInQuote * rate;
+                } catch (error) {
+                    // Reveal manual input override elements if rates hit network restrictions
+                    manualRateContainer.classList.remove('hidden');
+                    manualLabel.textContent = `// Conversion Override Rate Required (${quoteCurr} to ${accountCurrency})`;
+                    const manualOverrideRate = parseFloat(document.getElementById('manual-conversion-rate').value) || 1.0;
+                    finalPipValueInAccountCurrency = rawPipValueInQuote * manualOverrideRate;
+                }
+            }
+
+            // Render precise calculated pip valuations
+            document.getElementById('out-pip-value').textContent = `${accountCurrency} ${finalPipValueInAccountCurrency.toFixed(2)}`;
+
+            // 4. Run Sizing Dimension Math
+            const standardLotsCalculated = riskAmountMoney / (stopLoss * finalPipValueInAccountCurrency);
+            updateOutputDisplay(standardLotsCalculated);
+        }
+
+        // Helper API anchor engine fetching previous day close spot metrics
+        async function fetchLiveMarketPrice(ticker) {
+            if (!POLYGON_API_KEY) return 0;
+            try {
+                const response = await fetch(`https://api.polygon.io/v2/aggs/ticker/C:${ticker}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`);
+                const data = await response.json();
+                if (data && data.results && data.results[0]) {
+                    return data.results[0].c; 
+                }
+                return 0;
+            } catch (e) { return 0; }
+        }
+
+        function updateOutputDisplay(lots) {
+            if (lots < 0 || isNaN(lots) || !isFinite(lots)) lots = 0;
+            
+            const miniLots = lots * 10;
+            const nominalUnits = lots * 100000;
+
+            document.getElementById('out-lots-standard').textContent = lots.toFixed(2);
+            document.getElementById('out-lots-mini').textContent = miniLots.toFixed(1);
+            document.getElementById('out-units').textContent = Math.round(nominalUnits).toLocaleString();
+        }
+
+        // Initialize calculator loops on page load configuration states
+        window.addEventListener('DOMContentLoaded', () => {
+            computePositionSizing();
+        });
+    </script>
+</body>
+</html>
