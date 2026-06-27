@@ -4,31 +4,51 @@ let completedModules = JSON.parse(localStorage.getItem('kairos_completed_modules
 
 // ================= AUTOMATED FOREX MULTI-ZONE CLOCK SYSTEM =================
 function updateForexClocks() {
+    // Cross-browser formatting engine engineered to bypass iOS Safari string localization bugs
+    const getZoneTime = (tz) => {
+        try {
+            return new Intl.DateTimeFormat('en-US', {
+                timeZone: tz,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hourCycle: 'h23'
+            }).format(new Date());
+        } catch (e) {
+            return "00:00:00";
+        }
+    };
+
+    const getZoneHour = (tz) => {
+        try {
+            const hourString = new Intl.DateTimeFormat('en-US', {
+                timeZone: tz,
+                hour: 'numeric',
+                hourCycle: 'h23'
+            }).format(new Date());
+            return parseInt(hourString, 10);
+        } catch (e) {
+            return 0;
+        }
+    };
+
     const now = new Date();
-
-    // Time Formatting Logic Parameters
-    const options = (tz) => ({ timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-    const getHour = (tz) => parseInt(new Date().toLocaleTimeString('en-US', { timeZone: tz, hour: '2-digit', hour12: false }));
-
-    // Extract Local Zone Strings
     const timeUTC = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
-    const timeTokyo = now.toLocaleTimeString('en-GB', options('Asia/Tokyo'));
-    const timeLondon = now.toLocaleTimeString('en-GB', options('Europe/London'));
-    const timeNewYork = now.toLocaleTimeString('en-GB', options('America/New_York'));
 
-    // Inject Strings Into Target Nodes
+    // Map time output keys safely to DOM targets
     const nodes = {
         'live-time': timeUTC,
-        'clock-tokyo': timeTokyo,
-        'clock-london': timeLondon,
-        'clock-newyork': timeNewYork
+        'clock-tokyo': getZoneTime('Asia/Tokyo'),
+        'clock-london': getZoneTime('Europe/London'),
+        'clock-newyork': getZoneTime('America/New_York')
     };
+
     for (const [id, val] of Object.entries(nodes)) {
         const el = document.getElementById(id);
         if (el) el.textContent = val;
     }
 
-    // Dynamic Open/Closed Status Logic Engine (Standard 08:00 - 17:00 Market Session Rules)
+    // Dynamic Session Status Indicator Toggles (Standard 08:00 - 17:00 Market Window Rules)
     const toggleStatus = (id, hour) => {
         const indicator = document.getElementById(`status-${id}`);
         if (!indicator) return;
@@ -39,9 +59,9 @@ function updateForexClocks() {
         }
     };
 
-    toggleStatus('tokyo', getHour('Asia/Tokyo'));
-    toggleStatus('london', getHour('Europe/London'));
-    toggleStatus('newyork', getHour('America/New_York'));
+    toggleStatus('tokyo', getZoneHour('Asia/Tokyo'));
+    toggleStatus('london', getZoneHour('Europe/London'));
+    toggleStatus('newyork', getZoneHour('America/New_York'));
 }
 
 // ================= CHART WORKSPACE CONFIGURATOR (index.html only) =================
@@ -172,11 +192,11 @@ function renderAcademyDomElements() {
 
 // ================= SAFE LIFECYCLE INITIALIZATION =================
 window.addEventListener('DOMContentLoaded', () => {
-    // Fire clock engine loops immediately
+    // Fire clock loops immediately first to prevent execution bottlenecks
     updateForexClocks();
     setInterval(updateForexClocks, 1000);
 
-    // Render components safely
+    // Populate data channels
     renderPublicationsFeed();
     renderAcademyDomElements();
     calculateProgressMetrics();
