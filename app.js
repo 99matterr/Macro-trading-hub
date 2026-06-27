@@ -2,6 +2,48 @@
 let activeLayout = localStorage.getItem('kairos_layout') || 'single';
 let completedModules = JSON.parse(localStorage.getItem('kairos_completed_modules')) || [];
 
+// ================= AUTOMATED FOREX MULTI-ZONE CLOCK SYSTEM =================
+function updateForexClocks() {
+    const now = new Date();
+
+    // Time Formatting Logic Parameters
+    const options = (tz) => ({ timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    const getHour = (tz) => parseInt(new Date().toLocaleTimeString('en-US', { timeZone: tz, hour: '2-digit', hour12: false }));
+
+    // Extract Local Zone Strings
+    const timeUTC = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+    const timeTokyo = now.toLocaleTimeString('en-GB', options('Asia/Tokyo'));
+    const timeLondon = now.toLocaleTimeString('en-GB', options('Europe/London'));
+    const timeNewYork = now.toLocaleTimeString('en-GB', options('America/New_York'));
+
+    // Inject Strings Into Target Nodes
+    const nodes = {
+        'live-time': timeUTC,
+        'clock-tokyo': timeTokyo,
+        'clock-london': timeLondon,
+        'clock-newyork': timeNewYork
+    };
+    for (const [id, val] of Object.entries(nodes)) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+    }
+
+    // Dynamic Open/Closed Status Logic Engine (Standard 08:00 - 17:00 Market Session Rules)
+    const toggleStatus = (id, hour) => {
+        const indicator = document.getElementById(`status-${id}`);
+        if (!indicator) return;
+        if (hour >= 8 && hour < 17) {
+            indicator.className = "h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]";
+        } else {
+            indicator.className = "h-1.5 w-1.5 rounded-full bg-zinc-800";
+        }
+    };
+
+    toggleStatus('tokyo', getHour('Asia/Tokyo'));
+    toggleStatus('london', getHour('Europe/London'));
+    toggleStatus('newyork', getHour('America/New_York'));
+}
+
 // ================= CHART WORKSPACE CONFIGURATOR (index.html only) =================
 function setLayout(layoutFormat) {
     if(!document.getElementById('workspace-single')) return;
@@ -29,6 +71,9 @@ function setLayout(layoutFormat) {
 
 // ================= DYNAMIC DOCUMENT READ GENERATOR =================
 function compileAndOpenDocument(type, id) {
+    if (type === 'blog' && typeof KAIROS_BLOG_DATABASE === 'undefined') return;
+    if (type === 'academy' && typeof KAIROS_ACADEMY_DATABASE === 'undefined') return;
+
     const database = type === 'blog' ? KAIROS_BLOG_DATABASE : KAIROS_ACADEMY_DATABASE;
     const doc = database.find(item => item.id === id);
     if(!doc) return;
@@ -54,9 +99,14 @@ function toggleModuleMilestone(id, event) {
     calculateProgressMetrics();
 }
 
+// ================= PROGRESS METRIC CALCULATION ENGINE =================
 function calculateProgressMetrics() {
     const targetNode = document.getElementById('portal-progress-metric');
     if (!targetNode) return;
+    if (typeof KAIROS_ACADEMY_DATABASE === 'undefined') {
+        targetNode.textContent = "DATA PENDING";
+        return;
+    }
     const totalModules = KAIROS_ACADEMY_DATABASE.length;
     if(totalModules === 0) return;
     const ratio = Math.round((completedModules.length / totalModules) * 100);
@@ -67,6 +117,10 @@ function calculateProgressMetrics() {
 function renderPublicationsFeed() {
     const targetNode = document.getElementById('blog-posts-grid');
     if(!targetNode) return;
+    if (typeof KAIROS_BLOG_DATABASE === 'undefined') {
+        targetNode.innerHTML = `<p class="text-xs font-mono text-zinc-600">// WARNING: data.js file missing in repository path.</p>`;
+        return;
+    }
     targetNode.innerHTML = KAIROS_BLOG_DATABASE.map(post => `
         <article onclick="compileAndOpenDocument('blog', '${post.id}')" class="bg-[#08080c] border border-zinc-900 hover:border-zinc-800 transition-all rounded-xl p-6 flex flex-col justify-between cursor-pointer group">
             <div class="space-y-3">
@@ -88,6 +142,10 @@ function renderPublicationsFeed() {
 function renderAcademyDomElements() {
     const targetNode = document.getElementById('academy-modules-stack');
     if(!targetNode) return;
+    if (typeof KAIROS_ACADEMY_DATABASE === 'undefined') {
+        targetNode.innerHTML = `<p class="text-xs font-mono text-zinc-600">// WARNING: data.js file missing in repository path.</p>`;
+        return;
+    }
     targetNode.innerHTML = KAIROS_ACADEMY_DATABASE.map(mod => {
         const isFinished = completedModules.includes(mod.id);
         return `
@@ -112,17 +170,17 @@ function renderAcademyDomElements() {
     }).join('');
 }
 
-// ================= LIFE CYCLE ENTRY CONTROLLER =================
+// ================= SAFE LIFECYCLE INITIALIZATION =================
 window.addEventListener('DOMContentLoaded', () => {
+    // Fire clock engine loops immediately
+    updateForexClocks();
+    setInterval(updateForexClocks, 1000);
+
+    // Render components safely
     renderPublicationsFeed();
     renderAcademyDomElements();
     calculateProgressMetrics();
-    setLayout(activeLayout);
-    
-    setInterval(() => {
-        const timeSpan = document.getElementById('live-time');
-        if(timeSpan) timeSpan.textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
-    }, 1000);
+    if(document.getElementById('workspace-single')) setLayout(activeLayout);
 });
 
 window.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeReader(); });
