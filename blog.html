@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAIROS GLOBAL RESEARCH // SYSTEM FEEDS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- GLOBAL MAIN STICKY TOP NAVIGATION PLATFORM HEADER -->
+    <nav class="sticky top-0 z-50 bg-[#060608]/90 backdrop-blur-md border-b border-zinc-900 px-4 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-3">
+                <div class="h-6 w-6 rounded bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                    <span class="text-[10px] font-mono font-bold text-white">KG</span>
+                </div>
+                <div class="font-mono">
+                    <span class="text-xs font-bold text-white tracking-widest block leading-none">KAIROS GLOBAL</span>
+                    <span class="text-[9px] text-zinc-500 tracking-wider uppercase mt-0.5 block">Research Portal</span>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center gap-6 font-mono text-xs h-16">
+                <a href="index.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Live Intelligence</a>
+                <a href="blog.html" class="active-tab text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Research Feed</a>
+                <a href="academy.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Quant Academy</a>
+            </div>
+        </div>
+        <div class="font-mono text-xs text-zinc-500 flex items-center gap-4">
+            <span class="text-[10px] text-zinc-400 font-mono uppercase hidden lg:inline tracking-widest border border-zinc-900 px-2 py-1 rounded bg-[#040406]/60">System Intelligence Pipeline</span>
+            <div class="h-4 w-px bg-zinc-800 hidden sm:block"></div>
+            <span id="live-time" class="text-zinc-400 font-semibold tabular-nums hidden sm:inline">UTC --:--:--</span>
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
+        </div>
+    </nav>
+
+    <!-- MOBILE BREAKPOINT NAV INTERFACE TAPE -->
+    <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-4 py-2 flex justify-around font-mono text-xs">
+        <a href="index.html" class="text-zinc-400 py-1 font-medium">Terminal</a>
+        <a href="blog.html" class="active-tab text-zinc-400 py-1 font-medium">Research</a>
+        <a href="academy.html" class="text-zinc-400 py-1 font-medium">Academy</a>
+    </div>
+
+    <!-- MAIN TIMELINE FRAME -->
+    <main class="flex-grow w-full">
+        <div id="view-blog" class="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="border-b border-zinc-900 pb-4 font-mono">
+                <h2 class="text-lg font-bold text-white uppercase tracking-wider">Boutique Intelligence Logs</h2>
+                <p class="text-sm text-zinc-500 mt-1">Cross-border flow matrices and central bank liquidity breakdowns.</p>
+            </div>
+            <div id="blog-posts-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </div>
+    </main>
+
+    <!-- TRADITIONAL MULTI-COLUMN CORPORATE WEB FOOTER HOUSING -->
+    <footer class="bg-[#060608] border-t border-zinc-900 py-12 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
+        <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div class="space-y-3">
+                <p class="text-zinc-300 font-bold tracking-wider uppercase">Kairos Global Research</p>
+                <p class="text-zinc-500 leading-relaxed max-w-sm text-[11px]">
+                    An independent research cockpit engineered to track global macroeconomic cycles, inter-market yield alignments, and structural trend asymmetries.
+                </p>
+            </div>
+            <div class="space-y-2">
+                <p class="text-zinc-400 font-bold uppercase tracking-wider">Portal Core Navigation</p>
+                <ul class="space-y-1 text-[11px]">
+                    <li><a href="index.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Live Analytics Console</a></li>
+                    <li><a href="blog.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Macro Intelligence Logs</a></li>
+                    <li><a href="academy.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Systematic Course Workspace</a></li>
+                </ul>
+            </div>
+            <div class="space-y-2">
+                <p class="text-zinc-400 font-bold uppercase tracking-wider">System Telemetry</p>
+                <div class="text-[11px] space-y-1 text-zinc-500 uppercase">
+                    <div>Interface Protocol: <span class="text-zinc-400">HTTPS / STATIC WIDGET EDGE</span></div>
+                    <div>Data Status: <span class="text-emerald-500 font-bold">NOMINAL / STABLE</span></div>
+                    <div>Deployment Grid: <span class="text-zinc-400">GitHub Pages v2.2</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl w-full mx-auto border-t border-zinc-900/60 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px]">
+            <p>&copy; 2026 Kairos Global Research. All quantitative rights reserved.</p>
+            <p class="text-zinc-600 tracking-wide uppercase">Built with clean code & strategic purpose.</p>
+        </div>
+    </footer>
+
+    <!-- OVERLAY MODAL -->
+    <div id="immersive-reader" class="fixed inset-0 bg-[#020203]/95 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-[#08080c] border border-zinc-900 rounded-xl max-w-3xl w-full flex flex-col max-h-[85vh] shadow-2xl">
+            <div class="p-4 border-b border-zinc-900 flex justify-between items-center bg-[#050507]">
+                <span id="modal-badge" class="font-mono text-[9px] text-cyan-400 font-bold tracking-widest border border-cyan-500/20 px-2 py-0.5 rounded bg-cyan-500/5">INTEL_LOG</span>
+                <button onclick="closeReader()" class="text-zinc-500 hover:text-white font-mono text-xs bg-zinc-950 border border-zinc-900 px-2 py-1 rounded cursor-pointer transition-colors">CLOSE [ESC]</button>
+            </div>
+            <div class="p-6 overflow-y-auto max-w-none border-t border-zinc-900/40">
+                <div id="markdown-reader-target" class="text-zinc-300 space-y-4 prose-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
