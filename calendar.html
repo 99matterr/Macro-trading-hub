@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KAIROS GLOBAL // ECONOMIC CALENDAR</title>
-    <!-- Tailwind CSS Interface Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body { background-color: #020203; color: #d4d4d8; }
@@ -14,20 +13,16 @@
         ::-webkit-scrollbar-thumb:hover { background: #27272a; }
         .active-tab { color: #06b6d4 !important; border-bottom: 2px solid #06b6d4 !important; }
         
-        /* Forces the external widget table text elements to style correctly inside our obsidian design framework */
-        .calendar-container {
+        /* Smooth obsidian panel frame wrapper to contain the script injection */
+        .calendar-wrapper-box {
             background-color: #08080c !important;
             border: 1px solid #18181b;
             border-radius: 12px;
-            overflow: hidden;
         }
-        /* Style fixes for external text attribution links */
-        .calendar-container a { color: #52525b !important; font-family: monospace !important; font-size: 10px !important; text-transform: uppercase; }
     </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- STICKY GLOBAL HEADER NAVIGATION -->
     <nav class="sticky top-0 z-50 bg-[#060608]/90 backdrop-blur-md border-b border-zinc-900 px-4 lg:px-8 h-16 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-8">
             <div class="flex items-center gap-3">
@@ -39,7 +34,6 @@
                     <span class="text-[9px] text-zinc-500 tracking-wider uppercase mt-0.5 block">Quantitative Desk Suite</span>
                 </div>
             </div>
-            <!-- Portal Links -->
             <div class="hidden md:flex items-center gap-6 font-mono text-xs h-16">
                 <a href="index.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Live Intelligence</a>
                 <a href="research.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Research Feed</a>
@@ -53,7 +47,6 @@
         </div>
     </nav>
 
-    <!-- MOBILE NAVIGATION DECK -->
     <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-2 py-2 flex justify-around font-mono text-[11px] shrink-0">
         <a href="index.html" class="text-zinc-400 py-1 px-2 font-medium">Terminal</a>
         <a href="research.html" class="text-zinc-400 py-1 px-2 font-medium">Research</a>
@@ -61,10 +54,8 @@
         <a href="tools-hub.html" class="active-tab text-zinc-400 py-1 px-2 font-medium">Tools</a>
     </div>
 
-    <!-- MAIN CALENDAR CANVAS -->
     <main class="flex-grow w-full max-w-5xl mx-auto px-4 py-6 md:py-10 space-y-6">
         
-        <!-- Section Header -->
         <div class="border-b border-zinc-900 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 font-mono">
             <div>
                 <h1 class="text-base sm:text-lg font-bold text-white uppercase tracking-wider">// Macroeconomic Catalyst Calendar</h1>
@@ -75,34 +66,20 @@
             </a>
         </div>
 
-        <!-- CORRECTED COMPLIANT WEBMASTER WIDGET EMBED FRAME -->
-        <div class="calendar-container p-1 sm:p-3 bg-[#08080c]">
-            <!-- Script engine injection mapping standard container fields -->
+        <div class="calendar-wrapper-box p-2 sm:p-5">
             <div class="w-full overflow-x-auto">
-                <iframe src="https://sslecal.investing.com/?ecoId=&columns=time,currency,importance,event,actual,forecast,previous&category=_macroeconomic&importance=1,2,3&features=datepicker,timezone&countries=25,32,6,37,7,5,4,36,26,10,11,12,22,17,39,14,43,122,142,41,138,45,60,46,51,52,53,19,29,18,59,93,75,108,82,63,61,81,110,84,86,111,85,115,106,102,125,123,97,172,119,105,95,109,188,114,136,113,112,231,107,238,230,178,202,236,180,246,181,104,242,185,184,241,186,103,116,212,189,247,213,226,118,245,214,121,215,224,141,120,131,228,124,191,135,133,143,147,163,165,164,166,174,171,173,176,175,183,182,190,192,193,205,204,206,216,218,217,219,222,223,225,227,243,244,248&calType=week&timeZone=55&lang=1" 
-                        width="100%" 
-                        height="650" 
-                        style="background-color: #08080c;"
-                        frameborder="0" 
-                        allowtransparency="true" 
-                        marginwidth="0" 
-                        marginheight="0">
-                </iframe>
-            </div>
-            <div class="px-2 pt-2 text-right border-t border-zinc-950 mt-1">
-                <span class="text-[9px] font-mono text-zinc-600 uppercase tracking-wider">Real Time Calendar Provided By </span>
-                <a href="https://www.investing.com/" rel="nofollow" target="_blank" class="text-zinc-500 hover:text-cyan-400 font-bold font-mono text-[9px]">Investing.com</a>
+                <div id="investing-widget-target">
+                    <script type="text/javascript" src="https://ssltools.forexprostools.com/economic-calendar/index.php?action=getWidget&ecoId=&columns=time,currency,importance,event,actual,forecast,previous&category=_macroeconomic&importance=1,2,3&features=datepicker,timezone&countries=25,32,6,37,7,5,4,36,26,10,11,12,22,17,39,14,43,122,142,41,138,45,60,46,51,52,53,19,29,18,59,93,75,108,82,63,61,81,110,84,86,111,85,115,106,102,125,123,97,172,119,105,95,109,188,114,136,113,112,231,107,238,230,178,202,236,180,246,181,104,242,185,184,241,186,103,116,212,189,247,213,226,118,245,214,121,215,224,141,120,131,228,124,191,135,133,143,147,163,165,164,166,174,171,173,176,175,183,182,190,192,193,205,204,206,216,218,217,219,222,223,225,227,243,244,248&calType=week&timeZone=55&lang=1"></script>
+                </div>
             </div>
         </div>
 
-        <!-- System Risk Reminder -->
         <div class="bg-[#040406]/40 border border-zinc-900 rounded-xl p-4 font-mono text-[10px] text-zinc-500 uppercase leading-relaxed">
             <span class="text-amber-500 font-bold block mb-0.5">// Operational Volatility Warning</span>
             High-impact events (3-star ratings) can cause sudden expansion in bid-ask spreads and severe price slippage across the G8 matrix pairings. Adjust execution limits accordingly inside your sizing tools.
         </div>
     </main>
 
-    <!-- PREMIUM INSTITUTIONAL FOOTER -->
     <footer class="bg-[#060608] border-t border-zinc-900 py-8 md:py-12 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
         <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-left">
             <div class="space-y-3">
@@ -134,7 +111,6 @@
         </div>
     </footer>
 
-    <!-- REAL-TIME CLOCK MECHANIC INTERFACE -->
     <script>
         setInterval(() => {
             if(document.getElementById('live-time')) document.getElementById('live-time').textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
