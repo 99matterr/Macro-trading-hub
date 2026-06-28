@@ -14,11 +14,15 @@
         ::-webkit-scrollbar-thumb:hover { background: #27272a; }
         .active-tab { color: #06b6d4 !important; border-bottom: 2px solid #06b6d4 !important; }
         
-        /* Custom wrapper to smoothly blend the widget border with our obsidian theme */
-        .calendar-iframe-container iframe {
-            border: 1px solid #18181b !important;
-            border-radius: 12px !important;
+        /* Forces the external widget table text elements to style correctly inside our obsidian design framework */
+        .calendar-container {
+            background-color: #08080c !important;
+            border: 1px solid #18181b;
+            border-radius: 12px;
+            overflow: hidden;
         }
+        /* Style fixes for external text attribution links */
+        .calendar-container a { color: #52525b !important; font-family: monospace !important; font-size: 10px !important; text-transform: uppercase; }
     </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
@@ -71,17 +75,24 @@
             </a>
         </div>
 
-        <!-- INTEGRATED INVESTING.COM DARK EMBED WIDGET -->
-        <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-2 sm:p-4 calendar-iframe-container shadow-inner">
-            <iframe 
-                src="https://sslecal.investing.com/?ecoId=&columns=time,currency,importance,event,actual,forecast,previous&category=_macroeconomic&importance=1,2,3&features=datepicker,timezone&countries=25,32,6,37,7,5,4,36,26,10,11,12,22,17,39,14,43,122,142,41,138,45,60,46,51,52,53,19,29,18,59,93,75,108,82,63,61,81,110,84,86,111,85,115,106,102,125,123,97,172,119,105,95,109,188,114,136,113,112,231,107,238,230,178,202,236,180,246,181,104,242,185,184,241,186,103,116,212,189,247,213,226,118,245,214,121,215,224,141,120,131,228,124,191,135,133,143,147,163,165,164,166,174,171,173,176,175,183,182,190,192,193,205,204,206,216,218,217,219,222,223,225,227,243,244,248&calType=week&timeZone=55&lang=1" 
-                width="100%" 
-                height="600" 
-                frameborder="0" 
-                allowtransparency="true" 
-                marginwidth="0" 
-                marginheight="0">
-            </iframe>
+        <!-- CORRECTED COMPLIANT WEBMASTER WIDGET EMBED FRAME -->
+        <div class="calendar-container p-1 sm:p-3 bg-[#08080c]">
+            <!-- Script engine injection mapping standard container fields -->
+            <div class="w-full overflow-x-auto">
+                <iframe src="https://sslecal.investing.com/?ecoId=&columns=time,currency,importance,event,actual,forecast,previous&category=_macroeconomic&importance=1,2,3&features=datepicker,timezone&countries=25,32,6,37,7,5,4,36,26,10,11,12,22,17,39,14,43,122,142,41,138,45,60,46,51,52,53,19,29,18,59,93,75,108,82,63,61,81,110,84,86,111,85,115,106,102,125,123,97,172,119,105,95,109,188,114,136,113,112,231,107,238,230,178,202,236,180,246,181,104,242,185,184,241,186,103,116,212,189,247,213,226,118,245,214,121,215,224,141,120,131,228,124,191,135,133,143,147,163,165,164,166,174,171,173,176,175,183,182,190,192,193,205,204,206,216,218,217,219,222,223,225,227,243,244,248&calType=week&timeZone=55&lang=1" 
+                        width="100%" 
+                        height="650" 
+                        style="background-color: #08080c;"
+                        frameborder="0" 
+                        allowtransparency="true" 
+                        marginwidth="0" 
+                        marginheight="0">
+                </iframe>
+            </div>
+            <div class="px-2 pt-2 text-right border-t border-zinc-950 mt-1">
+                <span class="text-[9px] font-mono text-zinc-600 uppercase tracking-wider">Real Time Calendar Provided By </span>
+                <a href="https://www.investing.com/" rel="nofollow" target="_blank" class="text-zinc-500 hover:text-cyan-400 font-bold font-mono text-[9px]">Investing.com</a>
+            </div>
         </div>
 
         <!-- System Risk Reminder -->
