@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KAIROS GLOBAL // RISK & LOT SIZING CALCULATOR</title>
-    <!-- Tailwind CSS Interface Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body { background-color: #020203; color: #d4d4d8; }
@@ -16,7 +15,6 @@
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- NAVIGATION APP BAR -->
     <nav class="bg-[#060608] border-b border-zinc-900 px-4 lg:px-8 h-16 flex items-center justify-between">
         <div class="flex items-center gap-3">
             <div class="h-6 w-6 rounded bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
@@ -27,33 +25,27 @@
                 <span class="text-[9px] text-zinc-500 tracking-wider uppercase mt-0.5 block">Risk Architecture Desk</span>
             </div>
         </div>
-        <!-- Return Anchor Route -->
-        <a href="index.html" class="font-mono text-xs text-zinc-400 hover:text-cyan-400 transition-colors border border-zinc-800 bg-[#020203] px-3 py-1.5 rounded-lg">
-            &larr; RETURN TO TERMINAL
+        <a href="tools-hub.html" class="font-mono text-xs text-zinc-400 hover:text-cyan-400 transition-colors border border-zinc-800 bg-[#020203] px-3 py-1.5 rounded-lg">
+            &larr; RETURN TO TOOLS HUB
         </a>
     </nav>
 
-    <!-- MAIN COCKPIT MATRIX CONTENT -->
     <main class="flex-grow max-w-5xl w-full mx-auto px-4 py-12">
         <div class="space-y-6">
             
-            <!-- Page Title Block Identity -->
             <div class="border-b border-zinc-900 pb-4 font-mono">
                 <h1 class="text-lg font-bold text-white uppercase tracking-wider">// Tactical Lot Sizing & Multi-Currency Risk Calculator</h1>
                 <p class="text-xs text-zinc-500 mt-1">Determine exact contract sizing limits across cross-border cash positions while optimizing variance safety limits.</p>
             </div>
 
-            <!-- Double-Column Execution Workspace Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                 
-                <!-- Left Input Parameter Configuration Form Panel (7/12 Cols) -->
                 <div class="lg:col-span-7 bg-[#08080c] border border-zinc-900 rounded-xl p-6 font-mono text-xs space-y-4">
                     <h3 class="text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-900 pb-1.5 flex justify-between items-center">
                         <span>1. Risk Input Constraints</span>
                         <span class="text-[9px] text-zinc-600 font-normal uppercase tracking-wider text-cyan-500">// Real-Time Math Engine</span>
                     </h3>
 
-                    <!-- Input Fields Layout Component Rows -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-zinc-500 mb-1.5 text-[10px] tracking-wider uppercase">Account Base Currency</label>
@@ -119,14 +111,12 @@
                         </select>
                     </div>
 
-                    <!-- Manual Fallback Input Override -->
                     <div id="manual-rate-container" class="hidden pt-2">
                         <label id="manual-label" class="block text-amber-500 mb-1.5 text-[10px] tracking-wider uppercase">// Exchange Conversion Override Rate</label>
                         <input id="manual-conversion-rate" type="number" value="1.0000" step="0.0001" oninput="computePositionSizing()" class="w-full bg-[#0d0905] border border-amber-900/40 rounded-lg px-3 py-2.5 text-amber-400 font-bold focus:outline-none focus:border-amber-500">
                     </div>
                 </div>
 
-                <!-- Right Mathematical Telemetry Diagnostic Panel (5/12 Cols) -->
                 <div class="lg:col-span-5 bg-[#08080c] border border-zinc-900 rounded-xl p-6 font-mono flex flex-col justify-between relative overflow-hidden">
                     <div class="space-y-5">
                         <h3 class="text-cyan-400 font-bold uppercase tracking-wider border-b border-zinc-900 pb-1.5 text-xs">// Calculated Risk Metrics Output</h3>
@@ -142,14 +132,12 @@
                             </div>
                         </div>
 
-                        <!-- Main Lot Metric Banner Frame -->
                         <div class="bg-[#030305] border border-zinc-900 rounded-xl p-4 text-center mt-2">
                             <span class="block text-[9px] text-zinc-500 uppercase tracking-widest font-bold">Total Max Allocation Volume</span>
                             <div id="out-lots-standard" class="text-4xl font-extrabold text-cyan-400 tracking-tight my-1 tabular-nums">0.50</div>
                             <span class="block text-[10px] text-zinc-400 font-semibold tracking-wider">STANDARD LOTS</span>
                         </div>
 
-                        <!-- Secondary Volume Unit Translations -->
                         <div class="grid grid-cols-2 gap-2 text-[11px] pt-1">
                             <div class="bg-[#040406]/50 p-2.5 border border-zinc-900 rounded-lg text-center">
                                 <span class="text-zinc-500 block text-[9px]">MINI CONTRACTS</span>
@@ -172,29 +160,36 @@
         </div>
     </main>
 
-    <!-- FOOTER TELEMETRY LAYER -->
     <footer class="bg-[#060608] border-t border-zinc-900 py-6 px-4 font-mono text-[11px] text-zinc-600 text-center select-none w-full shrink-0">
         &copy; 2026 Kairos Global Research // Quantitative Risk Management Engine.
     </footer>
 
-    <!-- RISK CALCULATION AND PIP EXTRACTION SCRIPT MOTOR -->
     <script>
         const POLYGON_API_KEY = "No0EnBLyugPby70zmXCA0tpUjazFKKcg";
 
+        // Localized fallback exchange table to ensure safety loop initialization when API lags
+        const BACKUP_EXCHANGE_RESERVOIR = {
+            "EURUSD": 1.0850, "GBPUSD": 1.2650, "AUDUSD": 0.6650, "NZDUSD": 0.6120,
+            "USDJPY": 156.20, "USDCAD": 1.3650, "USDCHF": 0.9020, "EURGBP": 0.8550,
+            "EURJPY": 169.50, "GBPJPY": 197.60, "AUDJPY": 103.80, "CADJPY": 114.40,
+            "CHFJPY": 173.10, "NZDJPY": 95.60,  "EURAUD": 1.6310, "EURCAD": 1.4810,
+            "EURCHF": 0.9780, "EURNZD": 1.7720, "GBPAUD": 1.9020, "GBPCAD": 1.7260,
+            "GBPCHF": 1.1410, "GBPNZD": 2.0660, "AUDCAD": 0.9080, "AUDCHF": 0.6010,
+            "AUDNZD": 1.0860, "CADCHF": 0.6610, "NZDCAD": 0.8350, "NZDCHF": 0.5520
+        };
+
         async function computePositionSizing() {
-            // 1. Gather User Interface Input Parameters
             const accountCurrency = document.getElementById('account-currency').value;
             const balance = parseFloat(document.getElementById('acc-balance').value) || 0;
             const riskPct = parseFloat(document.getElementById('risk-percentage').value) || 0;
             const stopLoss = parseFloat(document.getElementById('stop-loss-pips').value) || 0;
             const pair = document.getElementById('calc-asset-pair').value;
 
-            // Isolate Base/Quote structure configurations
             const baseCurr = pair.substring(0, 3);
             const quoteCurr = pair.substring(3, 6);
             const isJpy = (quoteCurr === "JPY");
 
-            // 2. Render Capital Value at Risk Cash Allocation
+            // Capital Value at Risk Allocation display
             const riskAmountMoney = balance * (riskPct / 100);
             document.getElementById('out-risk-cash').textContent = `${accountCurrency} ${riskAmountMoney.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 
@@ -203,51 +198,50 @@
                 return;
             }
 
-            // Raw pip value calculation constants for a standard 100,000 unit lot size
             const rawPipValueInQuote = isJpy ? 1000 : 10;
             let finalPipValueInAccountCurrency = rawPipValueInQuote;
             
             const manualRateContainer = document.getElementById('manual-rate-container');
             const manualLabel = document.getElementById('manual-label');
 
-            // 3. Process Multi-Currency Conversion Logic
             if (quoteCurr === accountCurrency) {
-                // If quote currency matches account base currency, conversion is direct
                 finalPipValueInAccountCurrency = rawPipValueInQuote;
                 manualRateContainer.classList.add('hidden');
             } else {
                 try {
                     let rate = 0;
                     
-                    // Case A: Look for Account Currency as Base, Quote as counter (e.g., USDJPY)
+                    // Attempt to locate a direct conversion ticker combination 
                     let ticker1 = `${accountCurrency}${quoteCurr}`;
                     let price1 = await fetchLiveMarketPrice(ticker1);
+                    
                     if (price1 > 0) {
                         rate = 1 / price1;
                         manualRateContainer.classList.add('hidden');
                     } else {
-                        // Case B: Look for Quote Currency as Base, Account as counter (e.g., GBPUSD)
                         let ticker2 = `${quoteCurr}${accountCurrency}`;
                         let price2 = await fetchLiveMarketPrice(ticker2);
                         if (price2 > 0) {
                             rate = price2;
                             manualRateContainer.classList.add('hidden');
                         } else {
-                            // Case C: Indirect G8 calculation via cross-border paths
+                            // Indirect routing fallback engine calculation pass
                             let tokenToUsd = await fetchLiveMarketPrice(`${quoteCurr}USD`) || (1 / await fetchLiveMarketPrice(`USD${quoteCurr}`));
                             let accountToUsd = await fetchLiveMarketPrice(`${accountCurrency}USD`) || (1 / await fetchLiveMarketPrice(`USD${accountCurrency}`));
+                            
                             if (tokenToUsd > 0 && accountToUsd > 0) {
                                 rate = tokenToUsd / accountToUsd;
                                 manualRateContainer.classList.add('hidden');
                             } else {
-                                throw new Error("Exchange pricing path outside standard parameters.");
+                                // Trigger static backup calculation if live API fails to respond
+                                rate = getStaticFallbackConversion(quoteCurr, accountCurrency);
+                                manualRateContainer.classList.add('hidden');
                             }
                         }
                     }
 
                     finalPipValueInAccountCurrency = rawPipValueInQuote * rate;
                 } catch (error) {
-                    // Reveal manual input override elements if rates hit network restrictions
                     manualRateContainer.classList.remove('hidden');
                     manualLabel.textContent = `// Conversion Override Rate Required (${quoteCurr} to ${accountCurrency})`;
                     const manualOverrideRate = parseFloat(document.getElementById('manual-conversion-rate').value) || 1.0;
@@ -255,15 +249,33 @@
                 }
             }
 
-            // Render precise calculated pip valuations
+            // Guard rails to guarantee NaN protection loops
+            if (isNaN(finalPipValueInAccountCurrency) || finalPipValueInAccountCurrency <= 0) {
+                let safetyRate = getStaticFallbackConversion(quoteCurr, accountCurrency);
+                finalPipValueInAccountCurrency = rawPipValueInQuote * safetyRate;
+            }
+
             document.getElementById('out-pip-value').textContent = `${accountCurrency} ${finalPipValueInAccountCurrency.toFixed(2)}`;
 
-            // 4. Run Sizing Dimension Math
             const standardLotsCalculated = riskAmountMoney / (stopLoss * finalPipValueInAccountCurrency);
             updateOutputDisplay(standardLotsCalculated);
         }
 
-        // Helper API anchor engine fetching previous day close spot metrics
+        // Clean static parsing function to safely return alternative conversion rates
+        function getStaticFallbackConversion(quote, account) {
+            if (quote === account) return 1;
+            
+            // Check cross configurations direct maps
+            if (BACKUP_EXCHANGE_RESERVOIR[`${account}${quote}`]) return 1 / BACKUP_EXCHANGE_RESERVOIR[`${account}${quote}`];
+            if (BACKUP_EXCHANGE_RESERVOIR[`${quote}${account}`]) return BACKUP_EXCHANGE_RESERVOIR[`${quote}${account}`];
+            
+            // Standard proxy conversion via USD bridges
+            let quoteToUsd = BACKUP_EXCHANGE_RESERVOIR[`${quote}USD`] || (1 / BACKUP_EXCHANGE_RESERVOIR[`USD${quote}`]) || 1;
+            let accountToUsd = BACKUP_EXCHANGE_RESERVOIR[`${account}USD`] || (1 / BACKUP_EXCHANGE_RESERVOIR[`USD${account}`]) || 1;
+            
+            return quoteToUsd / accountToUsd;
+        }
+
         async function fetchLiveMarketPrice(ticker) {
             if (!POLYGON_API_KEY) return 0;
             try {
@@ -287,7 +299,6 @@
             document.getElementById('out-units').textContent = Math.round(nominalUnits).toLocaleString();
         }
 
-        // Initialize calculator loops on page load configuration states
         window.addEventListener('DOMContentLoaded', () => {
             computePositionSizing();
         });
