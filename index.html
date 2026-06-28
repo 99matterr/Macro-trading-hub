@@ -6,19 +6,13 @@
     <title>KAIROS GLOBAL RESEARCH // TERMINAL</title>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        /* Modern Obsidian Design Token Resets */
         body { background-color: #020203; color: #d4d4d8; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #020203; }
         ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 2px; }
         ::-webkit-scrollbar-thumb:hover { background: #27272a; }
-        
-        .active-tab {
-            color: #06b6d4 !important;
-            border-bottom: 2px solid #06b6d4;
-        }
+        .active-tab { color: #06b6d4 !important; border-bottom: 2px solid #06b6d4 !important; }
     </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
@@ -35,15 +29,14 @@
                 </div>
             </div>
             <div class="hidden md:flex items-center gap-6 font-mono text-xs h-16">
-                <a href="index.html" class="active-tab text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Live Intelligence</a>
-                <a href="index.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Research Feed</a>
-                <a href="index.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Quant Academy</a>
+                <a href="index.html" class="active-tab h-full px-1 flex items-center font-medium">Live Intelligence</a>
+                <a href="research.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Research Feed</a>
+                <a href="academy.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Quant Academy</a>
                 <a href="tools-hub.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Trading Tools</a>
             </div>
         </div>
         
         <div class="font-mono text-xs text-zinc-500 flex items-center gap-4">
-            <span class="text-[10px] text-zinc-400 font-mono uppercase hidden lg:inline tracking-widest border border-zinc-900 px-2 py-1 rounded bg-[#040406]/60">Live Market Workspace</span>
             <div id="workspace-layout-controls" class="flex border border-zinc-800 rounded p-0.5 bg-[#020203] transition-all">
                 <button onclick="setLayout('single')" id="layout-btn-single" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold bg-zinc-900 text-cyan-400 border border-zinc-800">Single view</button>
                 <button onclick="setLayout('split')" id="layout-btn-split" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold text-zinc-500 hover:text-zinc-300">Split Workspace</button>
@@ -55,9 +48,9 @@
     </nav>
 
     <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-2 py-2 flex justify-around font-mono text-[11px] shrink-0">
-        <a href="index.html" class="active-tab text-zinc-400 py-1 px-2 font-medium">Terminal</a>
-        <a href="index.html" class="text-zinc-400 py-1 px-2 font-medium">Research</a>
-        <a href="index.html" class="text-zinc-400 py-1 px-2 font-medium">Academy</a>
+        <a href="index.html" class="active-tab py-1 px-2 font-medium">Terminal</a>
+        <a href="research.html" class="text-zinc-400 py-1 px-2 font-medium">Research</a>
+        <a href="academy.html" class="text-zinc-400 py-1 px-2 font-medium">Academy</a>
         <a href="tools-hub.html" class="text-zinc-400 py-1 px-2 font-medium">Tools</a>
     </div>
 
@@ -70,262 +63,158 @@
                     { "proName": "FX:EURUSD", "title": "EUR/USD" }, { "proName": "FX:GBPUSD", "title": "GBP/USD" },
                     { "proName": "FX:USDJPY", "title": "USD/JPY" }, { "proName": "FX:USDCAD", "title": "USD/CAD" },
                     { "proName": "FX:USDCHF", "title": "USD/CHF" }, { "proName": "FX:AUDUSD", "title": "AUD/USD" },
-                    { "proName": "FX:NZDUSD", "title": "NZD/USD" }, { "proName": "FX:EURGBP", "title": "EUR/GBP" },
-                    { "proName": "FX:EURJPY", "title": "EUR/JPY" }, { "proName": "FX:GBPJPY", "title": "GBP/JPY" }
+                    { "proName": "FX:NZDUSD", "title": "NZD/USD" }
                 ],
                 "showSymbolLogo": true, "colorTheme": "dark", "isTransparent": true, "displayMode": "regular", "locale": "en"
-            }
             </script>
         </div>
     </div>
 
     <div class="w-full bg-[#030305] border-b border-zinc-900/60 px-4 lg:px-8 py-1.5 flex flex-wrap items-center justify-between font-mono text-[10px] text-zinc-500 select-none shrink-0">
-        <div class="flex items-center gap-2">
-            <span class="text-zinc-400 font-bold uppercase tracking-wider text-[9px] text-cyan-500">// SESSION MONITOR:</span>
-        </div>
+        <div class="flex items-center gap-2"><span class="text-[9px] text-cyan-500">// SESSION MONITOR:</span></div>
         <div class="flex items-center gap-6 flex-wrap">
-            <div class="flex items-center gap-2">
-                <span class="text-zinc-400 font-medium">TOKYO (JST):</span>
-                <span id="clock-tokyo" class="text-white font-semibold tabular-nums">00:00:00</span>
-                <span id="status-tokyo" class="h-1.5 w-1.5 rounded-full bg-zinc-700"></span>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="text-zinc-400 font-medium">LONDON (BST):</span>
-                <span id="clock-london" class="text-white font-semibold tabular-nums">00:00:00</span>
-                <span id="status-london" class="h-1.5 w-1.5 rounded-full bg-zinc-700"></span>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="text-zinc-400 font-medium">NEW YORK (EDT):</span>
-                <span id="clock-newyork" class="text-white font-semibold tabular-nums">00:00:00</span>
-                <span id="status-newyork" class="h-1.5 w-1.5 rounded-full bg-zinc-700"></span>
-            </div>
+            <div class="flex items-center gap-2"><span>TOKYO (JST):</span> <span id="clock-tokyo" class="text-white font-semibold tabular-nums">00:00:00</span> <span id="status-tokyo" class="h-1.5 w-1.5 rounded-full bg-zinc-700"></span></div>
+            <div class="flex items-center gap-2"><span>LONDON (BST):</span> <span id="clock-london" class="text-white font-semibold tabular-nums">00:00:00</span> <span id="status-london" class="h-1.5 w-1.5 rounded-full bg-zinc-700"></span></div>
+            <div class="flex items-center gap-2"><span>NEW YORK (EDT):</span> <span id="clock-newyork" class="text-white font-semibold tabular-nums">00:00:00</span> <span id="status-newyork" class="h-1.5 w-1.5 rounded-full bg-zinc-700"></span></div>
         </div>
     </div>
 
-    <main class="flex-grow w-full overflow-y-auto">
-        <div id="view-terminal" class="view-panel transition-all duration-150">
+    <main class="flex-grow w-full overflow-y-auto space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
+                <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
+                    <div class="text-[10px] text-zinc-500 uppercase">US Dollar Index (DXY)</div>
+                    <div class="text-sm sm:text-base font-bold text-white mt-1 tabular-nums">101.24 <span class="text-xs text-red-500 font-normal ml-2">-0.14%</span></div>
+                </div>
+                <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
+                    <div class="text-[10px] text-zinc-500 uppercase">US 10Y Treasury Yield</div>
+                    <div class="text-sm sm:text-base font-bold text-white mt-1 tabular-nums">4.118% <span class="text-xs text-emerald-500 font-normal ml-2">+0.62%</span></div>
+                </div>
+                <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
+                    <div class="text-[10px] text-zinc-500 uppercase">Quant Hub Status</div>
+                    <div class="text-sm sm:text-base font-bold text-cyan-400 mt-1">LIVE MONITOR ONLINE</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-8 bg-[#08080c] border border-zinc-900 rounded-xl flex flex-col h-[400px] sm:h-[480px] overflow-hidden">
+                <div class="w-full px-4 py-2.5 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50">Macro Catalyst Feed</div>
+                <div class="flex-grow relative bg-[#020203] p-0.5">
+                    <div class="tradingview-widget-container h-full w-full">
+                        <div class="tradingview-widget-container__widget h-full w-full"></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+                        { "colorTheme": "dark", "isTransparent": true, "width": "100%", "height": "100%", "locale": "en", "importanceFilter": "0,1", "currencyFilter": "USD,EUR,GBP,JPY,AUD" }
+                        </script>
+                    </div>
+                </div>
+            </div>
             
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
-                    <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
-                        <div class="text-[10px] text-zinc-500 uppercase tracking-wider">US Dollar Index (DXY)</div>
-                        <div class="text-sm sm:text-base font-bold text-white mt-1 tabular-nums">101.24 <span class="text-xs text-red-500 font-normal ml-2">-0.14%</span></div>
-                    </div>
-                    <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
-                        <div class="text-[10px] text-zinc-500 uppercase tracking-wider">US 10Y Treasury Yield</div>
-                        <div class="text-sm sm:text-base font-bold text-white mt-1 tabular-nums">4.118% <span class="text-xs text-emerald-500 font-normal ml-2">+0.62%</span></div>
-                    </div>
-                    <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
-                        <div class="text-[10px] text-zinc-500 uppercase tracking-wider">Quant Academy Milestone Track</div>
-                        <div id="portal-progress-metric" class="text-sm sm:text-base font-bold text-cyan-400 mt-1 tabular-nums">100% OPERATIONAL</div>
+            <div class="lg:col-span-4 bg-[#08080c] border border-zinc-900 rounded-xl flex flex-col h-[350px] sm:h-[480px] overflow-hidden">
+                <div class="w-full px-4 py-2.5 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50">Global Headline Wire</div>
+                <div class="flex-grow relative bg-[#020203] p-1">
+                    <div class="tradingview-widget-container h-full w-full">
+                        <div class="tradingview-widget-container__widget h-full w-full"></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js" async>
+                        { "feedMode": "all_symbols", "isTransparent": true, "displayMode": "regular", "width": "100%", "height": "100%", "colorTheme": "dark", "locale": "en" }
+                        </script>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div class="lg:col-span-8 bg-[#08080c] border border-zinc-900 rounded-xl flex flex-col h-[400px] sm:h-[480px] overflow-hidden">
-                    <div class="w-full px-4 py-2.5 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex justify-between items-center shrink-0 border-b border-zinc-900 bg-[#060608]/50">
-                        <div class="flex items-center gap-3">
-                            <span>Macro Catalyst Feed</span>
-                        </div>
-                        <span class="text-cyan-500 font-normal text-[9px] hidden sm:inline">// REAL-TIME DATA INDEX</span>
-                    </div>
-                    <div class="flex-grow relative bg-[#020203] p-0.5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-6 pb-12">
+            <div class="lg:col-span-8 flex flex-col">
+                <div id="chart-workspace-wrapper" class="h-[450px] sm:h-[580px] w-full relative">
+                    <div id="workspace-single" class="h-full w-full bg-[#08080c] border border-zinc-900 rounded-xl p-1">
                         <div class="tradingview-widget-container h-full w-full">
                             <div class="tradingview-widget-container__widget h-full w-full"></div>
-                            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
-                            { "colorTheme": "dark", "isTransparent": true, "width": "100%", "height": "100%", "locale": "en", "importanceFilter": "0,1", "currencyFilter": "USD,EUR,GBP,JPY,AUD" }
+                            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                            { "autosize": true, "symbol": "FX:EURUSD", "interval": "240", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "allow_symbol_change": true, "calendar": false }
                             </script>
                         </div>
                     </div>
-                </div>
-                
-                <div class="lg:col-span-4 bg-[#08080c] border border-zinc-900 rounded-xl flex flex-col h-[350px] sm:h-[480px] overflow-hidden">
-                    <div class="w-full px-4 py-2.5 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex justify-between items-center shrink-0 border-b border-zinc-900 bg-[#060608]/50">
-                        <span>Global Headline Wire</span>
-                        <span class="text-amber-500 font-normal text-[9px] hidden sm:inline">// NEWS TIMELINE</span>
-                    </div>
-                    <div class="flex-grow relative bg-[#020203] p-1">
-                        <div class="tradingview-widget-container h-full w-full">
-                            <div class="tradingview-widget-container__widget h-full w-full"></div>
-                            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js" async>
-                            { "feedMode": "all_symbols", "isTransparent": true, "displayMode": "regular", "width": "100%", "height": "100%", "colorTheme": "dark", "locale": "en" }
-                            </script>
+                    <div id="workspace-split" class="h-full w-full grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+                        <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-1 h-full w-full">
+                            <div class="tradingview-widget-container h-full w-full"><div class="tradingview-widget-container__widget h-full w-full"></div><script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{ "autosize": true, "symbol": "FX:EURUSD", "interval": "240", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "allow_symbol_change": true, "calendar": false }</script></div>
+                        </div>
+                        <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-1 h-full w-full">
+                            <div class="tradingview-widget-container h-full w-full"><div class="tradingview-widget-container__widget h-full w-full"></div><script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{ "autosize": true, "symbol": "TVC:US10Y", "interval": "D", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "allow_symbol_change": true, "calendar": false }</script></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-6 pb-12">
-                
-                <div class="lg:col-span-8 flex flex-col">
-                    <div id="chart-workspace-wrapper" class="h-[450px] sm:h-[580px] w-full relative">
-                        <div id="workspace-single" class="h-full w-full bg-[#08080c] border border-zinc-900 rounded-xl p-1">
-                            <div class="tradingview-widget-container h-full w-full">
-                                <div class="tradingview-widget-container__widget h-full w-full"></div>
-                                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                                { "autosize": true, "symbol": "FX:EURUSD", "interval": "240", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "allow_symbol_change": true, "calendar": false }
-                                </script>
-                            </div>
-                        </div>
-                        <div id="workspace-split" class="h-full w-full grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
-                            <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-1 h-full w-full">
-                                <div class="tradingview-widget-container h-full w-full">
-                                    <div class="tradingview-widget-container__widget h-full w-full"></div>
-                                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                                    { "autosize": true, "symbol": "FX:EURUSD", "interval": "240", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "allow_symbol_change": true, "calendar": false }
-                                    </script>
-                                </div>
-                            </div>
-                            <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-1 h-full w-full">
-                                <div class="tradingview-widget-container h-full w-full">
-                                    <div class="tradingview-widget-container__widget h-full w-full"></div>
-                                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                                    { "autosize": true, "symbol": "TVC:US10Y", "interval": "D", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "allow_symbol_change": true, "calendar": false }
-                                    </script>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-4 bg-[#08080c] border border-zinc-900 rounded-xl p-4 sm:p-5 flex flex-col h-auto lg:h-[580px] justify-between">
-                    <div class="w-full">
-                        <div class="font-mono text-xs font-bold tracking-wider uppercase text-zinc-300 border-b border-zinc-900 pb-2 mb-4 flex items-center justify-between">
-                            <span>Tactical Workspace Log</span>
-                            <span class="text-zinc-600 font-normal text-[10px]">v2.2</span>
-                        </div>
-                        <form id="workspace-form" class="space-y-4 text-xs font-mono">
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-zinc-500 mb-1 text-[10px]">PAIR / ASSET</label>
-                                    <input type="text" placeholder="e.g., GBPJPY" class="w-full bg-[#030305] border border-zinc-900 rounded px-2.5 py-2 text-zinc-200 focus:outline-none focus:border-cyan-500 font-semibold uppercase">
-                                </div>
-                                <div>
-                                    <label class="block text-zinc-500 mb-1 text-[10px]">EXECUTION BIAS</label>
-                                    <select class="w-full bg-[#030305] border border-zinc-900 rounded px-2 py-2 text-zinc-200 focus:outline-none focus:border-cyan-500 font-semibold">
-                                        <option class="text-red-400">SHORT / SELL</option>
-                                        <option class="text-emerald-400">LONG / BUY</option>
-                                        <option class="text-zinc-400">NEUTRAL / WATCH</option>
-                                    </select>
-                                </div>
+            <div class="lg:col-span-4 bg-[#08080c] border border-zinc-900 rounded-xl p-4 sm:p-5 flex flex-col h-auto lg:h-[580px] justify-between">
+                <div class="w-full">
+                    <div class="font-mono text-xs font-bold tracking-wider uppercase text-zinc-300 border-b border-zinc-900 pb-2 mb-4">Tactical Workspace Log</div>
+                    <form id="workspace-form" class="space-y-4 text-xs font-mono">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-zinc-500 mb-1 text-[10px]">PAIR / ASSET</label>
+                                <input type="text" placeholder="e.g., GBPJPY" class="w-full bg-[#030305] border border-zinc-900 rounded px-2.5 py-2 text-zinc-200 focus:outline-none focus:border-cyan-500 uppercase font-bold">
                             </div>
                             <div>
-                                <label class="block text-zinc-500 mb-1 text-[10px]">MACRO REGIME THESIS</label>
-                                <textarea rows="5" placeholder="Identify monetary divergence models, swap anomalies, or incoming central bank catalyst parameters mapping structural asymmetry entries..." class="w-full bg-[#030305] border border-zinc-900 rounded px-2.5 py-2 text-zinc-200 focus:outline-none focus:border-cyan-500 resize-none leading-relaxed text-xs"></textarea>
+                                <label class="block text-zinc-500 mb-1 text-[10px]">EXECUTION BIAS</label>
+                                <select class="w-full bg-[#030305] border border-zinc-900 rounded px-2 py-2 text-zinc-200 focus:outline-none focus:border-cyan-500 font-semibold">
+                                    <option class="text-red-400">SHORT / SELL</option>
+                                    <option class="text-emerald-400">LONG / BUY</option>
+                                    <option class="text-zinc-400">NEUTRAL</option>
+                                </select>
                             </div>
-                        </form>
-                    </div>
-                    <button type="button" class="w-full bg-zinc-900 border border-zinc-800 hover:border-cyan-500/40 text-zinc-300 hover:text-cyan-400 transition-all rounded-lg py-2.5 text-xs font-mono tracking-wider font-medium cursor-pointer mt-4 lg:mt-6">
-                        LOCK CONTEXT LOG ENTRY
-                    </button>
+                        </div>
+                        <div>
+                            <label class="block text-zinc-500 mb-1 text-[10px]">MACRO REGIME THESIS</label>
+                            <textarea rows="5" placeholder="Identify monetary divergence models..." class="w-full bg-[#030305] border border-zinc-900 rounded px-2.5 py-2 text-zinc-200 focus:outline-none focus:border-cyan-500 resize-none leading-relaxed text-xs"></textarea>
+                        </div>
+                    </form>
                 </div>
+                <button type="button" class="w-full bg-zinc-900 border border-zinc-800 hover:border-cyan-500/40 text-zinc-300 hover:text-cyan-400 transition-all rounded-lg py-2.5 text-xs font-mono tracking-wider font-medium cursor-pointer mt-4">LOCK CONTEXT LOG ENTRY</button>
             </div>
         </div>
     </main>
 
-    <footer class="bg-[#060608] border-t border-zinc-900 py-8 md:py-12 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
-        <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div class="space-y-3">
-                <p class="text-zinc-300 font-bold tracking-wider uppercase">Kairos Global Research</p>
-                <p class="text-zinc-500 leading-relaxed max-w-sm text-[11px]">
-                    An independent research cockpit engineered to track global macroeconomic cycles, inter-market yield alignments, and structural trend asymmetries.
-                </p>
-            </div>
-            <div class="space-y-2">
-                <p class="text-zinc-400 font-bold uppercase tracking-wider">Portal Core Navigation</p>
-                <ul class="space-y-1 text-[11px]">
-                    <li><a href="index.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Live Analytics Console</a></li>
-                    <li><a href="index.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Macro Intelligence Logs</a></li>
-                    <li><a href="index.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Systematic Course Workspace</a></li>
-                </ul>
-            </div>
-            <div class="space-y-2">
-                <p class="text-zinc-400 font-bold uppercase tracking-wider">System Telemetry</p>
-                <div class="text-[11px] space-y-1 text-zinc-500 uppercase">
-                    <div>Interface Protocol: <span class="text-zinc-400">HTTPS / STATIC ENGINE EDGE</span></div>
-                    <div>Data Status: <span class="text-emerald-500 font-bold">NOMINAL / STABLE</span></div>
-                    <div>Deployment Grid: <span class="text-zinc-400">GitHub Pages v2.2</span></div>
-                </div>
-            </div>
-        </div>
-        <div class="max-w-7xl w-full mx-auto border-t border-zinc-900/60 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px]">
-            <p>&copy; 2026 Kairos Global Research. All quantitative rights reserved.</p>
-            <p class="text-zinc-600 tracking-wide uppercase">Built with clean code & strategic purpose.</p>
-        </div>
+    <footer class="bg-[#060608] border-t border-zinc-900 py-4 px-4 font-mono text-[11px] text-zinc-600 text-center select-none w-full shrink-0">
+        &copy; 2026 Kairos Global Research // Live Intelligence Terminal.
     </footer>
 
     <script>
         let activeLayout = localStorage.getItem('kairos_layout') || 'single';
-
         function setLayout(layoutFormat) {
-            activeLayout = layoutFormat;
-            localStorage.setItem('kairos_layout', layoutFormat);
-            
-            const singleView = document.getElementById('workspace-single');
-            const splitView = document.getElementById('workspace-split');
-            const btnSingle = document.getElementById('layout-btn-single');
-            const btnSplit = document.getElementById('layout-btn-split');
-            
+            activeLayout = layoutFormat; localStorage.setItem('kairos_layout', layoutFormat);
+            const singleView = document.getElementById('workspace-single'); const splitView = document.getElementById('workspace-split');
+            const btnSingle = document.getElementById('layout-btn-single'); const btnSplit = document.getElementById('layout-btn-split');
             if (!singleView || !splitView || !btnSingle || !btnSplit) return;
-
             btnSingle.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold text-zinc-500 hover:text-zinc-300";
             btnSplit.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold text-zinc-500 hover:text-zinc-300";
-
             if(layoutFormat === 'split') {
-                singleView.classList.add('hidden');
-                splitView.classList.remove('hidden');
+                singleView.classList.add('hidden'); splitView.classList.remove('hidden');
                 btnSplit.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold bg-zinc-900 text-cyan-400 border border-zinc-800";
             } else {
-                singleView.classList.remove('hidden');
-                splitView.classList.add('hidden');
+                singleView.classList.remove('hidden'); splitView.classList.add('hidden');
                 btnSingle.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold bg-zinc-900 text-cyan-400 border border-zinc-800";
             }
         }
-
         function updateForexClocks() {
             const now = new Date();
-            
-            const timeUTC = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
-            const liveTimeEl = document.getElementById('live-time');
-            if (liveTimeEl) liveTimeEl.textContent = timeUTC;
-
+            if (document.getElementById('live-time')) document.getElementById('live-time').textContent = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
             const parseZoneParameters = (tz, clockId, statusId, openHour, closeHour) => {
                 try {
-                    const formatter = new Intl.DateTimeFormat('en-US', {
-                        timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'
-                    });
-                    const timeString = formatter.format(now);
-                    const currentHour = parseInt(timeString.split(':')[0], 10);
-                    
-                    const clockNode = document.getElementById(clockId);
-                    if (clockNode) clockNode.textContent = timeString;
-
+                    const formatter = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
+                    const timeString = formatter.format(now); const currentHour = parseInt(timeString.split(':')[0], 10);
+                    if (document.getElementById(clockId)) document.getElementById(clockId).textContent = timeString;
                     const statusDot = document.getElementById(statusId);
                     if (statusDot) {
-                        const isSessionOpen = openHour < closeHour 
-                            ? (currentHour >= openHour && currentHour < closeHour)
-                            : (currentHour >= openHour || currentHour < closeHour);
-                        
-                        if (isSessionOpen) {
-                            statusDot.className = "h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981]";
-                        } else {
-                            statusDot.className = "h-1.5 w-1.5 rounded-full bg-zinc-800";
-                        }
+                        const isOpen = openHour < closeHour ? (currentHour >= openHour && currentHour < closeHour) : (currentHour >= openHour || currentHour < closeHour);
+                        statusDot.className = isOpen ? "h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981]" : "h-1.5 w-1.5 rounded-full bg-zinc-800";
                     }
-                } catch (e) { console.error("Clock telemetry failure: ", e); }
+                } catch (e) {}
             };
-
             parseZoneParameters('Asia/Tokyo', 'clock-tokyo', 'status-tokyo', 9, 18);
             parseZoneParameters('Europe/London', 'clock-london', 'status-london', 8, 16);
             parseZoneParameters('America/New_York', 'clock-newyork', 'status-newyork', 8, 17);
         }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            setLayout(activeLayout);
-            updateForexClocks();
-            setInterval(updateForexClocks, 1000);
-        });
+        window.addEventListener('DOMContentLoaded', () => { setLayout(activeLayout); updateForexClocks(); setInterval(updateForexClocks, 1000); });
     </script>
 </body>
 </html>
