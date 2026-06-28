@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KAIROS GLOBAL // QUANTITATIVE TOOLS DIRECTORY</title>
+    <!-- Tailwind CSS Interface Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body { background-color: #020203; color: #d4d4d8; }
@@ -14,13 +15,14 @@
         
         .active-tab {
             color: #06b6d4 !important;
-            border-bottom: 2px solid #06b6d4;
+            border-bottom: 2px solid #06b6d4 !important;
         }
     </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-    <nav class="sticky top-0 z-50 bg-[#060608]/90 backdrop-blur-md border-b border-zinc-900 px-4 lg:px-8 h-16 flex items-center justify-between">
+    <!-- GLOBAL TOP NAVIGATION APP BAR -->
+    <nav class="sticky top-0 z-50 bg-[#060608]/90 backdrop-blur-md border-b border-zinc-900 px-4 lg:px-8 h-16 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-8">
             <div class="flex items-center gap-3">
                 <div class="h-6 w-6 rounded bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
@@ -31,11 +33,12 @@
                     <span class="text-[9px] text-zinc-500 tracking-wider uppercase mt-0.5 block">Quantitative Desk Suite</span>
                 </div>
             </div>
+            <!-- Portal Links -->
             <div class="hidden md:flex items-center gap-6 font-mono text-xs h-16">
                 <a href="index.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Live Intelligence</a>
-                <a href="index.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Research Feed</a>
-                <a href="index.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Quant Academy</a>
-                <a href="tools-hub.html" class="active-tab text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Trading Tools</a>
+                <a href="research.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Research Feed</a>
+                <a href="academy.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Quant Academy</a>
+                <a href="tools-hub.html" class="active-tab text-cyan-400 transition-colors h-full px-1 flex items-center font-medium">Trading Tools</a>
             </div>
         </div>
         <div class="font-mono text-xs text-zinc-500 flex items-center gap-4">
@@ -44,67 +47,96 @@
         </div>
     </nav>
 
-    <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-4 py-2 flex justify-around font-mono text-xs">
-        <a href="index.html" class="text-zinc-400 py-1 font-medium">Terminal</a>
-        <a href="index.html" class="text-zinc-400 py-1 font-medium">Research</a>
-        <a href="index.html" class="text-zinc-400 py-1 font-medium">Academy</a>
-        <a href="tools-hub.html" class="active-tab text-zinc-400 py-1 font-medium">Tools</a>
+    <!-- MOBILE NAVIGATION DECK -->
+    <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-2 py-2 flex justify-around font-mono text-[11px] shrink-0">
+        <a href="index.html" class="text-zinc-400 py-1 px-2 font-medium">Terminal</a>
+        <a href="research.html" class="text-zinc-400 py-1 px-2 font-medium">Research</a>
+        <a href="academy.html" class="text-zinc-400 py-1 px-2 font-medium">Academy</a>
+        <a href="tools-hub.html" class="active-tab text-zinc-400 py-1 px-2 font-medium">Tools</a>
     </div>
 
-    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-12">
+    <!-- MAIN GRID DECK CONTAINER -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8 md:py-12 overflow-y-auto">
         <div class="space-y-8">
             
+            <!-- Structural Header Signature -->
             <div class="border-b border-zinc-900 pb-5 font-mono">
-                <h1 class="text-lg font-bold text-white uppercase tracking-wider">// Quantitative Workspace Directory</h1>
+                <h1 class="text-base sm:text-lg font-bold text-white uppercase tracking-wider">// Quantitative Workspace Directory</h1>
                 <p class="text-xs text-zinc-500 mt-1">Access custom client-side analytics desks built to calculate systemic macro risk, capital scaling rules, and market range variance models.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Directory Grid Deck (3 Column Dynamic Layout) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
-                <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-6 flex flex-col justify-between hover:border-cyan-500/30 transition-all group">
+                <!-- TOOL CARD 01: REALIZED VOLATILITY PROFILE INDEX -->
+                <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-5 sm:p-6 flex flex-col justify-between hover:border-cyan-500/30 transition-all group">
                     <div class="space-y-4">
                         <div class="flex items-center justify-between font-mono">
-                            <span class="px-2 py-0.5 rounded bg-cyan-950/40 border border-cyan-900/50 text-[9px] font-bold text-cyan-400 tracking-wider uppercase">VOL_DESK_v3.0</span>
+                            <span class="px-2 py-0.5 rounded bg-cyan-950/40 border border-cyan-900/40 text-[9px] font-bold text-cyan-400 tracking-wider uppercase">VOL_DESK_v3.0</span>
                             <span class="text-[10px] text-zinc-600 font-bold tracking-tight">LIVE PARITY FEEDS</span>
                         </div>
                         <div class="font-mono">
-                            <h2 class="text-base font-bold text-white tracking-wide group-hover:text-cyan-400 transition-colors uppercase">// Realized Volatility Diagnostics</h2>
-                            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-                                Pulls live pricing data streams to map out trailing Average True Range (ATR) performance parameters. Contains pure 24-hour intraday session distribution channels and explicit absolute pip weekday variance grids matched directly to institutional baseline configurations.
+                            <h2 class="text-sm sm:text-base font-bold text-white tracking-wide group-hover:text-cyan-400 transition-colors uppercase">// Realized Volatility Diagnostics</h2>
+                            <p class="text-xs text-zinc-400 mt-2 leading-relaxed font-sans">
+                                Pulls live pricing data streams to map out trailing Average True Range (ATR) performance parameters. Contains pure 24-hour intraday session distribution channels and explicit absolute pip weekday variance grids.
                             </p>
                         </div>
                     </div>
-                    <div class="mt-8 pt-4 border-t border-zinc-900 flex items-center justify-between">
-                        <div class="font-mono text-[9px] text-zinc-500 uppercase">Lookup Span: <span class="text-zinc-400 font-bold">10 Weeks (70 Days)</span></div>
-                        <a href="volatility-index.html" class="bg-zinc-900 border border-zinc-800 hover:border-cyan-500 text-zinc-300 hover:text-cyan-400 font-mono text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all">
-                            LAUNCH COMPONENT &rarr;
+                    <div class="mt-8 pt-4 border-t border-zinc-900 flex items-center justify-between font-mono">
+                        <div class="text-[9px] text-zinc-500 uppercase">Lookup Span: <span class="text-zinc-400 font-bold">70 Days</span></div>
+                        <a href="volatility-index.html" class="bg-zinc-900 border border-zinc-800 hover:border-cyan-500 text-zinc-300 hover:text-cyan-400 text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-lg transition-all">
+                            LAUNCH &rarr;
                         </a>
                     </div>
                 </div>
 
-                <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-6 flex flex-col justify-between hover:border-emerald-500/30 transition-all group">
+                <!-- TOOL CARD 02: POSITION SIZE & RISK CALCULATOR -->
+                <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-5 sm:p-6 flex flex-col justify-between hover:border-emerald-500/30 transition-all group">
                     <div class="space-y-4">
                         <div class="flex items-center justify-between font-mono">
-                            <span class="px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-900/50 text-[9px] font-bold text-emerald-400 tracking-wider uppercase">RISK_DESK_v1.5</span>
+                            <span class="px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-900/40 text-[9px] font-bold text-emerald-400 tracking-wider uppercase">RISK_DESK_v1.5</span>
                             <span class="text-[10px] text-zinc-600 font-bold tracking-tight">CONSOLIDATED G8</span>
                         </div>
                         <div class="font-mono">
-                            <h2 class="text-base font-bold text-white tracking-wide group-hover:text-emerald-400 transition-colors uppercase">// Tactical Lot Sizing Desk</h2>
-                            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-                                A dynamic position sizing computer supporting flexible account base currency re-routing choices across a consolidated index of all 28 G8 major and minor cross-pair setups. Automatically resolves cross-currency indirect pip valuations using real-time asset prices.
+                            <h2 class="text-sm sm:text-base font-bold text-white tracking-wide group-hover:text-emerald-400 transition-colors uppercase">// Tactical Lot Sizing Desk</h2>
+                            <p class="text-xs text-zinc-400 mt-2 leading-relaxed font-sans">
+                                A dynamic position sizing computer supporting flexible account base currency re-routing choices across a consolidated index of all 28 G8 major and minor cross-pair setups. Automatically resolves cross-currency indirect valuations.
                             </p>
                         </div>
                     </div>
-                    <div class="mt-8 pt-4 border-t border-zinc-900 flex items-center justify-between">
-                        <div class="font-mono text-[9px] text-zinc-500 uppercase">Asset Coverage: <span class="text-zinc-400 font-bold">28 G8 Pairs</span></div>
-                        <a href="calculator.html" class="bg-zinc-900 border border-zinc-800 hover:border-emerald-500 text-zinc-300 hover:text-emerald-400 font-mono text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all">
-                            LAUNCH COMPONENT &rarr;
+                    <div class="mt-8 pt-4 border-t border-zinc-900 flex items-center justify-between font-mono">
+                        <div class="text-[9px] text-zinc-500 uppercase">Asset Coverage: <span class="text-zinc-400 font-bold">28 Crosses</span></div>
+                        <a href="calculator.html" class="bg-zinc-900 border border-zinc-800 hover:border-emerald-500 text-zinc-300 hover:text-emerald-400 text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-lg transition-all">
+                            LAUNCH &rarr;
+                        </a>
+                    </div>
+                </div>
+
+                <!-- TOOL CARD 03: UPGRADED INVESTING.COM ECONOMIC CALENDAR -->
+                <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-5 sm:p-6 flex flex-col justify-between hover:border-amber-500/30 transition-all group">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between font-mono">
+                            <span class="px-2 py-0.5 rounded bg-amber-950/40 border border-amber-900/40 text-[9px] font-bold text-amber-400 tracking-wider uppercase">CAL_WIRE_v1.0</span>
+                            <span class="text-[10px] text-zinc-600 font-bold tracking-tight">MACRO CATALYST</span>
+                        </div>
+                        <div class="font-mono">
+                            <h2 class="text-sm sm:text-base font-bold text-white tracking-wide group-hover:text-amber-400 transition-colors uppercase">// Macro Economic Calendar</h2>
+                            <p class="text-xs text-zinc-400 mt-2 leading-relaxed font-sans">
+                                Tracks live global market events, data summaries, inflation gauges, and central bank parameters customized to render seamlessly within an integrated dark liquidity framework interface.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-4 border-t border-zinc-900 flex items-center justify-between font-mono">
+                        <div class="text-[9px] text-zinc-500 uppercase">Coverage Span: <span class="text-zinc-400 font-bold">Global Indices</span></div>
+                        <a href="calendar.html" class="bg-zinc-900 border border-zinc-800 hover:border-amber-500 text-zinc-300 hover:text-amber-400 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all">
+                            LAUNCH &rarr;
                         </a>
                     </div>
                 </div>
 
             </div>
 
+            <!-- Status Note Section Panel -->
             <div class="bg-[#040406]/40 border border-zinc-900 rounded-xl p-4 font-mono text-[10px] text-zinc-500 uppercase leading-relaxed">
                 <span class="text-cyan-500 font-bold block mb-0.5">// Unified System Workspace Notice</span>
                 All tools operate purely client-side inside the browser sandbox loop. Live spot rate conversions and lookback candles are processed and cached safely via the core Polygon pipeline to maintain fast load intervals.
@@ -113,13 +145,39 @@
         </div>
     </main>
 
-    <footer class="bg-[#060608] border-t border-zinc-900 py-6 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
-        <div class="max-w-7xl w-full mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px]">
+    <!-- PREMIUM INSTITUTIONAL FOOTER -->
+    <footer class="bg-[#060608] border-t border-zinc-900 py-8 md:py-12 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
+        <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-left">
+            <div class="space-y-3">
+                <p class="text-zinc-300 font-bold tracking-wider uppercase">Kairos Global Research</p>
+                <p class="text-zinc-500 leading-relaxed max-w-sm text-[11px]">
+                    An independent research cockpit engineered to track global macroeconomic cycles, inter-market yield alignments, and structural trend asymmetries.
+                </p>
+            </div>
+            <div class="space-y-2">
+                <p class="text-zinc-400 font-bold uppercase tracking-wider">Portal Core Navigation</p>
+                <ul class="space-y-1 text-[11px]">
+                    <li><a href="index.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Live Analytics Console</a></li>
+                    <li><a href="research.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Macro Intelligence Logs</a></li>
+                    <li><a href="academy.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Systematic Course Workspace</a></li>
+                </ul>
+            </div>
+            <div class="space-y-2">
+                <p class="text-zinc-400 font-bold uppercase tracking-wider">System Telemetry</p>
+                <div class="text-[11px] space-y-1 text-zinc-500 uppercase">
+                    <div>Interface Protocol: <span class="text-zinc-400">HTTPS / STATIC ENGINE EDGE</span></div>
+                    <div>Data Status: <span class="text-emerald-500 font-bold">NOMINAL / STABLE</span></div>
+                    <div>Deployment Grid: <span class="text-zinc-400">GitHub Pages v2.2</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl w-full mx-auto border-t border-zinc-900/60 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px]">
             <p>&copy; 2026 Kairos Global Research. All quantitative rights reserved.</p>
-            <p class="text-zinc-600 tracking-wide uppercase">Tactical Terminal Suite Panel.</p>
+            <p class="text-zinc-600 tracking-wide uppercase">Built with clean code & strategic purpose.</p>
         </div>
     </footer>
 
+    <!-- REAL-TIME CLOCK MECHANIC INTERFACE -->
     <script>
         function updatePlatformTime() {
             const timeSpan = document.getElementById('live-time');
