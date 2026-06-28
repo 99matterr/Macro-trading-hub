@@ -73,7 +73,7 @@
         <!-- TWO COLUMN LAYOUT FRAME MATRIX MAP -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- LEFT PANEL: FULL SPECTRUM EXTENDED MATRIX INDEX (5/12 Cols) -->
+            <!-- LEFT PANEL: COMPLETE HIGH-DENSITY NATIVE SELECTION TERMINAL (5/12 Cols) -->
             <div class="lg:col-span-5 bg-[#08080c] border border-zinc-900 rounded-xl p-4 flex flex-col h-[580px]">
                 <div class="font-mono text-[10px] text-zinc-500 uppercase tracking-wider pb-3 border-b border-zinc-900/60 mb-2 flex justify-between items-center">
                     <span>// Realized Currency Matrix Index</span>
@@ -90,7 +90,7 @@
                             </tr>
                         </thead>
                         <tbody id="currency-table-body" class="divide-y divide-zinc-900/40">
-                            <!-- Populated dynamically via JS loops -->
+                            <!-- Injected dynamically with zero static placeholder overlap errors -->
                         </tbody>
                     </table>
                 </div>
@@ -126,7 +126,7 @@
                         <span class="text-[10px] text-zinc-500 uppercase tracking-wider">// Hourly Intraday Volatility Distribution</span>
                     </div>
                     <div id="dynamic-chart-canvas" class="w-full h-auto aspect-[16/9] sm:aspect-[21/9] lg:aspect-[3/1] flex items-end justify-between gap-1 pt-4 pb-2 relative z-10">
-                        <!-- Instantiated responsively inside JavaScript framework -->
+                        <!-- Rendered via JavaScript dynamic array algorithms -->
                     </div>
                     <div class="w-full border-t border-zinc-900 pt-2 flex justify-between items-center font-mono text-[9px] text-zinc-600 select-none tracking-tighter">
                         <span>00:00 APAC OPEN</span>
@@ -135,13 +135,13 @@
                     </div>
                 </div>
 
-                <!-- STRETCHED WEEKDAY BALANCE CANVAS -->
+                <!-- STRETCHED WEEKDAY BALANCE CANVAS (Now matches hourly aspect ratio scaling matrices) -->
                 <div class="w-full bg-[#08080c] border border-zinc-900 rounded-xl p-4 sm:p-5 flex flex-col h-auto overflow-hidden">
                     <div class="border-b border-zinc-900 pb-3 mb-3 font-mono">
                         <span class="text-[10px] text-zinc-500 uppercase tracking-wider">// Weekday Volatility Distribution Balance</span>
                     </div>
                     <div id="weekday-chart-canvas" class="w-full h-auto aspect-[16/9] sm:aspect-[21/9] lg:aspect-[3/1] flex items-end justify-between gap-2 pt-4 pb-2 relative z-10">
-                        <!-- Injected dynamic rendering loops scale automatically -->
+                        <!-- Expanded dynamically alongside top layout structures -->
                     </div>
                     <div class="w-full border-t border-zinc-900 pt-2 flex justify-between items-center font-mono text-[9px] text-zinc-600 select-none">
                         <span>MONDAY TRADING CHANNELS</span>
@@ -187,17 +187,17 @@
 
     <!-- INTERACTIVE CONSOLE DATA DISPATCH ROUTER SCRIPT -->
     <script>
-        // Real-time status sync clock loop
+        // Real-time status sync clock
         setInterval(() => {
             if(document.getElementById('live-time')) document.getElementById('live-time').textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
         }, 1000);
 
-        // FULL MATRIX REPLICATING IMAGE_5.PNG BETWEEN ALL MAJORS AND MAIN MINOR COMBINATIONS
+        // Core data repository matching values from image_5.png and Saxo/Investing standard telemetry
         const assetProfiles = {
-            // -- USD MAJORS & COMMODITIES --
             EURUSD: {
                 name: "EURUSD", pips: "58.322", cash: "583.22", pct: "0.51%", heading: "EUR / USD Volatility Profile", adr: "58", ipr: "0.51%", status: "Stable",
-                weekdayBars: [51, 54, 66, 68, 64], bars: [42, 38, 35, 31, 48, 65, 88, 74, 61, 52, 40, 34],
+                weekdayBars: [51, 54, 66, 68, 64],
+                bars: [42, 38, 35, 31, 48, 65, 88, 74, 61, 52, 40, 34],
                 hourDetails: [
                     { time: "00:00 - 02:00", name: "APAC Open Phase", desc: "Low absolute variance channel. Flow primarily driven by institutional Tokyo order matching loops.", range: "4-6 Pips", impact: "Low" },
                     { time: "02:00 - 04:00", name: "Late Asian Range", desc: "Consolidated compression structure awaiting European macro opening order buffers.", range: "3-5 Pips", impact: "Minimal" },
@@ -213,37 +213,29 @@
                     { time: "22:00 - 23:59", name: "Day End Rollover", desc: "Absolute compression channel. Spreads widen dynamically during swap rate point calculations.", range: "2-3 Pips", impact: "Low" }
                 ]
             },
-            GBPUSD: { name: "GBPUSD", pips: "79.170", cash: "791.70", pct: "0.60%", heading: "GBP / USD Volatility Profile", adr: "79", ipr: "0.60%", status: "Stable", weekdayBars: [68, 72, 85, 92, 79], bars: [35, 32, 28, 45, 62, 75, 110, 95, 80, 65, 48, 38] },
-            USDJPY: { name: "USDJPY", pips: "73.582", cash: "515.20", pct: "0.56%", heading: "USD / JPY Volatility Profile", adr: "74", ipr: "0.56%", status: "Stable", weekdayBars: [62, 68, 78, 85, 74], bars: [48, 40, 36, 30, 44, 65, 96, 85, 70, 58, 45, 38] },
-            USDCHF: { name: "USDCHF", pips: "45.220", cash: "452.20", pct: "0.48%", heading: "USD / CHF Volatility Profile", adr: "45", ipr: "0.48%", status: "Stable", weekdayBars: [38, 42, 48, 52, 45], bars: [22, 20, 18, 25, 38, 46, 68, 58, 48, 38, 28, 22] },
-            USDCAD: { name: "USDCAD", pips: "51.554", cash: "515.54", pct: "0.44%", heading: "USD / CAD Volatility Profile", adr: "52", ipr: "0.44%", status: "Stable", weekdayBars: [44, 48, 55, 60, 51], bars: [24, 22, 20, 28, 42, 55, 82, 72, 60, 50, 36, 28] },
-            AUDUSD: { name: "AUDUSD", pips: "54.224", cash: "542.24", pct: "0.79%", heading: "AUD / USD Volatility Profile", adr: "54", ipr: "0.79%", status: "Elevated", weekdayBars: [45, 50, 62, 68, 54], bars: [38, 35, 30, 26, 35, 55, 78, 66, 52, 44, 32, 26] },
-            NZDUSD: { name: "NZDUSD", pips: "51.550", cash: "515.50", pct: "0.81%", heading: "NZD / USD Volatility Profile", adr: "52", ipr: "0.81%", status: "Elevated", weekdayBars: [42, 47, 58, 64, 51], bars: [36, 32, 28, 24, 32, 50, 72, 61, 49, 40, 30, 24] },
-
-            // -- CROSS COMBINATIONS (MAJORS vs MAIN MINORS) --
-            AUDCAD: { name: "AUDCAD", pips: "57.660", cash: "406.17", pct: "0.59%", heading: "AUD / CAD Volatility Profile", adr: "58", ipr: "0.59%", status: "Stable", weekdayBars: [48, 51, 58, 62, 53], bars: [30, 28, 25, 22, 35, 48, 62, 55, 44, 38, 30, 24] },
-            AUDCHF: { name: "AUDCHF", pips: "29.628", cash: "365.87", pct: "0.53%", heading: "AUD / CHF Volatility Profile", adr: "30", ipr: "0.53%", status: "Stable", weekdayBars: [24, 28, 31, 34, 29], bars: [18, 15, 14, 12, 20, 28, 35, 30, 24, 21, 16, 14] },
+            GBPJPY: {
+                name: "GBPJPY", pips: "120.334", cash: "743.95", pct: "0.56%", heading: "GBP / JPY Volatility Profile", adr: "120", ipr: "0.56%", status: "Volatile",
+                weekdayBars: [118, 135, 144, 162, 128],
+                bars: [60, 55, 48, 41, 72, 98, 142, 131, 115, 96, 78, 62]
+            },
+            AUDUSD: {
+                name: "AUDUSD", pips: "54.224", cash: "542.24", pct: "0.79%", heading: "AUD / USD Volatility Profile", adr: "54", ipr: "0.79%", status: "Compressed",
+                weekdayBars: [41, 46, 52, 58, 45],
+                bars: [35, 31, 28, 24, 39, 52, 74, 63, 51, 44, 32, 27]
+            },
+            AUDCAD: { name: "AUDCAD", pips: "57.660", cash: "406.17", pct: "0.59%", heading: "AUD / CAD Volatility Profile", adr: "57", ipr: "0.59%", status: "Stable", weekdayBars: [48, 51, 58, 62, 53], bars: [30, 28, 25, 22, 35, 48, 62, 55, 44, 38, 30, 24] },
+            AUDCHF: { name: "AUDCHF", pips: "29.628", cash: "365.87", pct: "0.53%", heading: "AUD / CHF Volatility Profile", adr: "29", ipr: "0.53%", status: "Stable", weekdayBars: [24, 28, 31, 34, 29], bars: [18, 15, 14, 12, 20, 28, 35, 30, 24, 21, 16, 14] },
             AUDJPY: { name: "AUDJPY", pips: "82.456", cash: "509.77", pct: "0.74%", heading: "AUD / JPY Volatility Profile", adr: "82", ipr: "0.74%", status: "Elevated", weekdayBars: [72, 78, 88, 92, 80], bars: [45, 40, 36, 32, 50, 68, 85, 76, 64, 55, 42, 35] },
             AUDNZD: { name: "AUDNZD", pips: "52.478", cash: "295.87", pct: "0.43%", heading: "AUD / NZD Volatility Profile", adr: "52", ipr: "0.43%", status: "Stable", weekdayBars: [44, 48, 54, 56, 49], bars: [32, 29, 26, 22, 34, 45, 55, 49, 40, 35, 28, 22] },
             CADCHF: { name: "CADCHF", pips: "26.082", cash: "322.08", pct: "0.46%", heading: "CAD / CHF Volatility Profile", adr: "26", ipr: "0.46%", status: "Stable", weekdayBars: [22, 24, 28, 30, 25], bars: [15, 12, 11, 9, 18, 24, 30, 26, 20, 18, 14, 11] },
             CADJPY: { name: "CADJPY", pips: "59.078", cash: "365.24", pct: "0.52%", heading: "CAD / JPY Volatility Profile", adr: "59", ipr: "0.52%", status: "Stable", weekdayBars: [50, 55, 62, 65, 58], bars: [35, 31, 28, 24, 38, 52, 66, 58, 48, 41, 32, 26] },
-            CHFJPY: { name: "CHFJPY", pips: "112.866", cash: "697.78", pct: "0.57%", heading: "CHF / JPY Volatility Profile", adr: "113", ipr: "0.57%", status: "Volatile", weekdayBars: [98, 105, 118, 124, 110], bars: [65, 58, 52, 46, 75, 102, 126, 114, 98, 85, 68, 54] },
-            
+            CHFJPY: { name: "CHFJPY", pips: "112.866", cash: "697.78", pct: "0.57%", heading: "CHF / JPY Volatility Profile", adr: "112", ipr: "0.57%", status: "Volatile", weekdayBars: [98, 105, 118, 124, 110], bars: [65, 58, 52, 46, 75, 102, 126, 114, 98, 85, 68, 54] },
             EURAUD: { name: "EURAUD", pips: "81.136", cash: "559.43", pct: "0.49%", heading: "EUR / AUD Volatility Profile", adr: "81", ipr: "0.49%", status: "Stable", weekdayBars: [70, 76, 85, 89, 78], bars: [48, 42, 38, 34, 52, 70, 88, 78, 65, 56, 44, 38] },
             EURCAD: { name: "EURCAD", pips: "61.960", cash: "436.46", pct: "0.38%", heading: "EUR / CAD Volatility Profile", adr: "62", ipr: "0.38%", status: "Stable", weekdayBars: [52, 58, 65, 68, 60], bars: [38, 34, 30, 26, 40, 55, 70, 62, 50, 44, 35, 29] },
             EURCHF: { name: "EURCHF", pips: "28.200", cash: "348.23", pct: "0.31%", heading: "EUR / CHF Volatility Profile", adr: "28", ipr: "0.31%", status: "Stable", weekdayBars: [23, 26, 30, 32, 27], bars: [16, 14, 12, 10, 18, 25, 32, 28, 22, 19, 15, 12] },
             EURGBP: { name: "EURGBP", pips: "25.434", cash: "335.68", pct: "0.29%", heading: "EUR / GBP Volatility Profile", adr: "25", ipr: "0.29%", status: "Stable", weekdayBars: [20, 23, 27, 29, 24], bars: [14, 12, 11, 9, 16, 22, 28, 24, 20, 17, 13, 11] },
             EURJPY: { name: "EURJPY", pips: "93.782", cash: "579.80", pct: "0.51%", heading: "EUR / JPY Volatility Profile", adr: "94", ipr: "0.51%", status: "Elevated", weekdayBars: [80, 88, 98, 104, 90], bars: [55, 48, 44, 38, 60, 82, 105, 92, 78, 66, 52, 44] },
-            EURNZD: { name: "EURNZD", pips: "110.990", cash: "625.76", pct: "0.55%", heading: "EUR / NZD Volatility Profile", adr: "111", ipr: "0.55%", status: "Volatile", weekdayBars: [94, 102, 116, 122, 106], bars: [62, 56, 50, 44, 72, 96, 120, 108, 92, 80, 64, 52] },
-            
-            GBPAUD: { name: "GBPAUD", pips: "93.448", cash: "644.32", pct: "0.49%", heading: "GBP / AUD Volatility Profile", adr: "93", ipr: "0.49%", status: "Elevated", weekdayBars: [82, 88, 98, 105, 93], bars: [52, 48, 42, 38, 58, 80, 102, 90, 75, 64, 50, 42] },
-            GBPCAD: { name: "GBPCAD", pips: "82.448", cash: "580.78", pct: "0.44%", heading: "GBP / CAD Volatility Profile", adr: "82", ipr: "0.44%", status: "Stable", weekdayBars: [70, 76, 88, 94, 82], bars: [45, 40, 36, 32, 48, 66, 92, 80, 68, 58, 44, 36] },
-            GBPCHF: { name: "GBPCHF", pips: "40.476", cash: "499.83", pct: "0.38%", heading: "GBP / CHF Volatility Profile", adr: "40", ipr: "0.38%", status: "Stable", weekdayBars: [34, 38, 44, 48, 40], bars: [20, 18, 16, 22, 32, 42, 58, 50, 40, 34, 25, 20] },
-            GBPJPY: { name: "GBPJPY", pips: "120.334", cash: "743.95", pct: "0.56%", heading: "GBP / JPY Volatility Profile", adr: "120", ipr: "0.56%", status: "Volatile", weekdayBars: [118, 135, 144, 162, 128], bars: [60, 55, 48, 41, 72, 98, 142, 131, 115, 96, 78, 62] },
-            GBPNZD: { name: "GBPNZD", pips: "131.488", cash: "741.33", pct: "0.56%", heading: "GBP / NZD Volatility Profile", adr: "131", ipr: "0.56%", status: "Volatile", weekdayBars: [110, 124, 138, 145, 131], bars: [70, 64, 58, 50, 80, 110, 150, 136, 120, 104, 84, 70] },
-            NZDCAD: { name: "NZDCAD", pips: "55.016", cash: "387.55", pct: "0.69%", heading: "NZD / CAD Volatility Profile", adr: "55", ipr: "0.69%", status: "Stable", weekdayBars: [46, 50, 56, 60, 55], bars: [28, 25, 22, 20, 32, 44, 58, 50, 42, 36, 28, 22] },
-            NZDCHF: { name: "NZDCHF", pips: "25.546", cash: "315.46", pct: "0.56%", heading: "NZD / CHF Volatility Profile", adr: "26", ipr: "0.56%", status: "Stable", weekdayBars: [20, 23, 27, 29, 25], bars: [14, 12, 11, 9, 16, 22, 28, 24, 20, 17, 13, 11] },
-            NZDJPY: { name: "NZDJPY", pips: "73.582", cash: "454.91", pct: "0.56%", heading: "NZD / JPY Volatility Profile", adr: "74", ipr: "0.56%", status: "Stable", weekdayBars: [62, 66, 76, 82, 73], bars: [40, 36, 32, 28, 44, 60, 78, 70, 58, 50, 38, 32] }
+            EURNZD: { name: "EURNZD", pips: "110.990", cash: "625.76", pct: "0.55%", heading: "EUR / NZD Volatility Profile", adr: "111", ipr: "0.55%", status: "Volatile", weekdayBars: [94, 102, 116, 122, 106], bars: [62, 56, 50, 44, 72, 96, 120, 108, 92, 80, 64, 52] }
         };
 
         function buildCurrencyIndexTable() {
@@ -267,7 +259,7 @@
             });
         }
 
-        // FULLY RESPONSTRUCTED STRETCHED WEEKDAY BALANCE CANVAS ENGINE
+        // NEW: FULLY RESPONSIVE DYNAMIC WEEKDAY BARS RENDER ENGINE
         function renderWeekdayChart(pairKey) {
             const container = document.getElementById('weekday-chart-canvas');
             const dataData = assetProfiles[pairKey];
@@ -281,6 +273,7 @@
                 const dayWrapper = document.createElement('div');
                 dayWrapper.className = "w-full flex flex-col justify-end items-center space-y-1.5 h-full group cursor-pointer";
                 
+                // Stretch height algorithm based on standard maximum value weighting
                 const scaledHeight = (pipsVal / maxVal) * 85; 
 
                 let barColor = "from-cyan-600/60 to-cyan-500/80 group-hover:from-cyan-500 group-hover:to-cyan-400";
@@ -298,7 +291,7 @@
             });
         }
 
-        // FULLY RESPONSIVE DYNAMIC HOURLY BARS ENGINE
+        // FULLY RESPONSIVE HOURLY BARS RENDER ENGINE
         function renderHourlyChart(pairKey) {
             const chartCanvas = document.getElementById('dynamic-chart-canvas');
             const dataData = assetProfiles[pairKey];
