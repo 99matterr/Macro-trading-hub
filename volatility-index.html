@@ -3,22 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAIROS GLOBAL RESEARCH // DIAGNOSTICS</title>
+    <title>KAIROS GLOBAL // VOLATILITY DIAGNOSTICS</title>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        /* Modern Obsidian Design Token Resets */
         body { background-color: #020203; color: #d4d4d8; }
-        ::-webkit-scrollbar { width: 5px; height: 5px; height: 5px; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #020203; }
         ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 2px; }
         ::-webkit-scrollbar-thumb:hover { background: #27272a; }
-        
-        .active-tab {
-            color: #06b6d4 !important;
-            border-bottom: 2px solid #06b6d4;
-        }
+        .active-tab { color: #06b6d4 !important; border-bottom: 2px solid #06b6d4; }
     </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
@@ -31,7 +25,7 @@
                 </div>
                 <div class="font-mono">
                     <span class="text-xs font-bold text-white tracking-widest block leading-none">KAIROS GLOBAL</span>
-                    <span class="text-[9px] text-zinc-500 tracking-wider uppercase mt-0.5 block">Research Portal</span>
+                    <span class="text-[9px] text-zinc-500 tracking-wider uppercase mt-0.5 block hidden xs:inline">Research Portal</span>
                 </div>
             </div>
             <div class="hidden md:flex items-center gap-6 font-mono text-xs h-16">
@@ -41,32 +35,30 @@
                 <a href="tools-hub.html" class="active-tab text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Trading Tools</a>
             </div>
         </div>
-        <div class="font-mono text-xs text-zinc-500 flex items-center gap-4">
-            <span class="text-[10px] text-zinc-400 font-mono uppercase hidden lg:inline tracking-widest border border-zinc-900 px-2 py-1 rounded bg-[#040406]/60">Volatility Tools Suite</span>
-            <div class="h-4 w-px bg-zinc-800 hidden sm:block"></div>
-            <span id="live-time" class="text-zinc-400 font-semibold tabular-nums hidden sm:inline">UTC --:--:--</span>
+        <div class="font-mono text-xs text-zinc-500 flex items-center gap-3">
+            <span id="live-time" class="text-zinc-400 font-semibold tabular-nums text-[11px] sm:text-xs">UTC --:--:--</span>
             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
         </div>
     </nav>
 
-    <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-4 py-2 flex justify-around font-mono text-xs">
-        <a href="index.html" class="text-zinc-400 py-1 font-medium">Terminal</a>
-        <a href="index.html" class="text-zinc-400 py-1 font-medium">Research</a>
-        <a href="index.html" class="text-zinc-400 py-1 font-medium">Academy</a>
-        <a href="tools-hub.html" class="text-zinc-400 py-1 font-medium">Tools</a>
+    <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-2 py-2 flex justify-around font-mono text-[11px]">
+        <a href="index.html" class="text-zinc-400 py-1 px-2">Terminal</a>
+        <a href="index.html" class="text-zinc-400 py-1 px-2">Research</a>
+        <a href="index.html" class="text-zinc-400 py-1 px-2">Academy</a>
+        <a href="tools-hub.html" class="active-tab text-zinc-400 py-1 px-2">Tools</a>
     </div>
 
-    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 py-4 md:py-6">
         
         <div class="border-b border-zinc-900 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 font-mono mb-6">
             <div>
-                <h2 class="text-lg font-bold text-white uppercase tracking-wider">G8 Volatility Realized Diagnostics</h2>
-                <p class="text-sm text-zinc-500 mt-1">Calculates and updates real-time pip variation models directly from live exchange candles.</p>
+                <h2 class="text-base sm:text-lg font-bold text-white uppercase tracking-wider">G8 Volatility Realized Diagnostics</h2>
+                <p class="text-xs text-zinc-500 mt-0.5">Calculates real-time pip variation models directly from live exchange candles.</p>
             </div>
             
-            <div class="flex items-center gap-3 bg-[#08080c] border border-zinc-800 rounded-xl px-4 py-2">
-                <label for="asset-selector" class="text-[10px] font-bold text-cyan-400 tracking-wider uppercase">SELECT COUPLING:</label>
-                <select id="asset-selector" onchange="handleAssetChange(this.value)" class="bg-[#020203] text-white border border-zinc-900 rounded-lg px-3 py-1.5 font-bold text-xs focus:outline-none focus:border-cyan-500 font-mono tracking-wide cursor-pointer min-w-[200px]">
+            <div class="flex items-center justify-between md:justify-end gap-3 bg-[#08080c] border border-zinc-800 rounded-xl px-3 py-2 w-full md:w-auto">
+                <label for="asset-selector" class="text-[9px] sm:text-[10px] font-bold text-cyan-400 tracking-wider uppercase whitespace-nowrap">SELECT COUPLING:</label>
+                <select id="asset-selector" onchange="handleAssetChange(this.value)" class="bg-[#020203] text-white border border-zinc-900 rounded-lg px-2 sm:px-3 py-1.5 font-bold text-xs focus:outline-none focus:border-cyan-500 font-mono tracking-wide cursor-pointer w-full md:min-w-[220px]">
                     <optgroup label="G8 DOLLAR MAJORS" id="opt-majors"></optgroup>
                     <optgroup label="EURO CROSS RATES" id="opt-euro"></optgroup>
                     <optgroup label="POUND CROSS RATES" id="opt-pound"></optgroup>
@@ -75,70 +67,71 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch pb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pb-12">
             
-            <div class="lg:col-span-4 bg-[#08080c] border border-zinc-900 rounded-xl p-6 font-mono flex flex-col justify-between relative overflow-hidden">
-                <div class="space-y-6">
+            <div class="lg:col-span-4 bg-[#08080c] border border-zinc-900 rounded-xl p-5 sm:p-6 font-mono flex flex-col justify-between relative overflow-hidden">
+                <div class="space-y-4 sm:space-y-6">
                     <div>
-                        <div id="target-asset-display" class="text-sm font-bold text-cyan-400 tracking-widest uppercase">EURUSD VOLATILITY PROFILE</div>
-                        <p class="text-[11px] text-zinc-500 mt-1 leading-relaxed">Realized variance metrics parsed over a live trailing 70-day lookback window via dynamic currency calculation engines.</p>
+                        <div id="target-asset-display" class="text-xs sm:text-sm font-bold text-cyan-400 tracking-widest uppercase">EURUSD VOLATILITY PROFILE</div>
+                        <p class="text-[11px] text-zinc-500 mt-1 leading-relaxed">Realized variance metrics parsed over a live trailing 70-day lookback window.</p>
                     </div>
                     
-                    <div class="space-y-4 pt-4 border-t border-zinc-900/60">
+                    <div class="grid grid-cols-2 lg:grid-cols-1 gap-4 pt-4 border-t border-zinc-900/60">
                         <div>
-                            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider">Average Daily Range (Mataf-Matched Window)</span>
-                            <div class="text-2xl font-bold text-white tracking-tight tabular-nums mt-0.5"><span id="metric-daily-pips">--</span> <span class="text-xs text-zinc-500 font-normal">PIPS</span></div>
+                            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider leading-tight">Average Daily Range</span>
+                            <div class="text-xl sm:text-2xl font-bold text-white tracking-tight tabular-nums mt-0.5"><span id="metric-daily-pips">--</span> <span class="text-xs text-zinc-500 font-normal">PIPS</span></div>
                         </div>
                         <div>
-                            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider">Implied Percentage Range</span>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span id="metric-percentage-range" class="text-base font-bold text-zinc-300 tabular-nums">--</span>
-                                <span id="metric-regime-badge" class="px-1.5 py-0.5 text-[8px] font-bold uppercase rounded border">--</span>
+                            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider leading-tight">Implied Percentage Range</span>
+                            <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                                <span id="metric-percentage-range" class="text-sm sm:text-base font-bold text-zinc-300 tabular-nums">--</span>
+                                <span id="metric-regime-badge" class="px-1.5 py-0.5 text-[8px] font-bold uppercase rounded border scale-90 sm:scale-100 origin-left">--</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-8 pt-4 border-t border-zinc-900/40 text-[10px] text-zinc-500 leading-relaxed">
+                <div class="mt-6 lg:mt-8 pt-4 border-t border-zinc-900/40 text-[10px] text-zinc-500 leading-relaxed hidden sm:block">
                     <span class="text-cyan-500 font-bold">// INTERACTION NOTICE:</span><br>
-                    Tapping an individual session or day tracking block locks that element open. Switch your asset dropdown coupling to clear selection overrides.
+                    Tapping a tracking bar locks details onto the active visual logs window.
                 </div>
             </div>
 
             <div class="lg:col-span-8 space-y-6">
                 
                 <div class="bg-[#08080c] border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
-                    <div class="w-full px-4 py-3 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50 flex justify-between items-center">
-                        <span>Hourly Intraday Session Volatility Distribution</span>
-                        <span id="hourly-focus-readout" class="text-cyan-400 font-mono text-[9px] tracking-wider uppercase bg-cyan-950/40 border border-cyan-900/40 px-2 py-0.5 rounded">TAP A COLUMN BAR</span>
+                    <div class="w-full px-4 py-3 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <span>Hourly Intraday Volatility Distribution</span>
+                        <span id="hourly-focus-readout" class="text-cyan-400 font-mono text-[9px] tracking-wider uppercase bg-cyan-950/40 border border-cyan-900/40 px-2 py-0.5 rounded w-full sm:w-auto text-center sm:text-left">TAP A BAR TO EXAMINE</span>
                     </div>
-                    <div class="p-6 bg-[#030305]/20 flex items-end justify-between h-56 gap-[2px] sm:gap-1.5 pt-10 border-b border-zinc-900/40" id="hour-chart-container">
-                        </div>
-                    <div class="px-4 py-2 flex justify-between font-mono text-[9px] text-zinc-600 uppercase tracking-wider bg-[#040406]/20">
-                        <span>00:00 Asian Session Open</span>
-                        <span>12:00 London/NY Overlap Crux</span>
-                        <span>23:00 Day Wrap</span>
+                    <div class="w-full overflow-x-auto custom-scrollbar-x">
+                        <div class="p-6 bg-[#030305]/20 flex items-end justify-between h-52 pt-10 border-b border-zinc-900/40 min-w-[640px]" id="hour-chart-container">
+                            </div>
+                    </div>
+                    <div class="px-4 py-2 flex justify-between font-mono text-[9px] text-zinc-600 uppercase tracking-wider bg-[#040406]/20 select-none">
+                        <span>00:00 Asia Open</span>
+                        <span>12:00 Lon/NY overlap</span>
+                        <span>23:00 Close</span>
                     </div>
                 </div>
 
                 <div class="bg-[#08080c] border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
-                    <div class="w-full px-4 py-3 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50 flex justify-between items-center">
-                        <span>Weekday Distribution Matrix Allocation Profile</span>
-                        <span id="weekday-focus-readout" class="text-emerald-400 font-mono text-[9px] tracking-wider uppercase bg-emerald-950/40 border border-emerald-900/40 px-2 py-0.5 rounded">TAP A WEEKDAY BAR</span>
+                    <div class="w-full px-4 py-3 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-900 bg-[#060608]/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <span>Weekday Distribution Profile Matrix</span>
+                        <span id="weekday-focus-readout" class="text-emerald-400 font-mono text-[9px] tracking-wider uppercase bg-emerald-950/40 border border-emerald-900/40 px-2 py-0.5 rounded w-full sm:w-auto text-center sm:text-left">TAP A WEEKDAY BAR</span>
                     </div>
-                    <div class="p-6 bg-[#030305]/20 flex items-end justify-between h-44 gap-4 pt-10" id="weekday-chart-container">
-                        </div>
+                    <div class="w-full overflow-x-auto">
+                        <div class="p-6 bg-[#030305]/20 grid grid-cols-5 gap-2 sm:gap-4 items-end h-44 pt-10 min-w-[420px]" id="weekday-chart-container">
+                            </div>
+                    </div>
                 </div>
 
             </div>
         </div>
     </main>
 
-    <footer class="bg-[#060608] border-t border-zinc-900 py-6 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
-        <div class="max-w-7xl w-full mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px]">
-            <p>&copy; 2026 Kairos Global Research. All quantitative rights reserved.</p>
-            <p class="text-zinc-600 tracking-wide uppercase">Unified interface platform loop.</p>
-        </div>
+    <footer class="bg-[#060608] border-t border-zinc-900 py-4 px-4 font-mono text-[10px] text-zinc-600 text-center select-none w-full shrink-0">
+        &copy; 2026 Kairos Global Research // Unified mobile diagnostics suite interface.
     </footer>
 
     <script>
@@ -166,7 +159,6 @@
                 if (activeTip) activeTip.className = "absolute -top-7 bg-cyan-950 border border-cyan-500 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded opacity-100 pointer-events-none text-cyan-400 font-extrabold z-10 tabular-nums tooltip-bubble scale-105 shadow-md";
                 if (activeFill) activeFill.className = "absolute inset-0 bg-gradient-to-t from-cyan-400 to-cyan-300 shadow-[0_0_12px_#06b6d4] bar-fill-element";
             }
-
             document.getElementById('hourly-focus-readout').textContent = `${hourIdx < 10 ? '0'+hourIdx : hourIdx}:00 UTC // Mean Volatility: ${pipValue} Pips`;
         }
 
@@ -185,7 +177,6 @@
                 if (activeTip) activeTip.className = "absolute -top-7 bg-emerald-950 border border-emerald-500 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded opacity-100 pointer-events-none text-emerald-400 font-extrabold z-10 tabular-nums tooltip-bubble scale-105 shadow-md";
                 if (activeFill) activeFill.className = "absolute inset-0 bg-gradient-to-t from-emerald-400 to-emerald-300 shadow-[0_0_12px_#10b981] bar-fill-element";
             }
-
             document.getElementById('weekday-focus-readout').textContent = `${dayLabel} // Realized Mean: ${computedPips} Pips`;
         }
 
@@ -205,179 +196,3 @@
                 try {
                     if (apiCache[pairKey]) {
                         liveDailyPips = apiCache[pairKey].liveDailyPips;
-                        weekdayAbsolutePips = apiCache[pairKey].weekdayAbsolutePips;
-                        hourlyPipsArray = apiCache[pairKey].hourlyPipsArray;
-                    } else {
-                        const toDate = new Date().toISOString().split('T')[0];
-                        const fromDate = new Date(Date.now() - 70 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                        const ticker = `C:${pairKey}`;
-
-                        const dayResponse = await fetch(`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/1/day/${fromDate}/${toDate}?adjusted=true&sort=desc&limit=60&apiKey=${POLYGON_API_KEY}`);
-                        const dayData = await dayResponse.json();
-
-                        if (dayData && dayData.results && dayData.results.length > 0) {
-                            let totalDailyPipsSum = 0;
-                            let weekdayPipBuckets = { 1: [], 2: [], 3: [], 4: [], 5: [] };
-
-                            dayData.results.forEach(candle => {
-                                const candleRangePips = (candle.h - candle.l) * pipMultiplier;
-                                totalDailyPipsSum += candleRangePips;
-                                
-                                const dayIndex = new Date(candle.t).getUTCDay();
-                                if (dayIndex >= 1 && dayIndex <= 5) {
-                                    weekdayPipBuckets[dayIndex].push(candleRangePips);
-                                }
-                            });
-
-                            liveDailyPips = Math.round(totalDailyPipsSum / dayData.results.length);
-
-                            weekdayAbsolutePips = Object.keys(weekdayPipBuckets).map(day => {
-                                const bucket = weekdayPipBuckets[day];
-                                return bucket.length > 0 ? Math.round(bucket.reduce((a, b) => a + b, 0) / bucket.length) : liveDailyPips;
-                            });
-                        }
-
-                        const hourResponse = await fetch(`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/1/hour/${fromDate}/${toDate}?adjusted=true&sort=desc&limit=2000&apiKey=${POLYGON_API_KEY}`);
-                        const hourData = await hourResponse.json();
-
-                        if (hourData && hourData.results && hourData.results.length > 0) {
-                            let hourlySumArray = new Array(24).fill(0);
-                            let hourlyCountsArray = new Array(24).fill(0);
-
-                            hourData.results.forEach(candle => {
-                                const currentHour = new Date(candle.t).getUTCHours();
-                                const hourRangePips = (candle.h - candle.l) * pipMultiplier;
-                                
-                                hourlySumArray[currentHour] += hourRangePips;
-                                hourlyCountsArray[currentHour]++;
-                            });
-
-                            for (let h = 0; h < 24; h++) {
-                                hourlyPipsArray[h] = hourlyCountsArray[h] > 0 
-                                    ? Math.max(1, Math.round(hourlySumArray[h] / hourlyCountsArray[h])) 
-                                    : Math.max(1, Math.round(liveDailyPips / 24));
-                            }
-                        }
-
-                        apiCache[pairKey] = { liveDailyPips, weekdayAbsolutePips, hourlyPipsArray };
-                    }
-                } catch (err) {
-                    console.log("Core API Throttle limit captured. Initializing backup profiles.", err);
-                }
-            }
-
-            document.getElementById('hourly-focus-readout').textContent = "TAP A COLUMN BAR";
-            document.getElementById('weekday-focus-readout').textContent = "TAP A WEEKDAY BAR";
-
-            document.getElementById('target-asset-display').textContent = `${pairKey.substring(0,3)} / ${pairKey.substring(3)} Volatility Profile`;
-            document.getElementById('metric-daily-pips').textContent = liveDailyPips;
-            document.getElementById('metric-percentage-range').textContent = fallbackData.percentageRange;
-            
-            const badge = document.getElementById('metric-regime-badge');
-            if (badge) {
-                badge.textContent = fallbackData.regime;
-                badge.className = `px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded border ${fallbackData.badgeClass}`;
-            }
-
-            const hourContainer = document.getElementById('hour-chart-container');
-            if (hourContainer) {
-                const extremeHourlyCeiling = Math.max(...hourlyPipsArray);
-                hourContainer.innerHTML = hourlyPipsArray.map((pips, hr) => {
-                    const blockHeightPct = Math.max(8, Math.round((pips / extremeHourlyCeiling) * 100));
-                    const labelString = hr < 10 ? `0${hr}` : hr;
-                    const gradientColors = (hr >= 8 && hr <= 16) ? 'from-emerald-600 to-emerald-400' : 'from-cyan-600 to-cyan-400';
-                    return `
-                        <div id="h-bar-wrapper-${hr}" onclick="tapHourlyBar(${hr}, ${pips})" class="flex flex-col items-center justify-end h-full w-full cursor-pointer relative hourly-bar-node group">
-                            <span class="absolute -top-7 bg-zinc-950 border border-zinc-800 text-[9px] font-mono font-bold px-1 py-0.5 rounded opacity-0 pointer-events-none text-white z-10 tabular-nums tooltip-bubble transition-all">${pips}p</span>
-                            <div class="w-full bg-zinc-950 border border-zinc-900/60 rounded-t relative" style="height: ${blockHeightPct}%;">
-                                <div class="absolute inset-0 bg-gradient-to-t ${gradientColors} bar-fill-element group-hover:brightness-125"></div>
-                            </div>
-                            <span class="font-mono text-[8px] text-zinc-600 mt-1.5 select-none font-medium group-hover:text-cyan-400">${labelString}</span>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            const dayContainer = document.getElementById('weekday-chart-container');
-            if (dayContainer) {
-                const dayLabels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-                const extremeDayCeiling = Math.max(...weekdayAbsolutePips);
-
-                dayContainer.innerHTML = weekdayAbsolutePips.map((avgPips, dIdx) => {
-                    const blockHeightPct = Math.max(12, Math.round((avgPips / extremeDayCeiling) * 100));
-                    const gradientColors = dIdx === 3 ? 'from-emerald-600 to-emerald-400' : 'from-cyan-600 to-cyan-400';
-                    return `
-                        <div id="w-bar-wrapper-${dIdx}" onclick="tapWeekdayBar(${dIdx}, '${dayLabels[dIdx]}', ${avgPips})" class="flex flex-col items-center justify-end h-full space-y-2 cursor-pointer relative weekday-bar-node group text-center">
-                            <span class="font-mono text-[10px] text-zinc-400 font-semibold tabular-nums select-none group-hover:text-cyan-400">${avgPips}p</span>
-                            <div class="w-full bg-zinc-950 border border-zinc-900 rounded-t-md overflow-hidden relative" style="height: ${blockHeightPct}%;">
-                                <div class="absolute inset-0 bg-gradient-to-t ${gradientColors} bar-fill-element group-hover:brightness-125"></div>
-                            </div>
-                            <span class="font-mono text-[9px] text-zinc-500 font-bold tracking-wider pt-1 select-none uppercase group-hover:text-cyan-400">${dayLabels[dIdx].substring(0,3)}</span>
-                        </div>
-                    `;
-                }).join('');
-            }
-        }
-
-        function populateSelectorDropdown() {
-            const selector = document.getElementById('asset-selector');
-            if (!selector) return;
-
-            const targetMajors = document.getElementById('opt-majors');
-            const targetEuro = document.getElementById('opt-euro');
-            const targetPound = document.getElementById('opt-pound');
-            const targetMinors = document.getElementById('opt-minors');
-
-            targetMajors.innerHTML = ""; targetEuro.innerHTML = ""; targetPound.innerHTML = ""; targetMinors.innerHTML = "";
-
-            for (const [key, obj] of Object.entries(KAIROS_INTERACTIVE_VOLATILITY_DB)) {
-                const optionNode = `<option value="${key}">${obj.label}</option>`;
-                if (obj.cat === 'major') targetMajors.innerHTML += optionNode;
-                else if (obj.cat === 'euro') targetEuro.innerHTML += optionNode;
-                else if (obj.cat === 'pound') targetPound.innerHTML += optionNode;
-                else if (obj.cat === 'minors') targetMinors.innerHTML += optionNode;
-            }
-            
-            const activePair = localStorage.getItem('kairos_active_tool_pair') || "EURUSD";
-            selector.value = activePair;
-            handleAssetChange(activePair);
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            updatePlatformTime();
-            populateSelectorDropdown();
-        });
-
-        const KAIROS_INTERACTIVE_VOLATILITY_DB = {
-            "EURUSD": { dailyPips: "78", percentageRange: "0.71%", regime: "STABLE", badgeClass: "text-zinc-400 bg-zinc-900 border-zinc-800", cat: "major", label: "EUR / USD (Euro / US Dollar)", hourly: [12,10,9,8,11,15,35,68,74,70,62,58,84,92,88,72,54,42,30,24,20,18,15,13], days: [16,21,22,23,18] },
-            "GBPUSD": { dailyPips: "96", percentageRange: "0.79%", regime: "ELEVATED", badgeClass: "text-amber-500 bg-amber-950/20 border-amber-900/40", cat: "major", label: "GBP / USD (British Pound / US Dollar)", hourly: [15,12,11,10,14,22,42,82,90,88,78,74,102,114,108,90,68,52,38,30,25,22,18,16], days: [15,21,22,24,18] },
-            "USDJPY": { dailyPips: "112", percentageRange: "0.84%", regime: "HIGH", badgeClass: "text-orange-400 bg-orange-950/20 border-orange-900/40", cat: "major", label: "USD / JPY (US Dollar / Japanese Yen)", hourly: [45,55,62,58,48,42,38,52,58,54,48,46,88,98,92,82,64,48,35,32,38,42,48,46], days: [16,20,22,24,18] },
-            "USDCAD": { dailyPips: "74", percentageRange: "0.58%", regime: "MUTED", badgeClass: "text-zinc-500 bg-zinc-950 border-zinc-900", cat: "major", label: "USD / CAD (US Dollar / Canadian Dollar)", hourly: [12,10,9,8,10,14,28,54,58,52,46,44,72,82,78,66,48,34,24,20,16,14,13,12], days: [14,20,22,23,21] },
-            "USDCHF": { dailyPips: "62", percentageRange: "0.64%", regime: "MUTED", badgeClass: "text-zinc-500 bg-zinc-950 border-zinc-900", cat: "major", label: "USD / Swiss Franc", hourly: [8,7,6,5,7,10,25,52,56,50,44,40,68,74,70,58,42,28,18,15,12,11,9,8], days: [15,21,22,23,19] },
-            "AUDUSD": { dailyPips: "70", percentageRange: "0.86%", regime: "STABLE", badgeClass: "text-zinc-400 bg-zinc-900 border-zinc-800", cat: "major", label: "AUD / USD (Australian Dollar / US Dollar)", hourly: [52,58,64,60,50,38,28,34,42,40,36,34,62,70,66,58,44,32,24,22,28,34,42,46], days: [15,21,21,22,21] },
-            "NZDUSD": { dailyPips: "66", percentageRange: "0.89%", regime: "STABLE", badgeClass: "text-zinc-400 bg-zinc-900 border-zinc-800", cat: "major", label: "NZD / USD (New Zealand Dollar / US Dollar)", hourly: [58,62,68,54,44,32,24,28,36,34,32,30,56,64,60,52,38,28,20,18,24,32,44,50], days: [16,20,21,22,21] },
-            "EURGBP": { dailyPips: "46", percentageRange: "0.44%", regime: "MUTED", badgeClass: "text-zinc-500 bg-zinc-950 border-zinc-900", cat: "euro", label: "EUR / GBP (Euro / British Pound)", hourly: [6,5,4,4,5,8,22,44,48,42,36,34,46,52,48,40,32,24,16,12,10,8,7,6], days: [15,21,22,23,19] },
-            "EURJPY": { dailyPips: "106", percentageRange: "0.98%", regime: "NORMAL", badgeClass: "text-cyan-400 bg-cyan-950/10 border-cyan-500/30", cat: "euro", label: "EUR / JPY (Euro / Japanese Yen)", hourly: [35,42,48,44,36,32,38,58,64,60,54,52,82,92,86,76,58,44,32,28,30,34,38,36], days: [15,20,22,24,19] },
-            "EURAUD": { dailyPips: "98", percentageRange: "0.73%", regime: "ELEVATED", badgeClass: "text-amber-500 bg-amber-950/20 border-amber-900/40", cat: "euro", label: "EUR / AUD (Euro / Australian Dollar)", hourly: [42,46,52,48,40,32,28,52,60,56,50,48,74,84,80,70,54,40,28,24,28,34,38,40], days: [15,20,21,23,21] },
-            "EURCAD": { dailyPips: "84", percentageRange: "0.66%", regime: "STABLE", badgeClass: "text-zinc-400 bg-zinc-900 border-zinc-800", cat: "euro", label: "EUR / CAD (Euro / Canadian Dollar)", hourly: [12,10,9,8,10,14,28,54,58,52,46,44,72,82,78,66,48,34,24,20,16,14,13,12], days: [15,20,22,23,20] },
-            "EURCHF": { dailyPips: "54", percentageRange: "0.59%", regime: "MUTED", badgeClass: "text-zinc-500 bg-zinc-950 border-zinc-900", cat: "euro", label: "EUR / CHF (Euro / Swiss Franc)", hourly: [7,6,5,4,6,8,22,48,52,46,40,38,56,62,58,48,36,24,16,12,10,9,8,7], days: [15,22,23,24,16] },
-            "EURNZD": { dailyPips: "114", percentageRange: "0.93%", regime: "HIGH", badgeClass: "text-orange-400 bg-orange-950/20 border-orange-900/40", cat: "euro", label: "EUR / NZD (Euro / New Zealand Dollar)", hourly: [48,54,60,52,42,30,24,48,56,52,48,46,84,94,88,78,56,42,26,22,28,36,44,46], days: [14,19,20,22,25] },
-            "GBPJPY": { dailyPips: "146", percentageRange: "1.12%", regime: "VOLATILE", badgeClass: "text-red-400 bg-red-950/20 border-red-900/50", cat: "pound", label: "GBP / JPY (British Pound / Japanese Yen)", hourly: [42,52,58,54,44,38,42,78,86,82,72,68,114,126,118,102,78,58,44,38,40,44,48,44], days: [13,21,22,24,20] },
-            "GBPAUD": { dailyPips: "124", percentageRange: "0.94%", regime: "HIGH", badgeClass: "text-orange-400 bg-orange-950/20 border-orange-900/40", cat: "pound", label: "GBP / AUD (British Pound / Australian Dollar)", hourly: [48,52,58,54,44,36,32,68,76,72,64,60,94,106,100,88,68,50,36,32,36,42,46,48], days: [14,20,21,22,23] },
-            "GBPCAD": { dailyPips: "112", percentageRange: "0.81%", regime: "HIGH", badgeClass: "text-orange-400 bg-orange-950/20 border-orange-900/40", cat: "pound", label: "GBP / CAD (British Pound / Canadian Dollar)", hourly: [18,14,12,11,14,18,32,74,80,74,66,62,96,108,102,88,64,46,32,28,24,22,20,18], days: [14,20,21,23,22] },
-            "GBPCHF": { dailyPips: "82", percentageRange: "0.72%", regime: "STABLE", badgeClass: "text-zinc-400 bg-zinc-900 border-zinc-800", cat: "pound", label: "GBP / Swiss Franc", hourly: [12,10,9,8,11,15,28,62,68,60,54,50,72,82,76,64,48,34,24,20,16,14,13,12], days: [14,20,21,22,23] },
-            "GBPNZD": { dailyPips: "138", percentageRange: "1.04%", regime: "VOLATILE", badgeClass: "text-red-400 bg-red-950/20 border-red-900/50", cat: "pound", label: "GBP / NZD (British Pound / New Zealand Dollar)", hourly: [54,60,66,58,48,36,30,62,72,68,62,58,104,116,108,96,72,52,34,30,36,44,52,54], days: [14,19,21,23,23] },
-            "AUDJPY": { dailyPips: "104", percentageRange: "1.01%", regime: "HIGH", badgeClass: "text-orange-400 bg-orange-950/20 border-orange-900/40", cat: "minors", label: "AUD / JPY (Australian Dollar / Japanese Yen)", hourly: [48,54,60,56,46,38,32,44,50,48,42,40,78,88,82,72,56,42,32,30,36,42,46,46], days: [15,21,22,24,18] },
-            "AUDCAD": { dailyPips: "62", percentageRange: "0.64%", regime: "STABLE", badgeClass: "text-zinc-400 bg-zinc-900 border-zinc-800", cat: "minors", label: "AUD / CAD (Australian Dollar / Canadian Dollar)", hourly: [32,36,40,38,32,24,18,24,28,26,24,22,46,54,50,44,34,24,18,16,20,24,28,30], days: [15,21,22,23,19] },
-            "AUDCHF": { dailyPips: "52", percentageRange: "0.68%", regime: "MUTED", badgeClass: "text-zinc-500 bg-zinc-950 border-zinc-900", cat: "minors", label: "AUD / Swiss Franc", hourly: [30,34,38,36,30,22,18,28,32,30,26,24,40,48,44,38,28,18,12,11,15,20,24,26], days: [15,21,22,23,19] },
-            "AUDNZD": { dailyPips: "56", percentageRange: "0.52%", regime: "MUTED", badgeClass: "text-zinc-500 bg-zinc-950 border-zinc-900", cat: "minors", label: "AUD / NZD (Australian Dollar / New Zealand Dollar)", hourly: [42,46,50,44,36,26,20,22,26,24,22,20,38,46,42,36,28,20,15,14,22,28,36,40], days: [16,21,22,23,18] },
-            "CADJPY": { dailyPips: "94", percentageRange: "0.78%", regime: "STABLE", badgeClass: "text-zinc-400 bg-zinc-900 border-zinc-800", cat: "minors", label: "CAD / JPY (Canadian Dollar / Japanese Yen)", hourly: [22,18,16,14,16,20,24,38,42,38,34,32,74,84,80,70,52,38,28,24,22,20,20,22], days: [16,20,21,23,20] },
-            "CADCHF": { dailyPips: "48", percentageRange: "0.54%", regime: "MUTED", badgeClass: "text-zinc-500 bg-zinc-950 border-zinc-900", cat: "minors", label: "CAD / Swiss Franc", hourly: [8,7,6,5,6,8,18,36,40,36,32,30,52,58,54,46,34,22,16,13,11,10,9,8], days: [13,21,22,24,20] },
-            "CHFJPY": { dailyPips: "116", percentageRange: "0.81%", regime: "HIGH", badgeClass: "text-orange-400 bg-orange-950/20 border-orange-900/40", cat: "minors", label: "CHF / JPY (Swiss Franc / Japanese Yen)", hourly: [25,28,32,30,26,22,25,48,54,48,42,40,84,94,88,78,60,44,32,28,26,24,24,25], days: [15,21,22,24,18] },
-            "NZDJPY": { dailyPips: "96", percentageRange: "0.98%", regime: "HIGH", badgeClass: "text-orange-400 bg-orange-950/20 border-orange-900/40", cat: "minors", label: "NZD / JPY (New Zealand Dollar / Japanese Yen)", hourly: [52,56,62,50,40,30,24,36,44,42,38,36,72,82,76,66,48,34,24,22,28,36,44,48], days: [16,20,21,23,20] },
-            "NZDCAD": { dailyPips: "60", percentageRange: "0.62%", regime: "STABLE", badgeClass: "text-zinc-400 bg-zinc-900 border-zinc-800", cat: "minors", label: "NZD / CAD (New Zealand Dollar / Canadian Dollar)", hourly: [36,40,44,36,30,22,16,20,26,24,22,20,44,52,48,40,30,20,15,13,18,24,30,34], days: [16,21,22,22,19] },
-            "NZDCHF": { dailyPips: "50", percentageRange: "0.66%", regime: "MUTED", badgeClass: "text-zinc-500 bg-zinc-950 border-zinc-900", cat: "minors", label: "NZD / Swiss Franc", hourly: [34,38,42,34,28,20,15,24,28,26,22,20,38,46,42,36,25,16,11,10,14,18,24,28], days: [15,21,22,23,19] }
-        };
-    </script>
-</body>
-</html>
