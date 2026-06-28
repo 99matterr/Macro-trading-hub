@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KAIROS GLOBAL // ECONOMIC CALENDAR</title>
+    <!-- Tailwind CSS Interface Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body { background-color: #020203; color: #d4d4d8; }
@@ -13,16 +14,20 @@
         ::-webkit-scrollbar-thumb:hover { background: #27272a; }
         .active-tab { color: #06b6d4 !important; border-bottom: 2px solid #06b6d4 !important; }
         
-        /* Smooth obsidian panel frame wrapper to contain the script injection */
-        .calendar-wrapper-box {
-            background-color: #08080c !important;
-            border: 1px solid #18181b;
+        /* The container locks to the exact size of the widget corners */
+        .calendar-firm-card {
+            background-color: #ffffff !important;
+            border: 1px solid #e4e4e7;
             border-radius: 12px;
+            overflow: hidden;
+            width: 100%;
+            max-width: 650px;
         }
     </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
 
+    <!-- STICKY GLOBAL HEADER NAVIGATION -->
     <nav class="sticky top-0 z-50 bg-[#060608]/90 backdrop-blur-md border-b border-zinc-900 px-4 lg:px-8 h-16 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-8">
             <div class="flex items-center gap-3">
@@ -34,6 +39,7 @@
                     <span class="text-[9px] text-zinc-500 tracking-wider uppercase mt-0.5 block">Quantitative Desk Suite</span>
                 </div>
             </div>
+            <!-- Portal Links -->
             <div class="hidden md:flex items-center gap-6 font-mono text-xs h-16">
                 <a href="index.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Live Intelligence</a>
                 <a href="research.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Research Feed</a>
@@ -47,6 +53,7 @@
         </div>
     </nav>
 
+    <!-- MOBILE NAVIGATION DECK -->
     <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-2 py-2 flex justify-around font-mono text-[11px] shrink-0">
         <a href="index.html" class="text-zinc-400 py-1 px-2 font-medium">Terminal</a>
         <a href="research.html" class="text-zinc-400 py-1 px-2 font-medium">Research</a>
@@ -54,32 +61,90 @@
         <a href="tools-hub.html" class="active-tab text-zinc-400 py-1 px-2 font-medium">Tools</a>
     </div>
 
-    <main class="flex-grow w-full max-w-5xl mx-auto px-4 py-6 md:py-10 space-y-6">
+    <!-- MAIN CALENDAR CANVAS -->
+    <main class="flex-grow w-full max-w-5xl mx-auto px-4 py-6 md:py-10 flex flex-col items-center space-y-6">
         
-        <div class="border-b border-zinc-900 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 font-mono">
+        <!-- Section Header -->
+        <div class="w-full max-w-[650px] border-b border-zinc-900 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 font-mono">
             <div>
                 <h1 class="text-base sm:text-lg font-bold text-white uppercase tracking-wider">// Macroeconomic Catalyst Calendar</h1>
                 <p class="text-xs text-zinc-500 mt-1">Track high-impact global risk events and central bank data releases.</p>
             </div>
-            <a href="tools-hub.html" class="font-mono text-[11px] text-zinc-400 hover:text-cyan-400 transition-colors border border-zinc-800 bg-[#08080c] px-3 py-1.5 rounded-lg self-stretch sm:self-auto text-center">
-                &larr; BACK TO TOOLS HUB
+            <a href="tools-hub.html" class="font-mono text-[11px] text-zinc-400 hover:text-cyan-400 transition-colors border border-zinc-800 bg-[#08080c] px-3 py-1.5 rounded-lg text-center">
+                &larr; BACK
             </a>
         </div>
 
-        <div class="calendar-wrapper-box p-2 sm:p-5">
-            <div class="w-full overflow-x-auto">
-                <div id="investing-widget-target">
-                    <script type="text/javascript" src="https://ssltools.forexprostools.com/economic-calendar/index.php?action=getWidget&ecoId=&columns=time,currency,importance,event,actual,forecast,previous&category=_macroeconomic&importance=1,2,3&features=datepicker,timezone&countries=25,32,6,37,7,5,4,36,26,10,11,12,22,17,39,14,43,122,142,41,138,45,60,46,51,52,53,19,29,18,59,93,75,108,82,63,61,81,110,84,86,111,85,115,106,102,125,123,97,172,119,105,95,109,188,114,136,113,112,231,107,238,230,178,202,236,180,246,181,104,242,185,184,241,186,103,116,212,189,247,213,226,118,245,214,121,215,224,141,120,131,228,124,191,135,133,143,147,163,165,164,166,174,171,173,176,175,183,182,190,192,193,205,204,206,216,218,217,219,222,223,225,227,243,244,248&calType=week&timeZone=55&lang=1"></script>
-                </div>
+        <!-- CUSTOM MULTIPLE CHOICE DROPDOWN FILTER SELECTION CONSOLE -->
+        <section class="w-full max-w-[650px] bg-[#08080c] border border-zinc-900 rounded-xl p-4 font-mono text-xs space-y-3 relative z-30">
+            <div class="flex items-center justify-between">
+                <div class="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">// Market Matrix Filters</div>
+                <button onclick="toggleDropdown()" class="bg-[#030305] border border-zinc-800 text-zinc-300 px-3 py-1.5 rounded flex items-center gap-2 hover:border-cyan-500/40 hover:text-cyan-400 transition-all cursor-pointer">
+                    <span>SELECT COUNTRIES / REGIONS</span>
+                    <span id="dropdown-arrow">&darr;</span>
+                </button>
+            </div>
+
+            <!-- Comprehensive Country Checkbox Grid Console Panel -->
+            <div id="country-dropdown-panel" class="hidden bg-[#030305] border border-zinc-800/80 rounded-lg p-4 grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2 max-h-[220px] overflow-y-auto">
+                <!-- PRE-SELECTED PARAMETERS -->
+                <label class="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer"><input type="checkbox" value="5" class="country-selector accent-cyan-500" checked onchange="updateCalendarFilters()"> United States</label>
+                <label class="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer"><input type="checkbox" value="72" class="country-selector accent-cyan-500" checked onchange="updateCalendarFilters()"> Euro Zone</label>
+                <label class="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer"><input type="checkbox" value="4" class="country-selector accent-cyan-500" checked onchange="updateCalendarFilters()"> United Kingdom</label>
+                <label class="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer"><input type="checkbox" value="35" class="country-selector accent-cyan-500" checked onchange="updateCalendarFilters()"> Japan</label>
+                <label class="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer"><input type="checkbox" value="25" class="country-selector accent-cyan-500" checked onchange="updateCalendarFilters()"> Australia</label>
+                <label class="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer"><input type="checkbox" value="6" class="country-selector accent-cyan-500" checked onchange="updateCalendarFilters()"> Canada</label>
+                <label class="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer"><input type="checkbox" value="32" class="country-selector accent-cyan-500" checked onchange="updateCalendarFilters()"> New Zealand</label>
+                <label class="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer"><input type="checkbox" value="12" class="country-selector accent-cyan-500" checked onchange="updateCalendarFilters()"> Switzerland</label>
+                <label class="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer"><input type="checkbox" value="37" class="country-selector accent-cyan-500" checked onchange="updateCalendarFilters()"> China</label>
+                <label class="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer"><input type="checkbox" value="17" class="country-selector accent-cyan-500" checked onchange="updateCalendarFilters()"> Germany</label>
+                <label class="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer"><input type="checkbox" value="22" class="country-selector accent-cyan-500" checked onchange="updateCalendarFilters()"> France</label>
+                
+                <!-- EXTENDED SELECTION MATRIX NODES -->
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="10" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> Italy</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="39" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> Singapore</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="14" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> Hong Kong</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="26" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> Sweden</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="11" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> Spain</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="43" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> South Africa</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="56" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> India</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="36" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> South Korea</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="60" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> Saudi Arabia</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="110" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> Russia</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="7" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> Brazil</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="51" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> Netherlands</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="19" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> Mexico</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="29" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> Norway</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="18" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> Denmark</label>
+                <label class="flex items-center gap-2 text-zinc-500 hover:text-white cursor-pointer"><input type="checkbox" value="53" class="country-selector accent-cyan-500" onchange="updateCalendarFilters()"> Finland</label>
+            </div>
+        </section>
+
+        <!-- EXACTLY CORNER-LOCKED WIDGET FRAME CONTAINER -->
+        <div class="calendar-firm-card shadow-lg relative z-10">
+            <div class="w-full overflow-hidden">
+                <iframe 
+                    id="live-calendar-frame"
+                    src="https://sslecal2.investing.com?ecoDayBackground=%23b3b3b3&columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=5,72,4,35,25,6,32,12,37,17,22&calType=week&timeZone=8&lang=1" 
+                    width="650" 
+                    height="950" 
+                    frameborder="0" 
+                    allowtransparency="true" 
+                    marginwidth="0" 
+                    marginheight="0"
+                    style="display: block;">
+                </iframe>
             </div>
         </div>
 
-        <div class="bg-[#040406]/40 border border-zinc-900 rounded-xl p-4 font-mono text-[10px] text-zinc-500 uppercase leading-relaxed">
+        <!-- System Risk Reminder -->
+        <div class="w-full max-w-[650px] bg-[#040406]/40 border border-zinc-900 rounded-xl p-4 font-mono text-[10px] text-zinc-500 uppercase leading-relaxed">
             <span class="text-amber-500 font-bold block mb-0.5">// Operational Volatility Warning</span>
             High-impact events (3-star ratings) can cause sudden expansion in bid-ask spreads and severe price slippage across the G8 matrix pairings. Adjust execution limits accordingly inside your sizing tools.
         </div>
     </main>
 
+    <!-- PREMIUM INSTITUTIONAL FOOTER -->
     <footer class="bg-[#060608] border-t border-zinc-900 py-8 md:py-12 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
         <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-left">
             <div class="space-y-3">
@@ -111,10 +176,50 @@
         </div>
     </footer>
 
+    <!-- INTERACTIVE MULTI-SELECT DROPDOWN DISPATCH ROUTER -->
     <script>
         setInterval(() => {
             if(document.getElementById('live-time')) document.getElementById('live-time').textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
         }, 1000);
+
+        function toggleDropdown() {
+            const panel = document.getElementById('country-dropdown-panel');
+            const arrow = document.getElementById('dropdown-arrow');
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                arrow.innerHTML = "&uarr;";
+            } else {
+                panel.classList.add('hidden');
+                arrow.innerHTML = "&darr;";
+            }
+        }
+
+        function updateCalendarFilters() {
+            const frame = document.getElementById('live-calendar-frame');
+            const checkboxes = document.querySelectorAll('.country-selector');
+            let activeIds = [];
+
+            checkboxes.forEach(box => {
+                if(box.checked) {
+                    activeIds.push(box.value);
+                    box.parentElement.classList.remove('text-zinc-500');
+                    box.parentElement.classList.add('text-zinc-300');
+                } else {
+                    box.parentElement.classList.remove('text-zinc-300');
+                    box.parentElement.classList.add('text-zinc-500');
+                }
+            });
+
+            // FIXED STATE: Lock default basket parameters explicitly if selection fields clear out
+            if(activeIds.length === 0) {
+                activeIds = [5,72,4,35,25,6,32,12,37,17,22];
+            }
+
+            // Generate verified compliant target string
+            const constructedString = "https://sslecal2.investing.com?ecoDayBackground=%23b3b3b3&columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=" + activeIds.join(',') + "&calType=week&timeZone=8&lang=1";
+            
+            frame.src = constructedString;
+        }
     </script>
 </body>
 </html>
