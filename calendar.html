@@ -11,6 +11,7 @@
         ::-webkit-scrollbar-track { background: #020203; }
         ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 2px; }
         .active-tab { color: #06b6d4 !important; border-bottom: 2px solid #06b6d4 !important; }
+        .filter-btn-active { background-color: #18181b !important; color: #06b6d4 !important; border-color: rgba(6,182,212,0.3) !important; }
     </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
@@ -21,28 +22,63 @@
         <div class="border-b border-zinc-900 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono">
             <div>
                 <h1 class="text-base sm:text-lg font-bold text-white uppercase tracking-wider">Economic Calendar</h1>
-                <p class="text-xs text-zinc-500 mt-1">// Trailing Macro Milestone Streams</p>
+                <p class="text-xs text-zinc-500 mt-1">// Macro-Economic Global Milestone Feed</p>
             </div>
             <a href="tools-hub.html" class="font-mono text-[11px] text-zinc-400 hover:text-cyan-400 transition-colors border border-zinc-800 bg-[#08080c] px-3 py-1.5 rounded-lg">
                 &larr; BACK TO TOOLS HUB
             </a>
         </div>
 
-        <div class="bg-[#040406] border border-zinc-900 rounded-xl p-2 h-[750px] w-full overflow-hidden shadow-2xl">
-            <iframe src="https://sslecal.forexprostools.com?ecoId=2&columns=2,3,4,5&importance=1,2,3&features=datepicker,timezone&countries=25,32,6,37,7,5,22,10,35,43,11,14,26,12,4,41,17,39,178,36,110,123,56&calType=week&timeZone=55&lang=1" 
+        <div class="bg-[#040406] border border-zinc-900 rounded-xl p-4 flex flex-wrap gap-2 font-mono text-[11px]">
+            <button id="btn-all" onclick="filterCalendar('all')" class="filter-btn-active bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1.5 rounded hover:text-white transition-all uppercase tracking-wider font-semibold">All Regions</button>
+            <button id="btn-usa" onclick="filterCalendar('usa')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1.5 rounded hover:text-white transition-all uppercase tracking-wider font-semibold">United States</button>
+            <button id="btn-euro" onclick="filterCalendar('euro')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1.5 rounded hover:text-white transition-all uppercase tracking-wider font-semibold">Eurozone / UK</button>
+            <button id="btn-asia" onclick="filterCalendar('asia')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1.5 rounded hover:text-white transition-all uppercase tracking-wider font-semibold">Asia Pacific</button>
+        </div>
+
+        <div class="bg-white border border-zinc-900 rounded-xl p-1 h-[650px] w-full overflow-hidden shadow-2xl">
+            <iframe id="investing-calendar-iframe" 
+                    src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=25,32,6,37,72,22,17,39,14,10,35,43,56,36,110,11,26,12,4,5&calType=week&timeZone=8&lang=1" 
                     width="100%" 
                     height="100%" 
                     frameborder="0" 
                     allowtransparency="true" 
                     marginwidth="0" 
                     marginheight="0"
-                    class="rounded-lg filter invert-[0.90] hue-rotate-180 brightness-[0.95] contrast-[1.05]">
+                    class="rounded-lg">
             </iframe>
+        </div>
+        
+        <div class="poweredBy font-mono text-[10px] text-zinc-600 text-right pt-1">
+            Real Time Economic Calendar provided by <a href="https://www.investing.com/" rel="nofollow" target="_blank" class="text-zinc-400 hover:text-cyan-400 font-bold underline">Investing.com</a>.
         </div>
     </main>
 
     <div id="global-footer"></div>
 
     <script src="inject-engine.js"></script>
+    <script>
+        // Programmatic frame redirection handler arrays
+        const sources = {
+            all: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=25,32,6,37,72,22,17,39,14,10,35,43,56,36,110,11,26,12,4,5&calType=week&timeZone=8&lang=1",
+            usa: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=5&calType=week&timeZone=8&lang=1",
+            euro: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=25,72&calType=week&timeZone=8&lang=1",
+            asia: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=6,37,22,10&calType=week&timeZone=8&lang=1"
+        };
+
+        function filterCalendar(region) {
+            const iframe = document.getElementById('investing-calendar-iframe');
+            if(!iframe || !sources[region]) return;
+            
+            // Redirect frame pointer target location url string
+            iframe.src = sources[region];
+
+            // Mutate layout component tracking tags
+            ['btn-all', 'btn-usa', 'btn-euro', 'btn-asia'].forEach(id => {
+                document.getElementById(id).classList.remove('filter-btn-active');
+            });
+            document.getElementById('btn-' + region).classList.add('filter-btn-active');
+        }
+    </script>
 </body>
 </html>
