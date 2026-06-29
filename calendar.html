@@ -11,12 +11,6 @@
         ::-webkit-scrollbar-track { background: #020203; }
         ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 2px; }
         .active-tab { color: #06b6d4 !important; border-bottom: 2px solid #06b6d4 !important; }
-        
-        /* Force the inner iframe contents to scale horizontally and eliminate the right-side dead zone */
-        .iframe-scale-container iframe {
-            width: 100% !important;
-            min-width: 100% !important;
-        }
     </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
@@ -49,13 +43,13 @@
                 
                 <div id="dropdown-menu-box" class="hidden absolute right-0 mt-2 w-full sm:w-64 rounded-lg bg-[#060609] border border-zinc-900 shadow-2xl p-3 space-y-2 max-h-64 overflow-y-auto">
                     <div class="text-[9px] text-zinc-600 uppercase border-b border-zinc-900 pb-1 font-bold tracking-widest">// TARGET COUNTRIES</div>
-                    <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="5" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> United States</label>
+                    <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="5"  checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> United States</label>
                     <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="72" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> Eurozone</label>
-                    <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="4" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> United Kingdom</label>
+                    <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="4"  checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> United Kingdom</label>
                     <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="25" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> Australia</label>
                     <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="12" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> Switzerland</label>
                     <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="32" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> New Zealand</label>
-                    <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="6" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> Canada</label>
+                    <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="6"  checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> Canada</label>
                     <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="22" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> France</label>
                     <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="17" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> Germany</label>
                     <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="35" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> Japan</label>
@@ -64,16 +58,17 @@
             </div>
         </div>
 
-        <div class="iframe-scale-container relative w-full overflow-hidden rounded-xl border border-zinc-900 shadow-2xl h-[920px] bg-white z-10">
-            <iframe id="investing-calendar-iframe" 
-                    src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=5,72,4,25,12,32,6,22,17,35,37&calType=week&timeZone=8&lang=1" 
-                    height="1100px" 
-                    frameborder="0" 
-                    allowtransparency="true" 
-                    marginwidth="0" 
+        <!-- id added for JS width measurement; bg-white removed (dead zone was white from this) -->
+        <div id="calendar-container" class="relative w-full overflow-hidden rounded-xl border border-zinc-900 shadow-2xl h-[920px] z-10">
+            <!-- src starts as about:blank — JS sets the real URL after measuring container width -->
+            <iframe id="investing-calendar-iframe"
+                    src="about:blank"
+                    height="1100px"
+                    frameborder="0"
+                    allowtransparency="true"
+                    marginwidth="0"
                     marginheight="0"
-                    style="margin-bottom: -180px;"
-                    class="rounded-lg">
+                    style="width: 100%; display: block; margin-bottom: -180px;">
             </iframe>
         </div>
         
@@ -86,43 +81,73 @@
 
     <script src="inject-engine.js"></script>
     <script>
-        function toggleDropdownMenu() {
-            const menu = document.getElementById('dropdown-menu-box');
-            menu.classList.toggle('hidden');
+        // ── Constants ──────────────────────────────────────────────────────────────
+        const DEFAULT_COUNTRIES = '5,72,4,25,12,32,6,22,17,35,37';
+        const CAL_BASE = 'https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone';
+        const CAL_TAIL = '&calType=week&timeZone=8&lang=1';
+
+        // ── Helpers ────────────────────────────────────────────────────────────────
+
+        /** Returns the container's pixel width, used as the &width= param so
+         *  Investing.com renders its table to exactly fill the available space. */
+        function getContainerWidth() {
+            const container = document.getElementById('calendar-container');
+            // Subtract 2px for the 1px border on each side
+            return Math.max(600, Math.floor(container.offsetWidth) - 2);
         }
 
-        window.addEventListener('click', function(e) {
-            const menu = document.getElementById('dropdown-menu-box');
-            const button = e.target.closest('button');
-            if (!button && !e.target.closest('#dropdown-menu-box')) {
-                menu.classList.add('hidden');
+        /** Builds the full Investing.com embed URL with a pixel-accurate width param. */
+        function buildCalendarSrc(countryIds) {
+            const w = getContainerWidth();
+            return `${CAL_BASE}&countries=${countryIds}${CAL_TAIL}&width=${w}`;
+        }
+
+        // ── Dropdown ───────────────────────────────────────────────────────────────
+
+        function toggleDropdownMenu() {
+            document.getElementById('dropdown-menu-box').classList.toggle('hidden');
+        }
+
+        window.addEventListener('click', function (e) {
+            if (!e.target.closest('button') && !e.target.closest('#dropdown-menu-box')) {
+                document.getElementById('dropdown-menu-box').classList.add('hidden');
             }
         });
 
-        function rebuildWidgetMatrix() {
-            const iframe = document.getElementById('investing-calendar-iframe');
-            const label = document.getElementById('dropdown-label');
-            const checkedBoxes = document.querySelectorAll('#dropdown-menu-box input[type="checkbox"]:checked');
-            
-            const selectedCountryIds = Array.from(checkedBoxes).map(box => box.value);
+        // ── Widget rebuild (called by checkboxes) ──────────────────────────────────
 
-            if (selectedCountryIds.length === 0) {
-                label.textContent = "No Channels Selected";
+        function rebuildWidgetMatrix() {
+            const iframe       = document.getElementById('investing-calendar-iframe');
+            const label        = document.getElementById('dropdown-label');
+            const checkedBoxes = document.querySelectorAll('#dropdown-menu-box input[type="checkbox"]:checked');
+            const ids          = Array.from(checkedBoxes).map(b => b.value);
+
+            if (ids.length === 0) {
+                label.textContent = 'No Channels Selected';
                 return;
             }
 
-            if (checkedBoxes.length === 11) {
-                label.textContent = "All Major Economies";
-            } else {
-                label.textContent = `${checkedBoxes.length} Markets Selected`;
-            }
-
-            const targetBaseUrl = "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=";
-            const targetQueryString = selectedCountryIds.join(',');
-            const targetTailUrl = "&calType=week&timeZone=8&lang=1";
-
-            iframe.src = targetBaseUrl + targetQueryString + targetTailUrl;
+            label.textContent = checkedBoxes.length === 11 ? 'All Major Economies' : `${checkedBoxes.length} Markets Selected`;
+            iframe.src = buildCalendarSrc(ids.join(','));
         }
+
+        // ── Initialisation ─────────────────────────────────────────────────────────
+
+        // Set the real URL once the layout has been painted (so offsetWidth is accurate)
+        window.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('investing-calendar-iframe').src = buildCalendarSrc(DEFAULT_COUNTRIES);
+        });
+
+        // Re-measure and reload if the viewport is resized (debounced to avoid thrashing)
+        let resizeTimer;
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function () {
+                const checked = document.querySelectorAll('#dropdown-menu-box input[type="checkbox"]:checked');
+                const ids     = Array.from(checked).map(b => b.value).join(',') || DEFAULT_COUNTRIES;
+                document.getElementById('investing-calendar-iframe').src = buildCalendarSrc(ids);
+            }, 400);
+        });
     </script>
 </body>
 </html>
