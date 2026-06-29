@@ -55,4 +55,74 @@
                     <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="25" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> Australia</label>
                     <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="12" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> Switzerland</label>
                     <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="32" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> New Zealand</label>
-                    <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox
+                    <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="6" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> Canada</label>
+                    <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="22" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> France</label>
+                    <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="17" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> Germany</label>
+                    <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="35" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> Japan</label>
+                    <label class="flex items-center gap-2.5 text-zinc-300 hover:text-white cursor-pointer py-0.5"><input type="checkbox" value="37" checked onchange="rebuildWidgetMatrix()" class="rounded bg-[#020203] border-zinc-800 text-cyan-500 focus:ring-0"> China</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="iframe-scale-container relative w-full overflow-hidden rounded-xl border border-zinc-900 shadow-2xl h-[920px] bg-white z-10">
+            <iframe id="investing-calendar-iframe" 
+                    src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=5,72,4,25,12,32,6,22,17,35,37&calType=week&timeZone=8&lang=1" 
+                    height="1100px" 
+                    frameborder="0" 
+                    allowtransparency="true" 
+                    marginwidth="0" 
+                    marginheight="0"
+                    style="margin-bottom: -180px;"
+                    class="rounded-lg">
+            </iframe>
+        </div>
+        
+        <div class="font-mono text-[10px] text-zinc-600 text-right pt-1 select-none">
+            Real Time Economic Calendar provided by <a href="https://www.investing.com/" rel="nofollow" target="_blank" class="text-zinc-400 hover:text-cyan-400 font-bold underline">Investing.com</a>.
+        </div>
+    </main>
+
+    <div id="global-footer"></div>
+
+    <script src="inject-engine.js"></script>
+    <script>
+        function toggleDropdownMenu() {
+            const menu = document.getElementById('dropdown-menu-box');
+            menu.classList.toggle('hidden');
+        }
+
+        window.addEventListener('click', function(e) {
+            const menu = document.getElementById('dropdown-menu-box');
+            const button = e.target.closest('button');
+            if (!button && !e.target.closest('#dropdown-menu-box')) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        function rebuildWidgetMatrix() {
+            const iframe = document.getElementById('investing-calendar-iframe');
+            const label = document.getElementById('dropdown-label');
+            const checkedBoxes = document.querySelectorAll('#dropdown-menu-box input[type="checkbox"]:checked');
+            
+            const selectedCountryIds = Array.from(checkedBoxes).map(box => box.value);
+
+            if (selectedCountryIds.length === 0) {
+                label.textContent = "No Channels Selected";
+                return;
+            }
+
+            if (checkedBoxes.length === 11) {
+                label.textContent = "All Major Economies";
+            } else {
+                label.textContent = `${checkedBoxes.length} Markets Selected`;
+            }
+
+            const targetBaseUrl = "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=";
+            const targetQueryString = selectedCountryIds.join(',');
+            const targetTailUrl = "&calType=week&timeZone=8&lang=1";
+
+            iframe.src = targetBaseUrl + targetQueryString + targetTailUrl;
+        }
+    </script>
+</body>
+</html>
