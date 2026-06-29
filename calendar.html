@@ -58,8 +58,8 @@
             </div>
         </div>
 
-        <!-- id added for JS width measurement; bg-white removed (dead zone was white from this) -->
-        <div id="calendar-container" class="relative w-full overflow-hidden rounded-xl border border-zinc-900 shadow-2xl h-[920px] z-10">
+        <!-- mx-auto centres the box; max-w-[750px] matches Investing.com's table width so &width= fills it exactly -->
+        <div id="calendar-container" class="relative mx-auto w-full max-w-[750px] overflow-hidden rounded-xl border border-zinc-900 shadow-2xl h-[920px] z-10">
             <!-- src starts as about:blank — JS sets the real URL after measuring container width -->
             <iframe id="investing-calendar-iframe"
                     src="about:blank"
