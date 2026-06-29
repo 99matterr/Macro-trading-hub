@@ -33,7 +33,7 @@
                 <a href="tools-hub.html" class="active-tab text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Trading Tools</a>
             </div>
         </div>
-        <div id="live-time" class="font-mono text-xs text-zinc-500 tabular-nums">--:--:-- UTC</div>
+        <div id="live-time" class="font-mono text-xs text-zinc-500 tabular-nums hidden sm:inline">--:--:-- UTC</div>
     </nav>
 
     <main class="flex-grow w-full max-w-4xl mx-auto px-4 py-10">
@@ -67,10 +67,10 @@
             <div class="space-y-2">
                 <p class="text-zinc-400 font-bold uppercase tracking-wider">Portal Navigation</p>
                 <ul class="space-y-1 text-[11px]">
-                    <li><a href="index.html" class="hover:text-cyan-400">Live Analytics</a></li>
-                    <li><a href="research.html" class="hover:text-cyan-400">Research Logs</a></li>
-                    <li><a href="academy.html" class="hover:text-cyan-400">Quant Academy</a></li>
-                    <li><a href="tools-hub.html" class="hover:text-cyan-400">Trading Tools</a></li>
+                    <li><a href="index.html" class="hover:text-cyan-400 transition-colors">Live Analytics</a></li>
+                    <li><a href="research.html" class="hover:text-cyan-400 transition-colors">Research Logs</a></li>
+                    <li><a href="academy.html" class="hover:text-cyan-400 transition-colors">Quant Academy</a></li>
+                    <li><a href="tools-hub.html" class="hover:text-cyan-400 transition-colors">Trading Tools</a></li>
                 </ul>
             </div>
             <div class="space-y-2">
@@ -85,7 +85,7 @@
 
     <script>
         setInterval(() => {
-            document.getElementById('live-time').textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+            if(document.getElementById('live-time')) document.getElementById('live-time').textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
         }, 1000);
 
         const assetProfiles = {
