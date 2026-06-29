@@ -4,65 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KAIROS GLOBAL RESEARCH // PORTAL</title>
-    <!-- Core External Chart Library Platform -->
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-    <!-- Tailwind CSS Interface Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body { background-color: #020203; color: #d4d4d8; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #020203; }
         ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 2px; }
-        ::-webkit-scrollbar-thumb:hover { background: #27272a; }
         .active-tab { color: #06b6d4 !important; border-bottom: 2px solid #06b6d4 !important; }
-        
-        /* Interactive pulse effect for key terminal nodes */
-        .terminal-pulse {
-            animation: pulse-glow 2s infinite ease-in-out;
-        }
-        @keyframes pulse-glow {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
+        .terminal-pulse { animation: pulse-glow 2s infinite ease-in-out; }
+        @keyframes pulse-glow { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
     </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- STICKY GLOBAL HEADER NAVIGATION -->
-    <nav class="sticky top-0 z-50 bg-[#060608]/90 backdrop-blur-md border-b border-zinc-900 px-4 lg:px-8 h-16 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-8">
-            <div class="flex items-center gap-3">
-                <div class="h-6 w-6 rounded bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-                    <span class="text-[10px] font-mono font-bold text-white">KG</span>
-                </div>
-                <div class="font-mono">
-                    <span class="text-xs font-bold text-white tracking-widest block leading-none">KAIROS GLOBAL</span>
-                    <span class="text-[9px] text-zinc-500 tracking-wider uppercase mt-0.5 block">Research Portal</span>
-                </div>
-            </div>
-            <div class="hidden md:flex items-center gap-6 font-mono text-xs h-16">
-                <a href="index.html" class="active-tab h-full px-1 flex items-center font-medium">Live Intelligence</a>
-                <a href="research.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Research Feed</a>
-                <a href="academy.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Quant Academy</a>
-                <a href="tools-hub.html" class="text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Trading Tools</a>
-            </div>
-        </div>
-        
-        <div class="font-mono text-xs text-zinc-500 flex items-center gap-4">
-            <span id="live-time" class="text-zinc-400 font-semibold tabular-nums hidden sm:inline">UTC --:--:--</span>
-            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
-        </div>
-    </nav>
+    <div id="global-header"></div>
 
-    <!-- MOBILE NAVIGATION DECK -->
-    <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-2 py-2 flex justify-around font-mono text-[11px] shrink-0">
-        <a href="index.html" class="active-tab py-1 px-2 font-medium">Terminal</a>
-        <a href="research.html" class="text-zinc-400 py-1 px-2 font-medium">Research</a>
-        <a href="academy.html" class="text-zinc-400 py-1 px-2 font-medium">Academy</a>
-        <a href="tools-hub.html" class="text-zinc-400 py-1 px-2 font-medium">Tools</a>
-    </div>
-
-    <!-- BLACK TRADINGVIEW TICKER TAPE -->
     <div class="w-full bg-[#020203] border-b border-zinc-900 overflow-hidden h-[46px] flex items-center shrink-0">
         <div class="tradingview-widget-container w-full h-full">
             <div class="tradingview-widget-container__widget h-full w-full"></div>
@@ -70,9 +27,7 @@
             {
                 "symbols": [
                     { "proName": "FX:EURUSD", "title": "EUR/USD" }, { "proName": "FX:GBPUSD", "title": "GBP/USD" },
-                    { "proName": "FX:USDJPY", "title": "USD/JPY" }, { "proName": "FX:USDCAD", "title": "USD/CAD" },
-                    { "proName": "FX:USDCHF", "title": "USD/CHF" }, { "proName": "FX:AUDUSD", "title": "AUD/USD" },
-                    { "proName": "FX:NZDUSD", "title": "NZD/USD" }
+                    { "proName": "FX:USDJPY", "title": "USD/JPY" }, { "proName": "FX:USDCAD", "title": "USD/CAD" }
                 ],
                 "showSymbolLogo": true, "colorTheme": "dark", "isTransparent": true, "displayMode": "regular", "locale": "en"
             }
@@ -80,44 +35,36 @@
         </div>
     </div>
 
-    <!-- MAIN HOOKING EDITORIAL CONTENT LAYERS -->
-    <main class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 space-y-10 overflow-y-auto">
-        
-        <!-- INTRO HERO BLOCK -->
+    <main class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
         <header class="font-mono space-y-4">
             <span class="text-cyan-500 font-bold text-[10px] tracking-widest uppercase block">// ARCHITECTURE DESK PORTAL</span>
-            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight uppercase leading-none">
+            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase leading-none">
                 Macro-Quantamental Modeling & Systemic Variance Management
             </h1>
-            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed font-sans max-w-2xl pt-1">
-                Welcome to the digital node for Kairos Global Research. This system acts as a decentralized risk engine engineered to process cross-border structural changes, track asymmetric market dynamics, and verify mechanical position thresholds.
+            <p class="text-xs text-zinc-400 font-sans max-w-2xl pt-1">
+                Welcome to the digital node for Kairos Global Research. This system acts as a decentralized risk engine engineered to process cross-border structural changes and verify position parameters.
             </p>
         </header>
 
-        <!-- MICRO TELEMETRY STATS GRID -->
-        <section class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono text-left">
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono text-xs">
             <div class="bg-[#050508] border border-zinc-900 rounded-lg p-3.5">
-                <span class="text-[9px] text-zinc-600 uppercase block">VOLATILITY REGIME</span>
-                <span class="text-xs font-bold text-emerald-400 uppercase mt-0.5 flex items-center gap-1.5">
-                    <span class="h-1 w-1 rounded-full bg-emerald-400 inline-block animate-ping"></span>
-                    COMPRESSED
-                </span>
+                <span class="text-[9px] text-zinc-600 block">VOLATILITY REGIME</span>
+                <span class="text-xs font-bold text-emerald-400 mt-0.5 flex items-center gap-1.5"><span class="h-1 w-1 rounded-full bg-emerald-400 inline-block animate-ping"></span>COMPRESSED</span>
             </div>
             <div class="bg-[#050508] border border-zinc-900 rounded-lg p-3.5">
-                <span class="text-[9px] text-zinc-600 uppercase block">SWAP LINE FUNDING</span>
-                <span class="text-xs font-bold text-white uppercase mt-0.5">NOMINAL POOLS</span>
+                <span class="text-[9px] text-zinc-600 block">SWAP LINE FUNDING</span>
+                <span class="text-xs font-bold text-white mt-0.5">NOMINAL POOLS</span>
             </div>
             <div class="bg-[#050508] border border-zinc-900 rounded-lg p-3.5">
-                <span class="text-[9px] text-zinc-600 uppercase block">LIQUIDITY THRESHOLD</span>
-                <span class="text-xs font-bold text-cyan-400 uppercase mt-0.5">94.2% EDGE</span>
+                <span class="text-[9px] text-zinc-600 block">LIQUIDITY THRESHOLD</span>
+                <span class="text-xs font-bold text-cyan-400 mt-0.5">94.2% EDGE</span>
             </div>
             <div class="bg-[#050508] border border-zinc-900 rounded-lg p-3.5">
-                <span class="text-[9px] text-zinc-600 uppercase block">ACTIVE CALCULATIONS</span>
-                <span class="text-xs font-bold text-zinc-400 uppercase mt-0.5 tabular-nums">28 MATRIX SYMBOLS</span>
+                <span class="text-[9px] text-zinc-600 block">ACTIVE CALCULATIONS</span>
+                <span class="text-xs font-bold text-zinc-400 mt-0.5">28 MATRIX SYMBOLS</span>
             </div>
         </section>
 
-        <!-- LIVE PROTOCOL MONITOR LOG (TERMINAL SCREEN) -->
         <section class="bg-[#040406] border border-zinc-900 rounded-xl p-4 font-mono text-xs">
             <div class="flex items-center justify-between border-b border-zinc-900 pb-2 mb-3">
                 <div class="flex items-center gap-2">
@@ -126,33 +73,12 @@
                 </div>
                 <span class="text-[9px] text-zinc-600 uppercase">SYS_ENG_v2.2</span>
             </div>
-            <!-- Live message pipeline targeted by JS engine below -->
-            <div id="terminal-event-stream" class="space-y-1.5 text-[11px] text-zinc-500 min-h-[90px] font-mono leading-relaxed select-none">
-                <div>[<span class="text-zinc-600">00:01:04</span>] <span class="text-zinc-400">SYS_INIT:</span> Establishing safe handshake protocols with Polygon API networks...</div>
-                <div>[<span class="text-zinc-600">00:01:05</span>] <span class="text-zinc-400">SYS_DATA:</span> Pulled cross-asset variance metrics for 28 G8 matrix pairings successfully.</div>
-                <div class="text-cyan-500/80 font-semibold">[<span class="text-cyan-700">00:01:06</span>] SYS_OK: Dynamic tracking interfaces initialized and awaiting input parameters.</div>
+            <div id="terminal-event-stream" class="space-y-1.5 text-[11px] text-zinc-500 min-h-[90px] leading-relaxed select-none">
+                <div>[<span class="text-zinc-600">00:01:04</span>] <span class="text-zinc-400">SYS_INIT:</span> Establishing safe handshake protocols with networks...</div>
+                <div class="text-cyan-500/80 font-semibold">[<span class="text-cyan-700">00:01:06</span>] SYS_OK: Dynamic tracking interfaces initialized.</div>
             </div>
         </section>
 
-        <!-- TELEMETRY HIGHLIGHTS MATRIX -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs">
-            <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-5 space-y-1">
-                <span class="text-[10px] text-zinc-500 uppercase">Core Framework Strategy</span>
-                <div class="text-white font-bold text-sm uppercase tracking-wide">Global Liquidity Allocation</div>
-                <p class="text-zinc-400 text-[11px] leading-relaxed font-sans mt-1">
-                    Isolating macro variance by tracking sovereign debt curves, repo operations, and central bank balance sheet expansions.
-                </p>
-            </div>
-            <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-5 space-y-1">
-                <span class="text-[10px] text-zinc-500 uppercase">Risk Protocol Status</span>
-                <div class="text-cyan-400 font-bold text-sm uppercase tracking-wide">System Sizing Operational</div>
-                <p class="text-zinc-400 text-[11px] leading-relaxed font-sans mt-1">
-                    Integrated analytical engines are standing by to execute precise contract calculations across all multi-currency combinations.
-                </p>
-            </div>
-        </section>
-
-        <!-- CTA ACCESS ANCHOR -->
         <section class="bg-[#08080c] border border-zinc-900 rounded-xl p-6 font-mono flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="space-y-1">
                 <div class="text-xs font-bold text-white uppercase tracking-wider">Access Proprietary Calculators</div>
@@ -162,81 +88,28 @@
                 Open Trading Tools &rarr;
             </a>
         </section>
-
     </main>
 
-    <!-- PREMIUM INSTITUTIONAL FOOTER -->
-    <footer class="bg-[#060608] border-t border-zinc-900 py-8 md:py-12 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
-        <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-left">
-            <div class="space-y-3">
-                <p class="text-zinc-300 font-bold tracking-wider uppercase">Kairos Global Research</p>
-                <p class="text-zinc-500 leading-relaxed max-w-sm text-[11px]">
-                    An independent research cockpit engineered to track global macroeconomic cycles, inter-market yield alignments, and structural trend asymmetries.
-                </p>
-            </div>
-            <div class="space-y-2">
-                <p class="text-zinc-400 font-bold uppercase tracking-wider">Portal Core Navigation</p>
-                <ul class="space-y-1 text-[11px]">
-                    <li><a href="index.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Live Analytics Console</a></li>
-                    <li><a href="research.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Macro Intelligence Logs</a></li>
-                    <li><a href="academy.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Systematic Course Workspace</a></li>
-                </ul>
-            </div>
-            <div class="space-y-2">
-                <p class="text-zinc-400 font-bold uppercase tracking-wider">System Telemetry</p>
-                <div class="text-[11px] space-y-1 text-zinc-500 uppercase">
-                    <div>Interface Protocol: <span class="text-zinc-400">HTTPS / STATIC ENGINE EDGE</span></div>
-                    <div>Data Status: <span class="text-emerald-500 font-bold">NOMINAL / STABLE</span></div>
-                    <div>Deployment Grid: <span class="text-zinc-400">GitHub Pages v2.2</span></div>
-                </div>
-            </div>
-        </div>
-        <div class="max-w-7xl w-full mx-auto border-t border-zinc-900/60 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px]">
-            <p>&copy; 2026 Kairos Global Research. All quantitative rights reserved.</p>
-            <p class="text-zinc-600 tracking-wide uppercase">Built with clean code & strategic purpose.</p>
-        </div>
-    </footer>
+    <div id="global-footer"></div>
 
-    <!-- INLINE SIMULATED PROTOCOL REFRESH RUNNER -->
+    <script src="inject-engine.js"></script>
     <script>
-        // Update live time loop
-        setInterval(() => {
-            if(document.getElementById('live-time')) document.getElementById('live-time').textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
-        }, 1000);
-
-        // Terminal text cycling animation script
         const logsContainer = document.getElementById('terminal-event-stream');
         const simulatedLogs = [
-            "SYS_DATA: Running lookback variance tests across EURUSD and GBPJPY setups...",
-            "YIELD_WARN: US10Y premium spread expansion shifting inter-market models +4.2bps.",
-            "SYS_CALC: Updating local cache tables for fallback pricing arrays...",
-            "POLYGON_API: Heartbeat status verified. Latency reading optimal at 14ms.",
-            "SYS_LOG: Local storage matrix layers synchronized with active layout selections."
+            "SYS_DATA: Running lookback variance tests across core pairings...",
+            "YIELD_WARN: US10Y premium spread expansion shifting models.",
+            "SYS_CALC: Updating local cache tables for fallback arrays...",
+            "SYS_LOG: Local storage matrix layers synchronized successfully."
         ];
-
-        function pushSimulatedLog() {
+        setInterval(() => {
             if (!logsContainer) return;
-            
-            // Get timestamp
-            const now = new Date();
-            const timeStr = now.toTimeString().split(' ')[0];
-
-            // Pick a random string from array
+            const timeStr = new Date().toTimeString().split(' ')[0];
             const text = simulatedLogs[Math.floor(Math.random() * simulatedLogs.length)];
-            
-            // Construct new row node
             const logRow = document.createElement('div');
             logRow.innerHTML = `[<span class="text-zinc-600">${timeStr}</span>] <span class="text-zinc-400">SYS_MONITOR:</span> ${text}`;
-            
-            // Inject and drop the top child line to keep terminal box neat
             logsContainer.appendChild(logRow);
-            if (logsContainer.children.length > 4) {
-                logsContainer.removeChild(logsContainer.children[0]);
-            }
-        }
-        
-        // Loop a new log message every 5 seconds
-        setInterval(pushSimulatedLog, 5000);
+            if (logsContainer.children.length > 4) logsContainer.removeChild(logsContainer.children[0]);
+        }, 5000);
     </script>
 </body>
 </html>
