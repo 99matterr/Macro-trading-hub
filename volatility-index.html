@@ -3,25 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAIROS GLOBAL // VOLATILITY REALIZED DIAGNOSTICS</title>
+    <title>KAIROS GLOBAL // VOLATILITY DIAGNOSTICS</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body { background-color: #020203; color: #d4d4d8; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #020203; }
         ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 2px; }
-        ::-webkit-scrollbar-thumb:hover { background: #27272a; }
         .active-tab { color: #06b6d4 !important; border-bottom: 2px solid #06b6d4 !important; }
-        
-        /* Mataf Active Highlighting State Layer Engine */
-        .selected-currency-row {
-            background-color: rgba(22, 78, 99, 0.25) !important;
-            border-left: 3px solid #06b6d4 !important;
-            color: #ffffff !important;
-        }
     </style>
 </head>
-<body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
+<body class="bg-[#020203] text-zinc-300 font-sans min-h-screen flex flex-col justify-between">
 
     <nav class="sticky top-0 z-50 bg-[#060608]/90 backdrop-blur-md border-b border-zinc-900 px-4 lg:px-8 h-16 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-8">
@@ -41,340 +33,105 @@
                 <a href="tools-hub.html" class="active-tab text-zinc-400 hover:text-white transition-colors h-full px-1 flex items-center font-medium">Trading Tools</a>
             </div>
         </div>
-        <div class="font-mono text-xs text-zinc-500 flex items-center gap-4">
-            <span id="live-time" class="text-zinc-400 font-semibold tabular-nums hidden sm:inline">UTC --:--:--</span>
-            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
-        </div>
+        <div id="live-time" class="font-mono text-xs text-zinc-500 tabular-nums">--:--:-- UTC</div>
     </nav>
 
-    <div class="md:hidden bg-[#060608] border-b border-zinc-900 px-2 py-2 flex justify-around font-mono text-[11px] shrink-0">
-        <a href="index.html" class="text-zinc-400 py-1 px-2 font-medium">Terminal</a>
-        <a href="research.html" class="text-zinc-400 py-1 px-2 font-medium">Research</a>
-        <a href="academy.html" class="text-zinc-400 py-1 px-2 font-medium">Academy</a>
-        <a href="tools-hub.html" class="active-tab text-zinc-400 py-1 px-2 font-medium">Tools</a>
-    </div>
-
-    <main class="flex-grow w-full max-w-7xl mx-auto px-4 py-6 md:py-10 space-y-6 overflow-y-auto">
-        
-        <div class="border-b border-zinc-900 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono">
-            <div>
-                <h1 class="text-base sm:text-lg font-bold text-white uppercase tracking-wider">G8 Volatility Realized Diagnostics</h1>
-                <p class="text-xs text-zinc-500 mt-1">Calculates real-time variation models directly from live exchange candles.</p>
-            </div>
-            <a href="tools-hub.html" class="font-mono text-[11px] text-zinc-400 hover:text-cyan-400 transition-colors border border-zinc-800 bg-[#08080c] px-3 py-1.5 rounded-lg text-center self-stretch sm:self-auto">
-                &larr; BACK
-            </a>
+    <main class="flex-grow w-full max-w-4xl mx-auto px-4 py-10">
+        <div class="text-center mb-10">
+            <h1 class="text-xl font-bold text-white uppercase tracking-widest">// Realized Volatility Matrix</h1>
+            <p class="text-xs text-zinc-500 mt-2 uppercase tracking-widest">Complete Global Asset Index</p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
-            <div class="lg:col-span-5 bg-[#08080c] border border-zinc-900 rounded-xl p-4 flex flex-col h-[580px]">
-                <div class="font-mono text-[10px] text-zinc-500 uppercase tracking-wider pb-3 border-b border-zinc-900/60 mb-2 flex justify-between items-center">
-                    <span>// Realized Currency Matrix Index</span>
-                    <span class="text-cyan-500/80 lowercase text-[9px]">Select a pair below</span>
-                </div>
-                <div class="flex-grow overflow-y-auto pr-1">
-                    <table class="w-full text-left font-mono text-xs select-none">
-                        <thead>
-                            <tr class="text-[10px] text-zinc-500 border-b border-zinc-900/60 uppercase">
-                                <th class="pb-2 font-medium pl-2">Pair</th>
-                                <th class="pb-2 font-medium text-right">Pips</th>
-                                <th class="pb-2 font-medium text-right">$ (100k)</th>
-                                <th class="pb-2 font-medium text-right pr-2">%</th>
-                            </tr>
-                        </thead>
-                        <tbody id="currency-table-body" class="divide-y divide-zinc-900/40">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="lg:col-span-7 space-y-6 flex flex-col justify-between">
-                
-                <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4 font-mono">
-                    <div class="border-b border-zinc-900 pb-2 flex justify-between items-center mb-3">
-                        <h2 id="profile-heading" class="text-xs font-bold text-cyan-400 uppercase tracking-wider">EUR / USD Volatility Profile</h2>
-                        <span class="text-[9px] text-zinc-600">MODEL RE_v3.0</span>
-                    </div>
-                    <p id="profile-description" class="text-[11px] text-zinc-400 leading-relaxed font-sans min-h-[50px]">
-                        Realized variance metrics parsed over a live trailing 70-day lookback window framework. Select any distribution bar below to inspect granular intra-day shifts.
-                    </p>
-                    <div class="grid grid-cols-2 gap-4 pt-3 border-t border-zinc-900/60 mt-3 text-[11px]">
-                        <div>
-                            <span id="metric-label-adr" class="text-[9px] text-zinc-500 uppercase block">Average Daily Range</span>
-                            <div id="metric-adr-value" class="text-white text-base font-bold mt-0.5 tabular-nums">58 <span class="text-xs font-normal text-zinc-500">PIPS</span></div>
-                        </div>
-                        <div>
-                            <span id="metric-label-ipr" class="text-[9px] text-zinc-500 uppercase block">Implied Percent Range</span>
-                            <div id="metric-ipr-value" class="text-white text-base font-bold mt-0.5 tabular-nums">0.51% <span class="text-[9px] font-bold text-emerald-500 bg-emerald-950/40 border border-emerald-900/40 px-1 rounded ml-1 uppercase">Stable</span></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4 sm:p-5 flex flex-col h-auto w-full overflow-hidden">
-                    <div class="flex items-center justify-between font-mono pb-3 border-b border-zinc-900/60 mb-3 shrink-0">
-                        <span class="text-[10px] text-zinc-500 uppercase tracking-wider">// Hourly Intraday Volatility Distribution</span>
-                    </div>
-                    <div id="dynamic-chart-canvas" class="w-full h-auto aspect-[16/9] sm:aspect-[21/9] lg:aspect-[3/1] flex items-end justify-between gap-1 pt-4 pb-2 relative z-10">
-                        </div>
-                    <div class="w-full border-t border-zinc-900 pt-2 flex justify-between items-center font-mono text-[9px] text-zinc-600 select-none tracking-tighter">
-                        <span>00:00 APAC OPEN</span>
-                        <span class="hidden sm:inline">12:00 LON/NY OVERLAP</span>
-                        <span>23:00 CLOSE</span>
-                    </div>
-                </div>
-
-                <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4 sm:p-5 flex flex-col h-auto overflow-hidden">
-                    <div class="border-b border-zinc-900 pb-3 mb-3 font-mono">
-                        <span class="text-[10px] text-zinc-500 uppercase tracking-wider">// Weekday Volatility Distribution Balance</span>
-                    </div>
-                    <div id="weekday-chart-canvas" class="w-full h-auto aspect-[16/9] sm:aspect-[21/9] lg:aspect-[3/1] flex items-end justify-between gap-2 pt-4 pb-2 relative z-10">
-                        </div>
-                    <div class="w-full border-t border-zinc-900 pt-2 flex justify-between items-center font-mono text-[9px] text-zinc-600 select-none">
-                        <span>MONDAY OPENING DRIFT</span>
-                        <span>FRIDAY WAVE END</span>
-                    </div>
-                </div>
-
-            </div>
+        <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-6">
+            <table class="w-full text-left font-mono text-sm">
+                <thead>
+                    <tr class="text-[10px] text-zinc-500 border-b border-zinc-900 uppercase">
+                        <th class="pb-4 font-medium pl-4">Pair</th>
+                        <th class="pb-4 font-medium text-right">Avg Pips</th>
+                        <th class="pb-4 font-medium text-right">$ Cash Val</th>
+                        <th class="pb-4 font-medium text-right pr-4">% Range</th>
+                    </tr>
+                </thead>
+                <tbody id="currency-table-body" class="divide-y divide-zinc-900/40">
+                    </tbody>
+            </table>
         </div>
     </main>
 
     <footer class="bg-[#060608] border-t border-zinc-900 py-8 md:py-12 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
-        <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-left">
+        <div class="max-w-4xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-left">
             <div class="space-y-3">
                 <p class="text-zinc-300 font-bold tracking-wider uppercase">Kairos Global Research</p>
-                <p class="text-zinc-500 leading-relaxed max-w-sm text-[11px]">
-                    An independent research cockpit engineered to track global macroeconomic cycles, inter-market yield alignments, and structural trend asymmetries.
-                </p>
+                <p class="text-zinc-500 leading-relaxed text-[11px]">Independent research cockpit tracking macroeconomic cycles, inter-market yield alignments, and structural trend asymmetries.</p>
             </div>
             <div class="space-y-2">
-                <p class="text-zinc-400 font-bold uppercase tracking-wider">Portal Core Navigation</p>
+                <p class="text-zinc-400 font-bold uppercase tracking-wider">Portal Navigation</p>
                 <ul class="space-y-1 text-[11px]">
-                    <li><a href="index.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Live Analytics Console</a></li>
-                    <li><a href="research.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Macro Intelligence Logs</a></li>
-                    <li><a href="academy.html" class="text-zinc-500 hover:text-cyan-400 transition-colors">Systematic Course Workspace</a></li>
+                    <li><a href="index.html" class="hover:text-cyan-400">Live Analytics</a></li>
+                    <li><a href="research.html" class="hover:text-cyan-400">Research Logs</a></li>
+                    <li><a href="academy.html" class="hover:text-cyan-400">Quant Academy</a></li>
+                    <li><a href="tools-hub.html" class="hover:text-cyan-400">Trading Tools</a></li>
                 </ul>
             </div>
             <div class="space-y-2">
                 <p class="text-zinc-400 font-bold uppercase tracking-wider">System Telemetry</p>
                 <div class="text-[11px] space-y-1 text-zinc-500 uppercase">
-                    <div>Interface Protocol: <span class="text-zinc-400">HTTPS / STATIC ENGINE EDGE</span></div>
-                    <div>Data Status: <span class="text-emerald-500 font-bold">NOMINAL / STABLE</span></div>
-                    <div>Deployment Grid: <span class="text-zinc-400">GitHub Pages v2.2</span></div>
+                    <div>Status: <span class="text-emerald-500 font-bold">NOMINAL</span></div>
+                    <div>Deployment: <span class="text-zinc-400">GITHUB PAGES v2.2</span></div>
                 </div>
             </div>
-        </div>
-        <div class="max-w-7xl w-full mx-auto border-t border-zinc-900/60 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px]">
-            <p>&copy; 2026 Kairos Global Research. All quantitative rights reserved.</p>
-            <p class="text-zinc-600 tracking-wide uppercase">Built with clean code & strategic purpose.</p>
         </div>
     </footer>
 
     <script>
-        // Core cross asset quantitative database dictionary
+        setInterval(() => {
+            document.getElementById('live-time').textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+        }, 1000);
+
         const assetProfiles = {
-            AUDCAD: { name: "AUDCAD", pips: "57.660", cash: "406.17", pct: "0.59%", heading: "AUD / CAD Volatility Profile", adr: "58", ipr: "0.59%", status: "Stable", weekdayBars: [48, 51, 58, 62, 53], bars: [30, 28, 25, 22, 35, 48, 62, 55, 44, 38, 30, 24] },
-            AUDCHF: { name: "AUDCHF", pips: "29.628", cash: "365.87", pct: "0.53%", heading: "AUD / CHF Volatility Profile", adr: "30", ipr: "0.53%", status: "Stable", weekdayBars: [24, 28, 31, 34, 29], bars: [18, 15, 14, 12, 20, 28, 35, 30, 24, 21, 16, 14] },
-            AUDJPY: { name: "AUDJPY", pips: "82.456", cash: "509.77", pct: "0.74%", heading: "AUD / JPY Volatility Profile", adr: "82", ipr: "0.74%", status: "Elevated", weekdayBars: [72, 78, 88, 92, 80], bars: [45, 40, 36, 32, 50, 68, 85, 76, 64, 55, 42, 35] },
-            AUDNZD: { name: "AUDNZD", pips: "52.478", cash: "295.87", pct: "0.43%", heading: "AUD / NZD Volatility Profile", adr: "52", ipr: "0.43%", status: "Stable", weekdayBars: [44, 48, 54, 56, 49], bars: [32, 29, 26, 22, 34, 45, 55, 49, 40, 35, 28, 22] },
-            AUDUSD: { name: "AUDUSD", pips: "54.224", cash: "542.24", pct: "0.79%", heading: "AUD / USD Volatility Profile", adr: "54", ipr: "0.79%", status: "Elevated", weekdayBars: [45, 50, 62, 68, 54], bars: [38, 35, 30, 26, 35, 55, 78, 66, 52, 44, 32, 26] },
-            CADCHF: { name: "CADCHF", pips: "26.082", cash: "322.08", pct: "0.46%", heading: "CAD / CHF Volatility Profile", adr: "26", ipr: "0.46%", status: "Stable", weekdayBars: [22, 24, 28, 30, 25], bars: [15, 12, 11, 9, 18, 24, 30, 26, 20, 18, 14, 11] },
-            CADJPY: { name: "CADJPY", pips: "59.078", cash: "365.24", pct: "0.52%", heading: "CAD / JPY Volatility Profile", adr: "59", ipr: "0.52%", status: "Stable", weekdayBars: [50, 55, 62, 65, 58], bars: [35, 31, 28, 24, 38, 52, 66, 58, 48, 41, 32, 26] },
-            CHFJPY: { name: "CHFJPY", pips: "112.866", cash: "697.78", pct: "0.57%", heading: "CHF / JPY Volatility Profile", adr: "113", ipr: "0.57%", status: "Volatile", weekdayBars: [98, 105, 118, 124, 110], bars: [65, 58, 52, 46, 75, 102, 126, 114, 98, 85, 68, 54] },
-            EURAUD: { name: "EURAUD", pips: "81.136", cash: "559.43", pct: "0.49%", heading: "EUR / AUD Volatility Profile", adr: "81", ipr: "0.49%", status: "Stable", weekdayBars: [70, 76, 85, 89, 78], bars: [48, 42, 38, 34, 52, 70, 88, 78, 65, 56, 44, 38] },
-            EURCAD: { name: "EURCAD", pips: "61.960", cash: "436.46", pct: "0.38%", heading: "EUR / CAD Volatility Profile", adr: "62", ipr: "0.38%", status: "Stable", weekdayBars: [52, 58, 65, 68, 60], bars: [38, 34, 30, 26, 40, 55, 70, 62, 50, 44, 35, 29] },
-            EURCHF: { name: "EURCHF", pips: "28.200", cash: "348.23", pct: "0.31%", heading: "EUR / CHF Volatility Profile", adr: "28", ipr: "0.31%", status: "Stable", weekdayBars: [23, 26, 30, 32, 27], bars: [16, 14, 12, 10, 18, 25, 32, 28, 22, 19, 15, 12] },
-            EURGBP: { name: "EURGBP", pips: "25.434", cash: "335.68", pct: "0.29%", heading: "EUR / GBP Volatility Profile", adr: "25", ipr: "0.29%", status: "Stable", weekdayBars: [20, 23, 27, 29, 24], bars: [14, 12, 11, 9, 16, 22, 28, 24, 20, 17, 13, 11] },
-            EURJPY: { name: "EURJPY", pips: "93.782", cash: "579.80", pct: "0.51%", heading: "EUR / JPY Volatility Profile", adr: "94", ipr: "0.51%", status: "Elevated", weekdayBars: [80, 88, 98, 104, 90], bars: [55, 48, 44, 38, 60, 82, 105, 92, 78, 66, 52, 44] },
-            EURNZD: { name: "EURNZD", pips: "110.990", cash: "625.76", pct: "0.55%", heading: "EUR / NZD Volatility Profile", adr: "111", ipr: "0.55%", status: "Volatile", weekdayBars: [94, 102, 116, 122, 106], bars: [62, 56, 50, 44, 72, 96, 120, 108, 92, 80, 64, 52] },
-            EURUSD: {
-                name: "EURUSD", pips: "58.322", cash: "583.22", pct: "0.51%", heading: "EUR / USD Volatility Profile", adr: "58", ipr: "0.51%", status: "Stable",
-                weekdayBars: [51, 54, 66, 68, 64], bars: [42, 38, 35, 31, 48, 65, 88, 74, 61, 52, 40, 34],
-                hourDetails: [
-                    { time: "00:00 - 02:00", name: "APAC Open Phase", desc: "Low absolute variance channel. Flow primarily driven by institutional Tokyo order matching loops.", range: "4-6 Pips", impact: "Low" },
-                    { time: "02:00 - 04:00", name: "Late Asian Range", desc: "Consolidated compression structure awaiting European macro opening order buffers.", range: "3-5 Pips", impact: "Minimal" },
-                    { time: "04:00 - 06:00", name: "Pre-Frankfurt Gap", desc: "Liquidity thinness causes light adjustments as Euro-zone bank desks synchronize routing servers.", range: "5-7 Pips", impact: "Low" },
-                    { time: "06:00 - 08:00", name: "Frankfurt / London Open", desc: "Sudden expansion vector. Velocity spikes as corporate volume runs structural asset reallocations.", range: "12-15 Pips", impact: "High" },
-                    { time: "08:00 - 10:00", name: "London Mid-Session", desc: "Stable structural trend extension. Liquidity depth absorbs standard spot executions cleanly.", range: "10-12 Pips", impact: "Moderate" },
-                    { time: "10:00 - 12:00", name: "Pre-NY Momentum Drop", desc: "Slight velocity contraction as participants hedge risk exposures prior to the US economic calendar releases.", range: "7-9 Pips", impact: "Moderate" },
-                    { time: "12:00 - 14:00", name: "London / New York Overlap", desc: "Absolute peak volatility axis. High cross-velocity driven by combined transatlantic institutional order flows.", range: "22-26 Pips", impact: "Critical" },
-                    { time: "14:00 - 16:00", name: "NY Mid-Session Drive", desc: "Strong trend continuation engine. Direct tracking of post-news reaction variance profiles.", range: "15-18 Pips", impact: "High" },
-                    { time: "16:00 - 18:00", name: "London Close Fix", desc: "Liquidity pool rebalancing. Closing order blocks execute to clear day-trading accounts.", range: "11-14 Pips", impact: "Moderate" },
-                    { time: "18:00 - 20:00", name: "Late NY Consolidation", desc: "Velocity slopes down smoothly. Capital distribution levels plateau into fixed evening ranges.", range: "6-8 Pips", impact: "Low" },
-                    { time: "20:00 - 22:00", name: "US Session Wind-down", desc: "Low transactional density. Spread risk widening begins as clearing desks finalize balance books.", range: "4-5 Pips", impact: "Minimal" },
-                    { time: "22:00 - 23:59", name: "Day End Rollover", desc: "Absolute compression channel. Spreads widen dynamically during swap rate point calculations.", range: "2-3 Pips", impact: "Low" }
-                ],
-                dayDetails: [
-                    { day: "Monday", desc: "Opening gap reconciliation workflows. Institutional asset managers layout tactical positioning parameters.", bias: "Neutral Drift" },
-                    { day: "Tuesday", desc: "Trend emergence phase. Volatility scales up as European industrial consensus logs hit the wires.", bias: "Bullish Expansion" },
-                    { day: "Wednesday", desc: "Mid-week liquidity depth spike. High transaction clustering due to block interest swap pricing adjustments.", bias: "Maximum Depth" },
-                    { day: "Thursday", desc: "Peak absolute realization performance. Central bank policy updates generate maximum displacement spikes.", bias: "High Variance" },
-                    { day: "Friday", desc: "Pre-weekend liquidation loops. Velocity decelerates past the New York mid-session benchmark floor.", bias: "Mean Reversion" }
-                ]
-            },
-            GBPAUD: { name: "GBPAUD", pips: "93.448", cash: "644.32", pct: "0.49%", heading: "GBP / AUD Volatility Profile", adr: "93", ipr: "0.49%", status: "Elevated", weekdayBars: [82, 88, 98, 105, 93], bars: [52, 48, 42, 38, 58, 80, 102, 90, 75, 64, 50, 42] },
-            GBPCAD: { name: "GBPCAD", pips: "82.448", cash: "580.78", pct: "0.44%", heading: "GBP / CAD Volatility Profile", adr: "82", ipr: "0.44%", status: "Stable", weekdayBars: [70, 76, 88, 94, 82], bars: [45, 40, 36, 32, 48, 66, 92, 80, 68, 58, 44, 36] },
-            GBPCHF: { name: "GBPCHF", pips: "40.476", cash: "499.83", pct: "0.38%", heading: "GBP / CHF Volatility Profile", adr: "40", ipr: "0.38%", status: "Stable", weekdayBars: [34, 38, 44, 48, 40], bars: [20, 18, 16, 22, 32, 42, 58, 50, 40, 34, 25, 20] },
-            GBPJPY: { name: "GBPJPY", pips: "120.334", cash: "743.95", pct: "0.56%", heading: "GBP / JPY Volatility Profile", adr: "120", ipr: "0.56%", status: "Volatile", weekdayBars: [118, 135, 144, 162, 128], bars: [60, 55, 48, 41, 72, 98, 142, 131, 115, 96, 78, 62] },
-            GBPNZD: { name: "GBPNZD", pips: "131.488", cash: "741.33", pct: "0.56%", heading: "GBP / NZD Volatility Profile", adr: "131", ipr: "0.56%", status: "Volatile", weekdayBars: [110, 124, 138, 145, 131], bars: [70, 64, 58, 50, 80, 110, 150, 136, 120, 104, 84, 70] },
-            GBPUSD: { name: "GBPUSD", pips: "79.170", cash: "791.70", pct: "0.60%", heading: "GBP / USD Volatility Profile", adr: "79", ipr: "0.60%", status: "Stable", weekdayBars: [68, 72, 85, 92, 79], bars: [35, 32, 28, 45, 62, 75, 110, 95, 80, 65, 48, 38] },
-            NZDCAD: { name: "NZDCAD", pips: "55.016", cash: "387.55", pct: "0.69%", heading: "NZD / CAD Volatility Profile", adr: "55", ipr: "0.69%", status: "Stable", weekdayBars: [46, 50, 56, 60, 55], bars: [28, 25, 22, 20, 32, 44, 58, 50, 42, 36, 28, 22] },
-            NZDCHF: { name: "NZDCHF", pips: "25.546", cash: "315.46", pct: "0.56%", heading: "NZD / CHF Volatility Profile", adr: "26", ipr: "0.56%", status: "Stable", weekdayBars: [20, 23, 27, 29, 25], bars: [14, 12, 11, 9, 16, 22, 28, 24, 20, 17, 13, 11] },
-            NZDJPY: { name: "NZDJPY", pips: "73.582", cash: "454.91", pct: "0.56%", heading: "NZD / JPY Volatility Profile", adr: "74", ipr: "0.56%", status: "Stable", weekdayBars: [62, 66, 76, 82, 73], bars: [40, 36, 32, 28, 44, 60, 78, 70, 58, 50, 38, 32] }
+            AUDCAD: { name: "AUDCAD", pips: "57.6", cash: "406.1", pct: "0.59%" },
+            AUDCHF: { name: "AUDCHF", pips: "29.6", cash: "365.8", pct: "0.53%" },
+            AUDJPY: { name: "AUDJPY", pips: "82.4", cash: "509.7", pct: "0.74%" },
+            AUDNZD: { name: "AUDNZD", pips: "52.4", cash: "295.8", pct: "0.43%" },
+            AUDUSD: { name: "AUDUSD", pips: "54.2", cash: "542.2", pct: "0.79%" },
+            CADCHF: { name: "CADCHF", pips: "26.0", cash: "322.0", pct: "0.46%" },
+            CADJPY: { name: "CADJPY", pips: "59.0", cash: "365.2", pct: "0.52%" },
+            CHFJPY: { name: "CHFJPY", pips: "112.8", cash: "697.7", pct: "0.57%" },
+            EURAUD: { name: "EURAUD", pips: "81.1", cash: "559.4", pct: "0.49%" },
+            EURCAD: { name: "EURCAD", pips: "61.9", cash: "436.4", pct: "0.38%" },
+            EURCHF: { name: "EURCHF", pips: "28.2", cash: "348.2", pct: "0.31%" },
+            EURGBP: { name: "EURGBP", pips: "25.4", cash: "335.6", pct: "0.29%" },
+            EURJPY: { name: "EURJPY", pips: "93.7", cash: "579.8", pct: "0.51%" },
+            EURNZD: { name: "EURNZD", pips: "110.9", cash: "625.7", pct: "0.55%" },
+            EURUSD: { name: "EURUSD", pips: "58.3", cash: "583.2", pct: "0.51%" },
+            GBPAUD: { name: "GBPAUD", pips: "93.4", cash: "644.3", pct: "0.49%" },
+            GBPCAD: { name: "GBPCAD", pips: "82.4", cash: "580.7", pct: "0.44%" },
+            GBPCHF: { name: "GBPCHF", pips: "40.4", cash: "499.8", pct: "0.38%" },
+            GBPJPY: { name: "GBPJPY", pips: "120.3", cash: "743.9", pct: "0.56%" },
+            GBPNZD: { name: "GBPNZD", pips: "131.4", cash: "741.3", pct: "0.56%" },
+            GBPUSD: { name: "GBPUSD", pips: "79.1", cash: "791.7", pct: "0.60%" },
+            NZDCAD: { name: "NZDCAD", pips: "55.0", cash: "387.5", pct: "0.69%" },
+            NZDCHF: { name: "NZDCHF", pips: "25.5", cash: "315.4", pct: "0.56%" },
+            NZDJPY: { name: "NZDJPY", pips: "73.5", cash: "454.9", pct: "0.56%" }
         };
 
-        function buildSortedCurrencyTable() {
+        function buildTable() {
             const tbody = document.getElementById('currency-table-body');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-            
-            // PROGRAMMATIC ALPHABETICAL SORT ROUTINE
             const sortedKeys = Object.keys(assetProfiles).sort();
-
             sortedKeys.forEach(key => {
                 const item = assetProfiles[key];
                 const row = document.createElement('tr');
-                row.id = `row-${item.name}`;
-                row.className = "hover:bg-zinc-900/60 transition-colors cursor-pointer border-b border-zinc-900/20 text-zinc-400 font-medium text-right";
+                row.className = "hover:bg-zinc-900 transition-colors border-b border-zinc-900/40 text-zinc-400";
                 row.innerHTML = `
-                    <td class="py-2.5 text-left font-bold text-zinc-300 pl-2">${item.name}</td>
-                    <td class="py-2.5 pr-1 tabular-nums">${item.pips}</td>
-                    <td class="py-2.5 pr-1 tabular-nums text-zinc-500">$${item.cash}</td>
-                    <td class="py-2.5 pr-2 tabular-nums text-cyan-500/80">${item.pct}</td>
+                    <td class="py-4 pl-4 font-bold text-zinc-200">${item.name}</td>
+                    <td class="py-4 text-right tabular-nums">${item.pips}</td>
+                    <td class="py-4 text-right tabular-nums text-zinc-600">$${item.cash}</td>
+                    <td class="py-4 text-right pr-4 tabular-nums text-cyan-500 font-bold">${item.pct}</td>
                 `;
-                row.onclick = () => selectCurrencyActiveRow(item.name);
                 tbody.appendChild(row);
             });
         }
-
-        // UPGRADED: TOUCH & CLICK INTERACTIVE WEEKDAY ENGINE
-        function renderWeekdayChart(pairKey) {
-            const container = document.getElementById('weekday-chart-canvas');
-            const dataData = assetProfiles[pairKey];
-            if(!container || !dataData) return;
-
-            container.innerHTML = '';
-            const maxVal = Math.max(...dataData.weekdayBars);
-            const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri"];
-            const defaultDayDetails = assetProfiles['EURUSD'].dayDetails;
-
-            dataData.weekdayBars.forEach((pipsVal, idx) => {
-                const dayObj = defaultDayDetails[idx];
-                const dayWrapper = document.createElement('div');
-                dayWrapper.className = "w-full flex flex-col justify-end items-center space-y-1.5 h-full group cursor-pointer";
-                
-                const scaledHeight = (pipsVal / maxVal) * 85; 
-                let barColor = "from-cyan-600/60 to-cyan-500/80 group-hover:from-cyan-500 group-hover:to-cyan-400";
-                if (pipsVal === maxVal) {
-                    barColor = "from-cyan-500 to-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.15)] group-hover:from-cyan-400 group-hover:to-emerald-300";
-                }
-
-                dayWrapper.innerHTML = `
-                    <div class="w-full bg-gradient-to-t ${barColor} rounded-t border border-cyan-500/10 flex items-end justify-center font-bold pb-1 text-white tabular-nums transition-all duration-150" style="height: ${scaledHeight}%">
-                        <span class="text-[9px] mb-0.5">${pipsVal}p</span>
-                    </div>
-                    <span class="uppercase font-bold text-zinc-600 group-hover:text-zinc-400 block text-[9px] font-mono tracking-wider transition-colors">${dayLabels[idx]}</span>
-                `;
-
-                // INTERACTIVE CLICK EVENT LOOP DISPATCH
-                dayWrapper.onclick = () => {
-                    document.getElementById('profile-description').innerHTML = `
-                        <span class="text-emerald-400 font-bold block font-mono text-[10px] mb-1">// ${dayObj.day} Analysis &bull; Realized Range: ${pipsVal} Pips</span>
-                        <span class="font-sans text-zinc-300">${dayObj.desc}</span>
-                    `;
-                    document.getElementById('metric-label-adr').textContent = "Selected Day Range";
-                    document.getElementById('metric-adr-value').innerHTML = `${pipsVal} <span class="text-xs font-normal text-zinc-500">PIPS</span>`;
-                    
-                    document.getElementById('metric-label-ipr').textContent = "Market Structure Bias";
-                    document.getElementById('metric-ipr-value').innerHTML = `
-                        <span class="text-white text-xs">${dayObj.bias}</span>
-                        <span class="text-[9px] font-bold text-cyan-400 bg-cyan-950/40 border border-cyan-900/40 px-1 rounded ml-1 tracking-widest uppercase">Active</span>
-                    `;
-                };
-
-                container.appendChild(dayWrapper);
-            });
-        }
-
-        function renderHourlyChart(pairKey) {
-            const chartCanvas = document.getElementById('dynamic-chart-canvas');
-            const dataData = assetProfiles[pairKey];
-            if (!chartCanvas || !dataData) return;
-
-            chartCanvas.innerHTML = ''; 
-            const defaultHours = assetProfiles['EURUSD'].hourDetails;
-
-            dataData.bars.forEach((heightPct, idx) => {
-                const hourObj = defaultHours[idx];
-                const barWrapper = document.createElement('div');
-                
-                let gradientString = "from-cyan-600/60 to-emerald-400 hover:from-cyan-500 hover:to-emerald-300";
-                let textHighlightNode = "text-zinc-400";
-                
-                if(idx === 6) { 
-                    gradientString = "from-cyan-500 to-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.2)] hover:from-cyan-400 hover:to-cyan-300";
-                    textHighlightNode = "text-cyan-400 font-bold opacity-100";
-                }
-
-                barWrapper.style.height = `${heightPct}%`;
-                barWrapper.className = `w-full bg-gradient-to-t ${gradientString} rounded-t-sm group relative flex flex-col justify-end items-center cursor-pointer transition-all duration-150`;
-                barWrapper.innerHTML = `<span class="absolute -top-5 font-mono text-[9px] ${textHighlightNode} opacity-0 group-hover:opacity-100 transition-opacity tabular-nums">${heightPct}p</span>`;
-                
-                barWrapper.onclick = () => {
-                    document.getElementById('profile-description').innerHTML = `
-                        <span class="text-cyan-400 font-bold block font-mono text-[10px] mb-1">// ${hourObj.time} &bull; ${hourObj.name}</span>
-                        <span class="font-sans text-zinc-300">${hourObj.desc}</span>
-                    `;
-                    document.getElementById('metric-label-adr').textContent = "Expected Window Var";
-                    document.getElementById('metric-adr-value').innerHTML = `${hourObj.range}`;
-                    
-                    document.getElementById('metric-label-ipr').textContent = "Session Impact Risk";
-                    let badgeColor = "text-emerald-400 bg-emerald-950/40 border border-emerald-900/40";
-                    if(hourObj.impact === 'High') badgeColor = "text-amber-400 bg-amber-950/40 border border-amber-900/40";
-                    if(hourObj.impact === 'Critical') badgeColor = "text-rose-400 bg-rose-950/40 border border-rose-900/40";
-                    
-                    document.getElementById('metric-ipr-value').innerHTML = `
-                        <span class="text-white">${hourObj.impact}</span>
-                        <span class="text-[9px] font-bold ${badgeColor} px-1 rounded ml-1 tracking-widest uppercase">${hourObj.impact}</span>
-                    `;
-                };
-
-                chartCanvas.appendChild(barWrapper);
-            });
-        }
-
-        function selectCurrencyActiveRow(pairKey) {
-            Object.keys(assetProfiles).forEach(key => {
-                const r = document.getElementById(`row-${key}`);
-                if(r) r.className = "hover:bg-zinc-900/60 transition-colors cursor-pointer border-b border-zinc-900/20 text-zinc-400 font-medium text-right";
-            });
-
-            const targetRow = document.getElementById(`row-${pairKey}`);
-            if(targetRow) targetRow.className = "selected-currency-row transition-colors cursor-pointer border-b border-zinc-900/20 text-right font-medium";
-
-            const dataData = assetProfiles[pairKey];
-            document.getElementById('profile-heading').textContent = dataData.heading;
-            document.getElementById('profile-description').innerHTML = `Realized variance metrics parsed over a live trailing 70-day lookback window framework. Select any distribution bar below to inspect granular intra-day shifts.`;
-            
-            // FIXED CALCULATION SYNC LOOP (Matches the target index table value accurately)
-            document.getElementById('metric-label-adr').textContent = "Average Daily Range";
-            document.getElementById('metric-adr-value').innerHTML = `${dataData.adr} <span class="text-xs font-normal text-zinc-500">PIPS</span>`;
-            
-            document.getElementById('metric-label-ipr').textContent = "Implied Percent Range";
-            let flagColorClass = "text-emerald-500 bg-emerald-950/40 border border-emerald-900/40";
-            if (dataData.status === 'Volatile' || dataData.status === 'Elevated') flagColorClass = "text-amber-500 bg-amber-950/40 border border-amber-900/40";
-            document.getElementById('metric-ipr-value').innerHTML = `${dataData.ipr} <span class="text-[9px] font-bold ${flagColorClass} px-1 rounded ml-1 tracking-widest uppercase">${dataData.status}</span>`;
-
-            renderHourlyChart(pairKey);
-            renderWeekdayChart(pairKey);
-        }
-
-        window.onload = () => {
-            document.getElementById('live-time').textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
-            buildSortedCurrencyTable();
-            selectCurrencyActiveRow('EURUSD');
-        };
+        window.onload = buildTable;
     </script>
 </body>
 </html>
