@@ -11,43 +11,37 @@
         ::-webkit-scrollbar-track { background: #020203; }
         ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 2px; }
         .active-tab { color: #06b6d4 !important; border-bottom: 2px solid #06b6d4 !important; }
-        .filter-btn-active { background-color: #18181b !important; color: #06b6d4 !important; border-color: rgba(6,182,212,0.3) !important; }
     </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
 
     <div id="global-header"></div>
 
-    <main class="flex-grow w-full mx-auto px-4 lg:px-8 py-10 space-y-6">
+    <main class="flex-grow w-full max-w-4xl mx-auto px-4 py-10 space-y-6">
         
-        <div class="max-w-7xl mx-auto border-b border-zinc-900 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono">
+        <div class="border-b border-zinc-900 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono">
             <div>
                 <h1 class="text-base sm:text-lg font-bold text-white uppercase tracking-wider">Economic Calendar</h1>
-                <p class="text-xs text-zinc-500 mt-1">// Institutional Grade Macro-Economic Milestone Feed</p>
+                <p class="text-xs text-zinc-500 mt-1">// Quantitative Macro Aggregation Feed</p>
             </div>
             <a href="tools-hub.html" class="font-mono text-[11px] text-zinc-400 hover:text-cyan-400 transition-colors border border-zinc-800 bg-[#08080c] px-3 py-1.5 rounded-lg">
                 &larr; BACK TO TOOLS HUB
             </a>
         </div>
 
-        <div class="max-w-7xl mx-auto bg-[#040406] border border-zinc-900 rounded-xl p-4 flex flex-wrap gap-2 font-mono text-[11px]">
-            <button id="btn-all" onclick="filterCalendar('all')" class="filter-btn-active bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1 rounded hover:text-white transition-all uppercase tracking-wider font-medium">All Regions</button>
-            <button id="btn-usa" onclick="filterCalendar('usa')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1 rounded hover:text-white transition-all uppercase tracking-wider font-medium">United States</button>
-            <button id="btn-euro" onclick="filterCalendar('euro')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1 rounded hover:text-white transition-all uppercase tracking-wider font-medium">Eurozone</button>
-            <button id="btn-uk" onclick="filterCalendar('uk')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1 rounded hover:text-white transition-all uppercase tracking-wider font-medium">United Kingdom</button>
-            <button id="btn-japan" onclick="filterCalendar('japan')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1 rounded hover:text-white transition-all uppercase tracking-wider font-medium">Japan</button>
-            <button id="btn-china" onclick="filterCalendar('china')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1 rounded hover:text-white transition-all uppercase tracking-wider font-medium">China</button>
-            <button id="btn-australia" onclick="filterCalendar('australia')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1 rounded hover:text-white transition-all uppercase tracking-wider font-medium">Australia</button>
-            <button id="btn-nz" onclick="filterCalendar('nz')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1 rounded hover:text-white transition-all uppercase tracking-wider font-medium">New Zealand</button>
-            <button id="btn-canada" onclick="filterCalendar('canada')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1 rounded hover:text-white transition-all uppercase tracking-wider font-medium">Canada</button>
-            <button id="btn-switzerland" onclick="filterCalendar('switzerland')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1 rounded hover:text-white transition-all uppercase tracking-wider font-medium">Switzerland</button>
-            <button id="btn-france" onclick="filterCalendar('france')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1 rounded hover:text-white transition-all uppercase tracking-wider font-medium">France</button>
-            <button id="btn-germany" onclick="filterCalendar('germany')" class="bg-[#020203] border border-zinc-800 text-zinc-400 px-3 py-1 rounded hover:text-white transition-all uppercase tracking-wider font-medium">Germany</button>
+        <div class="bg-[#040406] border border-zinc-900 rounded-xl p-4 flex items-center justify-between font-mono text-[11px]">
+            <div class="flex items-center gap-2">
+                <span class="h-2 w-2 rounded-full bg-cyan-500 animate-pulse"></span>
+                <span class="text-zinc-400 font-medium uppercase tracking-wide">Active Filters:</span>
+            </div>
+            <button class="bg-[#18181b] border border-cyan-500/30 text-cyan-400 px-4 py-1.5 rounded uppercase tracking-wider font-semibold shadow-[0_0_10px_rgba(6,182,212,0.05)] select-none">
+                G11 Macro Matrices Selected
+            </button>
         </div>
 
         <div class="bg-white border border-zinc-900 rounded-xl p-1 h-[1100px] w-full shadow-2xl overflow-hidden">
             <iframe id="investing-calendar-iframe" 
-                    src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=25,32,6,37,72,22,17,39,14,10,35,43,56,36,110,11,26,12,4,5&calType=week&timeZone=8&lang=1" 
+                    src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=5,72,4,25,12,32,6,22,17,35,37&calType=week&timeZone=8&lang=1" 
                     width="100%" 
                     height="100%" 
                     frameborder="0" 
@@ -58,7 +52,7 @@
             </iframe>
         </div>
         
-        <div class="poweredBy max-w-7xl mx-auto font-mono text-[10px] text-zinc-600 text-right pt-1">
+        <div class="font-mono text-[10px] text-zinc-600 text-right pt-1 select-none">
             Real Time Economic Calendar provided by <a href="https://www.investing.com/" rel="nofollow" target="_blank" class="text-zinc-400 hover:text-cyan-400 font-bold underline">Investing.com</a>.
         </div>
     </main>
@@ -66,37 +60,5 @@
     <div id="global-footer"></div>
 
     <script src="inject-engine.js"></script>
-    <script>
-        // Exact country ID mapping rules for clean layout injection filtering sequences
-        const sources = {
-            all: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=25,32,6,37,72,22,17,39,14,10,35,43,56,36,110,11,26,12,4,5&calType=week&timeZone=8&lang=1",
-            usa: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=5&calType=week&timeZone=8&lang=1",
-            euro: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=25&calType=week&timeZone=8&lang=1",
-            uk: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=4&calType=week&timeZone=8&lang=1",
-            japan: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=35&calType=week&timeZone=8&lang=1",
-            china: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=37&calType=week&timeZone=8&lang=1",
-            australia: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=25&calType=week&timeZone=8&lang=1",
-            nz: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=32&calType=week&timeZone=8&lang=1",
-            canada: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=6&calType=week&timeZone=8&lang=1",
-            switzerland: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=12&calType=week&timeZone=8&lang=1",
-            france: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=22&calType=week&timeZone=8&lang=1",
-            germany: "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=17&calType=week&timeZone=8&lang=1"
-        };
-
-        function filterCalendar(region) {
-            const iframe = document.getElementById('investing-calendar-iframe');
-            if(!iframe || !sources[region]) return;
-            
-            // Re-render source target pointer frame location
-            iframe.src = sources[region];
-
-            // Toggle visual button assignment highlights programmatically
-            const buttons = ['all', 'usa', 'euro', 'uk', 'japan', 'china', 'australia', 'nz', 'canada', 'switzerland', 'france', 'germany'];
-            buttons.forEach(btn => {
-                document.getElementById('btn-' + btn).classList.remove('filter-btn-active');
-            });
-            document.getElementById('btn-' + region).classList.add('filter-btn-active');
-        }
-    </script>
 </body>
 </html>
