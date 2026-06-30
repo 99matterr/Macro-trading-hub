@@ -39,7 +39,7 @@
                     </tr>
                 </thead>
                 <tbody id="currency-table-body" class="divide-y divide-zinc-900/40">
-                    </tbody>
+                </tbody>
             </table>
         </div>
     </main>
@@ -48,32 +48,36 @@
 
     <script src="inject-engine.js"></script>
     <script>
-        // Core asset profile data array matrix
+        // Core asset profile data array matrix - exact data synced from image.png
         const assetProfiles = {
-            AUDCAD: { name: "AUDCAD", pips: "57.660", cash: "406.17", pct: "0.59%" },
-            AUDCHF: { name: "AUDCHF", pips: "29.628", cash: "365.87", pct: "0.53%" },
-            AUDJPY: { name: "AUDJPY", pips: "82.456", cash: "509.77", pct: "0.74%" },
-            AUDNZD: { name: "AUDNZD", pips: "52.478", cash: "295.87", pct: "0.43%" },
-            AUDUSD: { name: "AUDUSD", pips: "54.224", cash: "542.24", pct: "0.79%" },
-            CADCHF: { name: "CADCHF", pips: "26.082", cash: "322.08", pct: "0.46%" },
-            CADJPY: { name: "CADJPY", pips: "59.078", cash: "365.24", pct: "0.52%" },
-            CHFJPY: { name: "CHFJPY", pips: "112.866", cash: "697.78", pct: "0.57%" },
-            EURAUD: { name: "EURAUD", pips: "81.136", cash: "559.43", pct: "0.49%" },
-            EURCAD: { name: "EURCAD", pips: "61.960", cash: "436.46", pct: "0.38%" },
-            EURCHF: { name: "EURCHF", pips: "28.200", cash: "348.23", pct: "0.31%" },
-            EURGBP: { name: "EURGBP", pips: "25.434", cash: "335.68", pct: "0.29%" },
-            EURJPY: { name: "EURJPY", pips: "93.782", cash: "579.80", pct: "0.51%" },
-            EURNZD: { name: "EURNZD", pips: "110.990", cash: "625.76", pct: "0.55%" },
-            EURUSD: { name: "EURUSD", pips: "58.322", cash: "583.22", pct: "0.51%" },
-            GBPAUD: { name: "GBPAUD", pips: "93.448", cash: "644.32", pct: "0.49%" },
-            GBPCAD: { name: "GBPCAD", pips: "82.448", cash: "580.78", pct: "0.44%" },
-            GBPCHF: { name: "GBPCHF", pips: "40.476", cash: "499.83", pct: "0.38%" },
-            GBPJPY: { name: "GBPJPY", pips: "120.334", cash: "743.95", pct: "0.56%" },
-            GBPNZD: { name: "GBPNZD", pips: "131.488", cash: "741.33", pct: "0.56%" },
-            GBPUSD: { name: "GBPUSD", pips: "79.170", cash: "791.70", pct: "0.60%" },
-            NZDCAD: { name: "NZDCAD", pips: "55.016", cash: "387.55", pct: "0.69%" },
-            NZDCHF: { name: "NZDCHF", pips: "25.546", cash: "315.46", pct: "0.56%" },
-            NZDJPY: { name: "NZDJPY", pips: "73.582", cash: "454.91", pct: "0.56%" }
+            AUDCAD: { name: "AUDCAD", pips: "57.990", cash: "408.29", pct: "0.59%" },
+            AUDCHF: { name: "AUDCHF", pips: "30.062", cash: "372.19", pct: "0.54%" },
+            AUDJPY: { name: "AUDJPY", pips: "83.622", cash: "514.28", pct: "0.74%" },
+            AUDNZD: { name: "AUDNZD", pips: "52.068", cash: "295.69", pct: "0.43%" },
+            AUDUSD: { name: "AUDUSD", pips: "53.922", cash: "539.22", pct: "0.78%" },
+            CADCHF: { name: "CADCHF", pips: "26.102", cash: "323.16", pct: "0.46%" },
+            CADJPY: { name: "CADJPY", pips: "58.928", cash: "362.41", pct: "0.51%" },
+            CHFJPY: { name: "CHFJPY", pips: "113.674", cash: "699.10", pct: "0.56%" },
+            EURAUD: { name: "EURAUD", pips: "83.020", cash: "574.58", pct: "0.50%" },
+            EURCAD: { name: "EURCAD", pips: "62.282", cash: "438.51", pct: "0.38%" },
+            EURCHF: { name: "EURCHF", pips: "27.646", cash: "342.28", pct: "0.30%" },
+            EURGBP: { name: "EURGBP", pips: "25.368", cash: "336.46", pct: "0.29%" },
+            EURJPY: { name: "EURJPY", pips: "96.322", cash: "592.39", pct: "0.52%" },
+            EURNZD: { name: "EURNZD", pips: "111.322", cash: "632.20", pct: "0.55%" },
+            EURUSD: { name: "EURUSD", pips: "57.968", cash: "579.68", pct: "0.51%" },
+            GBPAUD: { name: "GBPAUD", pips: "95.988", cash: "664.33", pct: "0.50%" },
+            GBPCAD: { name: "GBPCAD", pips: "83.786", cash: "589.92", pct: "0.44%" },
+            GBPCHF: { name: "GBPCHF", pips: "40.318", cash: "499.17", pct: "0.38%" },
+            GBPJPY: { name: "GBPJPY", pips: "123.092", cash: "757.02", pct: "0.57%" },
+            GBPNZD: { name: "GBPNZD", pips: "131.728", cash: "748.08", pct: "0.56%" },
+            GBPUSD: { name: "GBPUSD", pips: "79.216", cash: "792.16", pct: "0.60%" },
+            NZDCAD: { name: "NZDCAD", pips: "54.972", cash: "387.04", pct: "0.68%" },
+            NZDCHF: { name: "NZDCHF", pips: "25.696", cash: "318.14", pct: "0.56%" },
+            NZDJPY: { name: "NZDJPY", pips: "74.298", cash: "456.94", pct: "0.80%" },
+            NZDUSD: { name: "NZDUSD", pips: "51.052", cash: "510.52", pct: "0.90%" },
+            USDCAD: { name: "USDCAD", pips: "53.436", cash: "376.23", pct: "0.38%" },
+            USDCHF: { name: "USDCHF", pips: "47.586", cash: "589.15", pct: "0.59%" },
+            USDJPY: { name: "USDJPY", pips: "75.464", cash: "464.11", pct: "0.46%" }
         };
 
         function buildSortedCurrencyIndexTable() {
@@ -89,14 +93,13 @@
                 row.innerHTML = `
                     <td class="py-4 text-left font-bold text-zinc-200 pl-4">${item.name}</td>
                     <td class="py-4 pr-1 tabular-nums">${item.pips}</td>
-                    <td class="py-4 pr-1 tabular-nums text-zinc-600">$${item.cash}</td>
+                    <td class="py-4 pr-1 tabular-nums text-zinc-500">$${item.cash}</td>
                     <td class="py-4 pr-4 tabular-nums text-cyan-400 font-bold">${item.pct}</td>
                 `;
                 tbody.appendChild(row);
             });
         }
         
-        // Wait briefly for elements to initialize then structure content cards
         window.addEventListener('load', buildSortedCurrencyIndexTable);
     </script>
 </body>
