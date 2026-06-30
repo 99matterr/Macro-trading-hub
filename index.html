@@ -12,8 +12,6 @@
         ::-webkit-scrollbar-track { background: #020203; }
         ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 2px; }
         .active-tab { color: #06b6d4 !important; border-bottom: 2px solid #06b6d4 !important; }
-        .terminal-pulse { animation: pulse-glow 2s infinite ease-in-out; }
-        @keyframes pulse-glow { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
     </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
@@ -35,7 +33,7 @@
         </div>
     </div>
 
-    <main class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+    <main class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
         <header class="font-mono space-y-4">
             <span class="text-cyan-500 font-bold text-[10px] tracking-widest uppercase block">// ARCHITECTURE DESK PORTAL</span>
             <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase leading-none">
@@ -46,36 +44,32 @@
             </p>
         </header>
 
-        <section class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono text-xs">
-            <div class="bg-[#050508] border border-zinc-900 rounded-lg p-3.5">
-                <span class="text-[9px] text-zinc-600 block">VOLATILITY REGIME</span>
-                <span class="text-xs font-bold text-emerald-400 mt-0.5 flex items-center gap-1.5"><span class="h-1 w-1 rounded-full bg-emerald-400 inline-block animate-ping"></span>COMPRESSED</span>
-            </div>
-            <div class="bg-[#050508] border border-zinc-900 rounded-lg p-3.5">
-                <span class="text-[9px] text-zinc-600 block">SWAP LINE FUNDING</span>
-                <span class="text-xs font-bold text-white mt-0.5">NOMINAL POOLS</span>
-            </div>
-            <div class="bg-[#050508] border border-zinc-900 rounded-lg p-3.5">
-                <span class="text-[9px] text-zinc-600 block">LIQUIDITY THRESHOLD</span>
-                <span class="text-xs font-bold text-cyan-400 mt-0.5">94.2% EDGE</span>
-            </div>
-            <div class="bg-[#050508] border border-zinc-900 rounded-lg p-3.5">
-                <span class="text-[9px] text-zinc-600 block">ACTIVE CALCULATIONS</span>
-                <span class="text-xs font-bold text-zinc-400 mt-0.5">28 MATRIX SYMBOLS</span>
-            </div>
-        </section>
-
-        <section class="bg-[#040406] border border-zinc-900 rounded-xl p-4 font-mono text-xs">
-            <div class="flex items-center justify-between border-b border-zinc-900 pb-2 mb-3">
-                <div class="flex items-center gap-2">
-                    <span class="h-2 w-2 rounded-full bg-cyan-500/80 terminal-pulse"></span>
-                    <span class="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Live System Core Telemetry Log</span>
+        <section class="bg-[#040406] border border-zinc-900 rounded-xl p-6 font-mono text-xs space-y-5">
+            <div class="space-y-2">
+                <span class="text-[9px] text-zinc-600 block tracking-widest uppercase">// CURRENT CYCLE FOCUS CHANNELS</span>
+                <div class="flex flex-wrap gap-2 pt-0.5">
+                    <span class="bg-[#0c0c12] border border-zinc-800 text-zinc-400 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide">
+                        G10 Currency Majors
+                    </span>
+                    <span class="bg-[#0c0c12] border border-zinc-800 text-zinc-400 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide">
+                        Relative Pip Volatility
+                    </span>
+                    <span class="bg-[#0c0c12] border border-zinc-800 text-zinc-400 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide">
+                        Macro Event Risk Feeds
+                    </span>
                 </div>
-                <span class="text-[9px] text-zinc-600 uppercase">SYS_ENG_v2.2</span>
             </div>
-            <div id="terminal-event-stream" class="space-y-1.5 text-[11px] text-zinc-500 min-h-[90px] leading-relaxed select-none">
-                <div>[<span class="text-zinc-600">00:01:04</span>] <span class="text-zinc-400">SYS_INIT:</span> Establishing safe handshake protocols with networks...</div>
-                <div class="text-cyan-500/80 font-semibold">[<span class="text-cyan-700">00:01:06</span>] SYS_OK: Dynamic tracking interfaces initialized.</div>
+
+            <hr class="border-zinc-900/60">
+
+            <div class="space-y-1.5">
+                <div class="flex items-center gap-2">
+                    <span class="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.4)]"></span>
+                    <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Weekly Intelligence Briefing</span>
+                </div>
+                <p class="text-zinc-400 font-sans text-xs leading-relaxed pl-3.5 max-w-2xl">
+                    Macro parameters indicate low volatility dispersion across core dollar pairings early this cycle. Monitor high-impact calendar risk data releases for trend expansion verification benchmarks. Detailed strategic outlines are processed inside the Research Feed logs dashboard.
+                </p>
             </div>
         </section>
 
@@ -93,23 +87,5 @@
     <div id="global-footer"></div>
 
     <script src="inject-engine.js"></script>
-    <script>
-        const logsContainer = document.getElementById('terminal-event-stream');
-        const simulatedLogs = [
-            "SYS_DATA: Running lookback variance tests across core pairings...",
-            "YIELD_WARN: US10Y premium spread expansion shifting models.",
-            "SYS_CALC: Updating local cache tables for fallback arrays...",
-            "SYS_LOG: Local storage matrix layers synchronized successfully."
-        ];
-        setInterval(() => {
-            if (!logsContainer) return;
-            const timeStr = new Date().toTimeString().split(' ')[0];
-            const text = simulatedLogs[Math.floor(Math.random() * simulatedLogs.length)];
-            const logRow = document.createElement('div');
-            logRow.innerHTML = `[<span class="text-zinc-600">${timeStr}</span>] <span class="text-zinc-400">SYS_MONITOR:</span> ${text}`;
-            logsContainer.appendChild(logRow);
-            if (logsContainer.children.length > 4) logsContainer.removeChild(logsContainer.children[0]);
-        }, 5000);
-    </script>
 </body>
 </html>
