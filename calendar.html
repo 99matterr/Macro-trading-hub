@@ -17,7 +17,7 @@
             width: 100% !important;
             min-width: 100% !important;
             max-width: 650px !important; /* Locks structural layout integrity to prevent table breaking */
-            margin: 0 auto !important;   /* Centers the widget beautifully within the card canvas */
+            margin: 0 auto 0 0 !important; /* Left aligns the layout table cleanly */
             display: block;
         }
     </style>
@@ -74,8 +74,8 @@
             </div>
         </div>
 
-        <!-- Injected background matching logic eliminates right padding dead zones visually -->
-        <div class="iframe-bleed-wrapper relative w-full overflow-hidden rounded-xl border border-zinc-900 shadow-2xl h-[920px] bg-[#ffffff] z-10">
+        <!-- Changed background property from #ffffff to #020203 to turn the right-side blank zone into terminal pitch black -->
+        <div class="iframe-bleed-wrapper relative w-full overflow-hidden rounded-xl border border-zinc-900 shadow-2xl h-[920px] bg-[#020203] z-10">
             <iframe id="investing-calendar-iframe" 
                     src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=5,72,4,25,12,32,6,22,17,35,37&calType=week&timeZone=8&lang=1" 
                     height="1100px" 
