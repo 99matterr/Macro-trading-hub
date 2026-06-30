@@ -100,7 +100,13 @@
             });
         }
         
-        window.addEventListener('load', buildSortedCurrencyIndexTable);
+        // This execution architecture ensures the layout engine components load completely
+        // without timing out or interrupting the injection cycle of the metrics loop.
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', buildSortedCurrencyIndexTable);
+        } else {
+            buildSortedCurrencyIndexTable();
+        }
     </script>
 </body>
 </html>
