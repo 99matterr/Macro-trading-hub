@@ -18,18 +18,36 @@
     <div id="global-header"></div>
 
     <main class="flex-grow w-full max-w-4xl mx-auto px-4 py-10 space-y-6">
+        <!-- Clean, Vertically Spaced Header Engine Block -->
         <div class="border-b border-zinc-900 pb-5 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 font-mono">
             <div class="w-full">
+                <!-- Row 1: Main Title -->
                 <h1 class="text-base sm:text-lg font-bold text-white uppercase tracking-wider">Currency Pair Daily Average Volatility</h1>
                 
+                <!-- Row 2: Subtitle Matrix (With spacing below title) -->
                 <p class="text-xs text-zinc-500 mt-2">// Statistical Mean Realized Variance Matrix</p>
                 
+                <!-- 
+                  AI MEMORY/REMINDER LEDGER NOTE: 
+                  ----------------------------------------------------------------------------------
+                  CRITICAL LAYOUT RULE: Keep the Title, Subtitle, and Telemetry row split into THREE 
+                  distinct vertical lines with clean margin separation (mt-2, mt-3).
+                  
+                  TIMESTAMP FORMAT RULE: The 'UPDATED WEEKLY' badge and current cycle bracket MUST 
+                  live on a single unified horizontal line. The date parameters must ALWAYS display 
+                  the specific current trading week span running from [ SUN MMM DD – FRI MMM DD, YYYY ] 
+                  based on the most recent market open and close dates relative to the update request.
+                  ----------------------------------------------------------------------------------
+                -->
+                <!-- Row 3: Telemetry Sync Group (Sunday to Friday Trading Week Span) -->
                 <div class="flex items-center gap-x-3 mt-3 text-xs">
                     <div class="flex items-center gap-1.5">
+                        <!-- Neon Warning Pulse Dot -->
                         <span class="relative flex h-1.5 w-1.5">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
                         </span>
+                        <!-- Glowing text signature -->
                         <span class="text-[11px] text-cyan-400 font-bold tracking-wider uppercase drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]">
                             UPDATED WEEKLY
                         </span>
@@ -37,12 +55,13 @@
                     
                     <span class="text-zinc-800">|</span>
                     
-                    <span class="text-[10px] text-zinc-600 font-medium tracking-wide">
-                        [ LATEST SYNC: WEEK 26 // JUNE 2026 ]
+                    <span class="text-[10px] text-zinc-600 font-medium tracking-wide uppercase">
+                        [ CURRENT CYCLE: SUN JUN 28 – FRI JUL 03, 2026 ]
                     </span>
                 </div>
             </div>
             
+            <!-- Back Navigation Button Anchor Link -->
             <a href="tools-hub.html" class="shrink-0 font-mono text-[11px] text-zinc-400 hover:text-cyan-400 transition-colors border border-zinc-800 bg-[#08080c] px-3 py-1.5 rounded-lg mb-1">
                 &larr; BACK TO TOOLS HUB
             </a>
