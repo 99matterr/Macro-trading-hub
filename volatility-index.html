@@ -21,7 +21,22 @@
         <div class="border-b border-zinc-900 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono">
             <div>
                 <h1 class="text-base sm:text-lg font-bold text-white uppercase tracking-wider">Currency Pair Daily Average Volatility</h1>
-                <p class="text-xs text-zinc-500 mt-1">// Statistical Mean Realized Variance Matrix</p>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-y-1 sm:gap-x-3 mt-1.5">
+                    <p class="text-xs text-zinc-500">// Statistical Mean Realized Variance Matrix</p>
+                    <span class="hidden sm:inline text-zinc-800 text-xs">|</span>
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                        </span>
+                        <span class="text-[11px] text-cyan-400 font-bold tracking-wider uppercase drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]">
+                            UPDATED WEEKLY
+                        </span>
+                        <span class="text-[10px] text-zinc-600 font-medium">
+                            [ LATEST SYNC: WEEK 26 // JUNE 2026 ]
+                        </span>
+                    </div>
+                </div>
             </div>
             <a href="tools-hub.html" class="font-mono text-[11px] text-zinc-400 hover:text-cyan-400 transition-colors border border-zinc-800 bg-[#08080c] px-3 py-1.5 rounded-lg">
                 &larr; BACK TO TOOLS HUB
@@ -100,8 +115,7 @@
             });
         }
         
-        // This execution architecture ensures the layout engine components load completely
-        // without timing out or interrupting the injection cycle of the metrics loop.
+        // Safe document execution check wrapper
         if (document.readyState === 'loading') {
             window.addEventListener('DOMContentLoaded', buildSortedCurrencyIndexTable);
         } else {
