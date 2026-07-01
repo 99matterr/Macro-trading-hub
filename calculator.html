@@ -23,7 +23,7 @@
                 <h1 class="text-base sm:text-lg font-bold text-white uppercase tracking-wider">Risk/Position Size Calculator</h1>
                 <p class="text-xs text-zinc-500 mt-1">// Quantitative Position Unit Sizing Matrix</p>
             </div>
-            <a href="tools-hub.html" class="font-mono text-[11px] text-zinc-400 hover:text-cyan-400 transition-colors border border-zinc-800 bg-[#08080c] px-3 py-1.5 rounded-lg">
+            <a href="tools.html" class="font-mono text-[11px] text-zinc-400 hover:text-cyan-400 transition-colors border border-zinc-800 bg-[#08080c] px-3 py-1.5 rounded-lg">
                 &larr; BACK TO TOOLS HUB
             </a>
         </div>
@@ -126,25 +126,20 @@
 
     <script src="inject-engine.js"></script>
     <script>
-        // Global repository for real-time exchange pricing rates
         let exchangeRates = null;
 
-        // Async network routine fetching global asset prices (USD Base matrix)
         async function fetchLiveRates() {
             try {
                 const res = await fetch('https://open.er-api.com/v6/latest/USD');
                 if (!res.ok) throw new Error("API stream connection error.");
                 const data = await res.json();
                 exchangeRates = data.rates;
-                
-                // Initialize clean data update loop once variables clear
                 executePositionMath();
             } catch (error) {
                 console.error("Pricing API down. Sizing fallbacks active:", error);
             }
         }
 
-        // Resolves conversion metrics between cross pairs relative to USD anchor
         function getExchangeRate(fromCurrency, toCurrency) {
             if (!exchangeRates) return 1.0; 
             if (fromCurrency === toCurrency) return 1.0;
@@ -152,7 +147,6 @@
             const rateFromUSD = exchangeRates[fromCurrency] || 1;
             const rateToUSD = exchangeRates[toCurrency] || 1;
             
-            // Cross rate algebra formula
             return rateToUSD / rateFromUSD;
         }
 
@@ -165,45 +159,31 @@
 
             if (balance <= 0 || riskPct <= 0 || stopPips <= 0) return;
 
-            // Step 1: Establish absolute base portfolio allocation risks
             const cashRisk = balance * (riskPct / 100);
-            
-            // Step 2: Fragment target pair string components
             const baseCurr = pair.substring(0, 3);
             const quoteCurr = pair.substring(3, 6);
             
-            // Step 3: Map precision metrics (Pip parameters change if counter-asset is Yen)
             const pipSize = (quoteCurr === 'JPY') ? 0.01 : 0.0001;
             const standardContractUnits = 100000;
-
-            // Step 4: Calculate standardized single lot pip utility within asset terms
             const standardPipValueInQuote = pipSize * standardContractUnits; 
 
-            // Step 5: Convert valuation parity scales back to portfolio standard base
             const conversionFactor = getExchangeRate(quoteCurr, acctCurr);
             const pipValueInAccountPerLot = standardPipValueInQuote * conversionFactor;
 
-            // Step 6: Derive appropriate institutional lot boundaries
             let standardLots = cashRisk / (stopPips * pipValueInAccountPerLot);
-            
-            // Calculate absolute current aggregate risk run rate per pip changes
             const runningPipVal = standardLots * pipValueInAccountPerLot;
 
-            // Enforce hard floor constraints to support micro-lot broker limits
             if (standardLots < 0.01) standardLots = 0.01;
 
-            // Update DOM telemetry panels with accurate notation formats
             document.getElementById('out-cash').textContent = cashRisk.toFixed(2) + ' ' + acctCurr;
             document.getElementById('out-lots').innerHTML = standardLots.toFixed(2) + ' <span class="text-xs font-medium text-zinc-600">Lots</span>';
             document.getElementById('out-pipval').textContent = runningPipVal.toFixed(2) + ' ' + acctCurr + ' / pip';
         }
 
-        // Bind dynamic input observers to process instantly on keydown changes
         document.querySelectorAll('input, select').forEach(element => {
             element.addEventListener('input', executePositionMath);
         });
 
-        // Fire rate engine configuration instantly on viewport completion
         window.addEventListener('load', () => {
             fetchLiveRates();
         });
