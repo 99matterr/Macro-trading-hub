@@ -5,11 +5,11 @@
 async function loadLayoutComponents() {
     try {
         // 1. Fetch and inject global header component layout mapping parameters
-        const headerResponse = await fetch('/header.html');
+        const headerResponse = await fetch('header.html');
         document.getElementById('global-header').innerHTML = await headerResponse.text();
 
         // 2. Fetch and inject global footer component layout mapping parameters
-        const footerResponse = await fetch('/footer.html');
+        const footerResponse = await fetch('footer.html');
         document.getElementById('global-footer').innerHTML = await footerResponse.text();
 
         // 3. Extract the terminal namespace of the current location pointer
