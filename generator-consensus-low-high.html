@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institutional Weekly Macro Report Builder</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 30px;
+        }
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+        header {
+            border-bottom: 2px solid #ff6600;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 {
+            color: #00ffcc;
+            margin: 0;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .subtitle {
+            color: #888;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        .upload-box {
+            border: 2px dashed #333;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            margin-bottom: 30px;
+        }
+        .upload-box:hover {
+            border-color: #ff6600;
+        }
+        .upload-box p {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: #ffff00;
+        }
+        .file-input {
+            display: none;
+        }
+        .btn {
+            background: #ff6600;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #e05500;
+        }
+        .btn-secondary {
+            background: #00ffcc;
+            color: #121212;
+        }
+        .btn-secondary:hover {
+            background: #00cc99;
+        }
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #2d2d2d;
+            border-radius: 6px;
+            padding: 20px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .card-title {
+            margin: 0;
+            color: #00ffcc;
+            font-size: 16px;
+        }
+        textarea {
+            width: 100%;
+            height: 350px;
+            background: #0a0a0a;
+            color: #00ff00;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: "SF Mono", Monaco, Consolas, monospace;
+            font-size: 13px;
+            resize: vertical;
+            box-sizing: border-box;
+            line-height: 1.6;
+        }
+        .status-msg {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>Weekly Macro Range Compiler</h1>
+            <div class="subtitle">Consensus & Expectation Matrix Document Generator</div>
+        </div>
+        <button id="clear-btn" class="btn" style="background:#333;">Clear Workbench</button>
+    </header>
+
+    <div class="upload-box" id="drop-zone">
+        <p>Drag & Drop Your Daily Macro CSV Files Here</p>
+        <p style="font-size: 13px; color: #aaa; margin-bottom: 20px;">Or click below to browse files from your storage drives</p>
+        <button class="btn" onclick="document.getElementById('file-selector').click()">Select Multiple CSVs</button>
+        <input type="file" id="file-selector" class="file-input" multiple accept=".csv">
+    </div>
+
+    <div class="workspace">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Compiled Institutional Risk Report Text Output</h3>
+                <button id="copy-btn" class="btn btn-secondary">Copy Report Text</button>
+            </div>
+            <div id="status" class="status-msg">System standing by. Upload daily tracking models to begin generation...</div>
+            <textarea id="output-text" placeholder="Your fully compiled institutional text layout will render right here..."></textarea>
+        </div>
+    </div>
+</div>
+
+<script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileSelector = document.getElementById('file-selector');
+    const outputText = document.getElementById('output-text');
+    const statusBox = document.getElementById('status');
+    const copyBtn = document.getElementById('copy-btn');
+    const clearBtn = document.getElementById('clear-btn');
+
+    let weeklyData = {};
+
+    // Drag and drop layout events
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#00ffcc';
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#333';
+        }, false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles(files);
+    });
+
+    fileSelector.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+
+    clearBtn.addEventListener('click', () => {
+        weeklyData = {};
+        outputText.value = '';
+        statusBox.textContent = 'Workbench fully cleared. System standing by...';
+        statusBox.style.color = '#aaa';
+    });
+
+    copyBtn.addEventListener('click', () => {
+        if (!outputText.value.trim()) return;
+        outputText.select();
+        document.execCommand('copy');
+        alert('Institutional text block successfully copied to clipboard!');
+    });
+
+    function handleFiles(files) {
+        const csvFiles = Array.from(files).filter(file => file.name.endsWith('.csv'));
+        if (csvFiles.length === 0) {
+            alert('Please drop valid csv macro extraction files generated by the scanner.');
+            return;
+        }
+
+        statusBox.textContent = `Processing ${csvFiles.length} macro file schedules...`;
+        statusBox.style.color = '#ffff00';
+
+        let processedCount = 0;
+
+        csvFiles.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                parseCSVContent(e.target.result);
+                processedCount++;
+                if (processedCount === csvFiles.length) {
+                    generateWeeklyTextReport();
+                }
+            };
+            reader.readAsText(file);
+        });
+    }
+
+    function parseCSVContent(text) {
+        const lines = text.split('\n');
+        if (lines.length === 0) return;
+
+        let targetDate = "Unknown Date";
+        let dateLine = lines[0];
+        
+        // Isolate target verification headers
+        if (dateLine.includes("Calendar Target Date:")) {
+            let matches = dateLine.match(/"Calendar Target Date:",\s*"([^"]+)"/);
+            if (matches && matches[1]) {
+                targetDate = matches[1].trim();
+            }
+        }
+
+        if (!weeklyData[targetDate]) {
+            weeklyData[targetDate] = [];
+        }
+
+        // Process data elements, skip target headers and schema indices
+        for (let i = 1; i < lines.length; i++) {
+            let currentLine = lines[i].trim();
+            if (!currentLine) continue;
+
+            // Simple institutional standard CSV field parser 
+            let cells = [];
+            let inQuotes = false;
+            let currentCell = '';
+
+            for (let charIndex = 0; charIndex < currentLine.length; charIndex++) {
+                let c = currentLine[charIndex];
+                if (c === '"') {
+                    inQuotes = !inQuotes;
+                } else if (c === ',' && !inQuotes) {
+                    cells.push(currentCell.trim());
+                    currentCell = '';
+                } else {
+                    currentCell += c;
+                }
+            }
+            cells.push(currentCell.trim());
+
+            if (cells.length < 4 || cells[0].toLowerCase().includes("macro indicator")) continue;
+
+            let indicatorName = cells[0].replace(/\\n/g, " — ");
+            let consensusVal = cells[1];
+            let expectationRange = cells[2];
+            let priorVal = cells[3];
+
+            weeklyData[targetDate].push({
+                name: indicatorName,
+                consensus: consensusVal,
+                range: expectationRange,
+                prior: priorVal
+            });
+        }
+    }
+
+    function generateWeeklyTextReport() {
+        let finalReport = "";
+        
+        // Sort chronological sequences out if dates possess day names
+        const sortedDates = Object.keys(weeklyData).sort((a, b) => {
+            const daysOrder = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+            let aDay = daysOrder.findIndex(d => a.toLowerCase().includes(d));
+            let bDay = daysOrder.findIndex(d => b.toLowerCase().includes(d));
+            return aDay - bDay;
+        });
+
+        sortedDates.forEach(dateStr => {
+            let upperDayHeader = dateStr.split(',')[0].toUpperCase();
+            finalReport += `==================================================\n`;
+            finalReport += `${upperDayHeader} — ${dateStr.toUpperCase()}\n`;
+            finalReport += `==================================================\n\n`;
+
+            let items = weeklyData[dateStr];
+            if (items.length === 0 || (items.length === 1 && items[0].name === "Macro Event")) {
+                finalReport += `No structural high-level risk listings matched metrics for this day.\n\n`;
+            } else {
+                items.forEach(item => {
+                    // Clean up blank fallback tags
+                    let rangeDisplay = item.range === "Not Found" ? "No Range Forecasted" : item.range;
+                    
+                    finalReport += `• INDICATOR: ${item.name}\n`;
+                    finalReport += `  [Consensus]: ${item.consensus}   |   [Prior]: ${item.prior}\n`;
+                    finalReport += `  [EXPECTATION LIMITS]: ${rangeDisplay}\n`;
+                    finalReport += `--------------------------------------------------\n\n`;
+                });
+            }
+            finalReport += `\n`;
+        });
+
+        outputText.value = finalReport.trim();
+        statusBox.textContent = `Weekly summary report compiled cleanly across ${sortedDates.length} distinct days!`;
+        statusBox.style.color = '#00ffcc';
+    }
+</script>
+
+</body>
+</html>
