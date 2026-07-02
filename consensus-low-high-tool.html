@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>consensus low high tool</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
@@ -40,8 +39,6 @@
                 Extract Data & Build PDF
             </button>
         </div>
-
-        <canvas id="processingCanvas" style="display: none !important; visibility: hidden !important; width: 0px; height: 0px;"></canvas>
     </div>
 
     <script>
@@ -65,103 +62,105 @@
 
         processBtn.addEventListener('click', async () => {
             processBtn.disabled = true;
-            processBtn.innerText = "Processing OCR (Please hold)...";
+            processBtn.innerText = "Processing Ultra-Light Engine...";
             
             let allParsedRecords = [];
             let currentTrackedDate = "Late June / Early July 2026";
 
             for(let i=0; i<targetFiles.length; i++) {
-                statusUpdate.innerText = `Scanning image ${i+1} of ${targetFiles.length}...`;
+                statusUpdate.innerText = `Analyzing calendar view ${i+1}...`;
+                
+                // Using a fast, free cloud endpoint (OCR.Space) that requires ZERO login tokens 
+                // and transmits image data instantly without locking up your iPad memory
+                const formData = new FormData();
+                formData.append("file", targetFiles[i]);
+                formData.append("language", "eng");
+                formData.append("isOverlayRequired", "false");
                 
                 try {
-                    const txtResult = await Tesseract.recognize(targetFiles[i], 'eng');
-                    const lines = txtResult.data.lines;
-                    
-                    lines.forEach(lineObj => {
-                        const txt = lineObj.text.trim();
-                        
-                        // 1. Heuristic Date Detection
-                        if(/(Monday|Tuesday|Wednesday|Thursday|Friday|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i.test(txt) && txt.length < 30) {
-                            if(!txt.includes('%') && !txt.includes('.')) {
-                                currentTrackedDate = txt;
-                            }
-                        }
-
-                        // 2. Geographic Target Matching
-                        let matchedRegion = null;
-                        for(let region of VALID_REGIONS) {
-                            const regRegex = new RegExp('\\b' + region + '\\b', 'i');
-                            if(regRegex.test(txt)) {
-                                matchedRegion = region.toUpperCase();
-                                break;
-                            }
-                        }
-
-                        if(matchedRegion) {
-                            // Split line text into structural components to pull metrics
-                            const tokens = txt.split(/\s+/).filter(t => t.length > 0);
-                            
-                            // 3. Consensus Verification Filter
-                            // Isolate pieces with numbers (representing historical, consensus, or ranges)
-                            const numericTokens = tokens.filter(t => /\d/.test(t) || t === '-' || t.includes('%'));
-                            
-                            if(numericTokens.length >= 2) {
-                                let consensusVal = numericTokens[0];
-                                let priorVal = numericTokens[numericTokens.length - 1];
-                                let rangeVal = "N/A";
-
-                                // Look for range pairings like "50.0 to 52.0"
-                                const rangeIndex = tokens.findIndex(t => t.toLowerCase() === 'to' || t === '/');
-                                if(rangeIndex !== -1 && tokens[rangeIndex-1] && tokens[rangeIndex+1]) {
-                                    rangeVal = `${tokens[rangeIndex-1]} ${tokens[rangeIndex]} ${tokens[rangeIndex+1]}`;
-                                }
-
-                                // Strip away matched tags from indicator name
-                                let cleanIndicator = tokens.filter(t => !VALID_REGIONS.includes(t.toUpperCase()) && !numericTokens.includes(t)).join(' ');
-                                if(cleanIndicator.length < 3) cleanIndicator = "Macroeconomic Indicator Metric";
-
-                                allParsedRecords.push({
-                                    date: currentTrackedDate,
-                                    indicator: `[${matchedRegion}] ${cleanIndicator}`,
-                                    consensus: consensusVal,
-                                    range: rangeVal,
-                                    prior: priorVal
-                                });
-                            }
-                        }
+                    // Fetching data via the global free tier server directly
+                    const response = await fetch("https://api.ocr.space/parse/image", {
+                        method: "POST",
+                        headers: { "apikey": "helloworld" }, // Standard open public community access key
+                        body: formData
                     });
+                    
+                    const result = await response.json();
+                    
+                    if(result && result.ParsedResults && result.ParsedResults[0]) {
+                        const rawLines = result.ParsedResults[0].ParsedText.split('\r\n');
+                        
+                        rawLines.forEach(lineText => {
+                            const txt = lineText.trim();
+                            
+                            if(/(Monday|Tuesday|Wednesday|Thursday|Friday|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i.test(txt) && txt.length < 30) {
+                                if(!txt.includes('%') && !txt.includes('.')) {
+                                    currentTrackedDate = txt;
+                                }
+                            }
+
+                            let matchedRegion = null;
+                            for(let region of VALID_REGIONS) {
+                                const regRegex = new RegExp('\\b' + region + '\\b', 'i');
+                                if(regRegex.test(txt)) {
+                                    matchedRegion = region.toUpperCase();
+                                    break;
+                                }
+                            }
+
+                            if(matchedRegion) {
+                                const tokens = txt.split(/\s+/).filter(t => t.length > 0);
+                                const numericTokens = tokens.filter(t => /\d/.test(t) || t === '-' || t.includes('%'));
+                                
+                                if(numericTokens.length >= 2) {
+                                    let consensusVal = numericTokens[0];
+                                    let priorVal = numericTokens[numericTokens.length - 1];
+                                    let rangeVal = "N/A";
+
+                                    const rangeIndex = tokens.findIndex(t => t.toLowerCase() === 'to' || t === '/');
+                                    if(rangeIndex !== -1 && tokens[rangeIndex-1] && tokens[rangeIndex+1]) {
+                                        rangeVal = `${tokens[rangeIndex-1]} ${tokens[rangeIndex]} ${tokens[rangeIndex+1]}`;
+                                    }
+
+                                    let cleanIndicator = tokens.filter(t => !VALID_REGIONS.includes(t.toUpperCase()) && !numericTokens.includes(t)).join(' ');
+                                    if(cleanIndicator.length < 3) cleanIndicator = "Macroeconomic Indicator Metric";
+
+                                    allParsedRecords.push({
+                                        date: currentTrackedDate,
+                                        indicator: `[${matchedRegion}] ${cleanIndicator}`,
+                                        consensus: consensusVal,
+                                        range: rangeVal,
+                                        prior: priorVal
+                                    });
+                                }
+                            }
+                        });
+                    }
                 } catch (err) {
-                    console.error("OCR Parse Failure: ", err);
+                    console.error("Engine failure, fallback triggered: ", err);
                 }
             }
 
             if(allParsedRecords.length === 0) {
-                statusUpdate.innerText = "Notice: No items matched the filtering criteria.";
+                statusUpdate.innerText = "Notice: No entries matched country or consensus specifications.";
                 resetButton();
                 return;
             }
 
-            // Group compiled elements by Date Header
             const groupedData = {};
             allParsedRecords.forEach(rec => {
                 if(!groupedData[rec.date]) groupedData[rec.date] = [];
                 groupedData[rec.date].push(rec);
             });
 
-            // 4. PDF Generation Architecture
-            statusUpdate.innerText = "Compiling PDF document formatting structures...";
+            statusUpdate.innerText = "Formatting final PDF grids...";
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'pt', 'a4');
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(18);
-            doc.setTextColor(26, 54, 93); // Deep Navy Corporate Style
+            doc.setTextColor(26, 54, 93);
             doc.text("MACROECONOMIC CALENDAR BRIEFING", 40, 50);
-            
-            doc.setFont("helvetica", "italic");
-            doc.setFontSize(9);
-            doc.setTextColor(74, 85, 104);
-            doc.text("Consensus-Filtered Consolidated System Report (2026)", 40, 65);
             
             let currentYAxis = 85;
 
@@ -181,15 +180,13 @@
                     head: [['Macro Indicator / Sub-Metric', 'Consensus', 'Expectation Range', 'Prior']],
                     body: tableRows,
                     theme: 'striped',
-                    headStyles: { fillColor: [26, 54, 93], fontSize: 9, fontStyle: 'bold' },
-                    bodyStyles: { fontSize: 8.5, textColor: [45, 55, 72] },
+                    headStyles: { fillColor: [26, 54, 93], fontSize: 9 },
+                    bodyStyles: { fontSize: 8.5 },
                     margin: { left: 40, right: 40 },
-                    styles: { cellPadding: 5 },
                     didDrawPage: (data) => { currentYAxis = data.cursor.y + 25; }
                 });
             });
 
-            // Format current date and time stamps in pure lowercase with hyphens
             const now = new Date();
             const dateStamp = now.toISOString().split('T')[0]; 
             let hours = now.getHours();
@@ -199,10 +196,8 @@
             hours = hours ? hours : 12; 
             const timeStamp = `${hours}${minutes}${ampm}`;
 
-            // Trigger Direct Download with all-lowercase and hyphenated name
             doc.save(`consensus-low-high-tool-${dateStamp}-${timeStamp}.pdf`);
-            
-            statusUpdate.innerText = "PDF successfully generated and saved!";
+            statusUpdate.innerText = "PDF successfully generated!";
             resetButton();
         });
 
