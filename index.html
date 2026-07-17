@@ -35,13 +35,13 @@
         </div>
     </div>
 
-    <!-- 3. HERO SECTION (Blurred background graphic behind the main titles) -->
-    <div class="relative w-full h-[320px] sm:h-[380px] flex items-end overflow-hidden border-b border-zinc-900/50">
-        <!-- Empty alt tag prevents broken text placeholders from displaying -->
+    <!-- 3. HERO SECTION (Adjusted padding to pull the title upward) -->
+    <div class="relative w-full pt-8 pb-14 sm:pt-10 sm:pb-16 overflow-hidden border-b border-zinc-900/50">
         <img src="hero-dashboard.jpg" alt="" class="absolute inset-0 w-full h-full object-cover object-center opacity-35" />
-        <div class="absolute inset-0 bg-gradient-to-t from-[#020203] via-[#020203]/70 to-transparent backdrop-blur-[3px]"></div>
+        <!-- Re-balanced gradient to match the closer text positioning -->
+        <div class="absolute inset-0 bg-gradient-to-t from-[#020203] via-[#020203]/40 to-transparent backdrop-blur-[3px]"></div>
 
-        <div class="relative w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 z-10">
+        <div class="relative w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
             <header class="font-mono space-y-4">
                 <span class="text-cyan-500 font-bold text-[10px] tracking-widest uppercase block">// ARCHITECTURE DESK PORTAL</span>
                 <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase leading-none max-w-3xl">
