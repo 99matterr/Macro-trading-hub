@@ -16,7 +16,7 @@
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- 1. GLOBAL HEADER (Injected via JS) -->
+    <!-- 1. GLOBAL HEADER -->
     <div id="global-header"></div>
 
     <!-- 2. TICKER TAPE WIDGET -->
@@ -35,15 +35,12 @@
         </div>
     </div>
 
-    <!-- 3. HERO SECTION (With dynamic blur transition behind the text) -->
+    <!-- 3. HERO SECTION (Blurred background graphic behind the main titles) -->
     <div class="relative w-full h-[320px] sm:h-[380px] flex items-end overflow-hidden border-b border-zinc-900/50">
-        <!-- Background Asset Placeolder -->
-        <img src="hero-dashboard.jpg" alt="Portal Hero Background" class="absolute inset-0 w-full h-full object-cover object-center opacity-35" />
-        
-        <!-- Blur & Gradient Mask Layer -->
+        <!-- Empty alt tag prevents broken text placeholders from displaying -->
+        <img src="hero-dashboard.jpg" alt="" class="absolute inset-0 w-full h-full object-cover object-center opacity-35" />
         <div class="absolute inset-0 bg-gradient-to-t from-[#020203] via-[#020203]/70 to-transparent backdrop-blur-[3px]"></div>
 
-        <!-- Title Content (Positioned exactly over the blur initiation) -->
         <div class="relative w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 z-10">
             <header class="font-mono space-y-4">
                 <span class="text-cyan-500 font-bold text-[10px] tracking-widest uppercase block">// ARCHITECTURE DESK PORTAL</span>
@@ -57,7 +54,7 @@
         </div>
     </div>
 
-    <!-- 4. MAIN CONTENT CARDS -->
+    <!-- 4. STREAMLINED CONTENT BODY -->
     <main class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         <section class="bg-[#040406] border border-zinc-900 rounded-xl p-6 font-mono text-xs space-y-5">
             <div class="space-y-2">
@@ -87,22 +84,11 @@
                 </p>
             </div>
         </section>
-
-        <section class="bg-[#08080c] border border-zinc-900 rounded-xl p-6 font-mono flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="space-y-1">
-                <div class="text-xs font-bold text-white uppercase tracking-wider">Access Proprietary Calculators</div>
-                <p class="text-zinc-500 text-[11px] font-sans">Navigate directly to the live tools hub to process quantitative cross positions.</p>
-            </div>
-            <a href="tools.html" class="bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-cyan-400 hover:border-cyan-500/40 transition-all text-center rounded-lg px-5 py-2 text-xs font-bold tracking-wider uppercase whitespace-nowrap">
-                Open Trading Tools &rarr;
-            </a>
-        </section>
     </main>
 
-    <!-- 5. GLOBAL FOOTER (Injected via JS) -->
+    <!-- 5. GLOBAL FOOTER -->
     <div id="global-footer"></div>
 
-    <!-- Injection Script Execution -->
     <script src="inject-engine.js"></script>
 </body>
 </html>
