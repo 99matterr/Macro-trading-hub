@@ -42,7 +42,7 @@
             body, html {
                 background-color: white !important;
                 color: #0f172a !important;
-                font-family: Georgia, Cambria, "Times New Roman", Times, serif !important;
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
             }
             #web-app-interface {
                 display: none !important;
@@ -55,11 +55,47 @@
             }
             @page {
                 size: portrait;
-                margin: 1.5cm;
+                margin: 1.2cm;
             }
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+            }
+
+            /* Global PDF Table Layout Engine */
+            .pdf-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                margin-bottom: 1.5rem !important;
+                page-break-inside: avoid !important;
+            }
+            .pdf-table th {
+                background-color: #f8fafc !important;
+                color: #0f172a !important;
+                font-weight: 700 !important;
+                font-size: 10px !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.05em !important;
+                border: 1px solid #cbd5e1 !important;
+                padding: 8px 10px !important;
+                text-align: left;
+            }
+            .pdf-table td {
+                border: 1px solid #e2e8f0 !important;
+                padding: 8px 10px !important;
+                font-size: 11px !important;
+                color: #334155 !important;
+                vertical-align: top !important;
+            }
+            .pdf-section-title {
+                font-size: 11px !important;
+                font-weight: 800 !important;
+                letter-spacing: 0.05em !important;
+                text-transform: uppercase !important;
+                color: #0f172a !important;
+                margin-bottom: 0.5rem !important;
+                border-bottom: 2px solid #0f172a !important;
+                padding-bottom: 2px !important;
             }
         }
     </style>
@@ -364,83 +400,106 @@
     <!-- ========================================== -->
     <!-- 📄 PRINT-ONLY STRATEGY BRIEFING SHEET LAYOUT -->
     <!-- ========================================== -->
-    <div id="pdf-report-container" class="p-8 text-slate-950 leading-relaxed max-w-4xl mx-auto">
-        <!-- Corporate Letterhead -->
-        <div class="border-b-4 border-slate-950 pb-4 mb-6 flex justify-between items-end">
+    <div id="pdf-report-container" class="p-4 text-slate-950 max-w-4xl mx-auto">
+        
+        <!-- Corporate Letterhead Header -->
+        <div class="border-b-4 border-slate-950 pb-3 mb-5 flex justify-between items-end">
             <div>
-                <h1 class="text-3xl font-black tracking-tight text-slate-950 uppercase">KAIROS GLOBAL RESEARCH</h1>
-                <p class="text-[10px] text-slate-500 uppercase tracking-widest font-mono mt-1">Currency Sentiment Definer // Architectural Risk Assessment</p>
+                <h1 class="text-2xl font-black tracking-tight text-slate-950 uppercase">KAIROS GLOBAL RESEARCH</h1>
+                <p class="text-[9px] text-slate-500 uppercase tracking-widest font-mono mt-0.5">Currency Sentiment Engine // Technical Risk Assessment</p>
             </div>
-            <div class="text-right">
-                <div class="text-xl font-bold font-mono text-slate-900" id="print-target-pair">EUR/AUD</div>
-                <div class="text-[10px] text-slate-500 uppercase font-mono mt-0.5" id="print-date">Sunday Strategy Update</div>
-            </div>
-        </div>
-
-        <!-- Strategy Verdict Block -->
-        <div id="print-exec-callout" class="border-2 border-slate-950 p-5 mb-8 bg-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex-1">
-                <h2 class="text-xs font-bold tracking-widest text-slate-400 uppercase font-mono">System Tactical Bias</h2>
-                <div id="print-decision" class="text-2xl font-black text-slate-950 mt-1 uppercase">TRADE APPROVED (BUY)</div>
-                <p id="print-reason" class="text-sm text-slate-600 mt-1 font-serif italic">Analyzing data triggers...</p>
-            </div>
-            <div class="text-center bg-slate-950 text-white px-5 py-3 rounded">
-                <div class="text-[9px] uppercase tracking-wider text-slate-400 font-mono">Net Calendar Weight</div>
-                <div id="print-net-weight" class="text-2xl font-black font-mono">+2</div>
+            <div class="text-right font-mono">
+                <div class="text-lg font-black text-slate-900" id="print-target-pair">EUR/AUD</div>
+                <div class="text-[9px] text-slate-500 uppercase mt-0.5" id="print-date">Strategy Briefing Update</div>
             </div>
         </div>
 
-        <!-- Report Data Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Left side metrics -->
-            <div class="space-y-6">
-                <div>
-                    <h3 class="text-sm font-bold text-slate-950 uppercase tracking-wider border-b border-slate-950 pb-1 mb-3 font-mono">1. Dynamic Event Matrix</h3>
-                    
-                    <h4 class="text-xs font-bold text-slate-800 uppercase mt-2 mb-1" id="print-base-title">EUR Events (Base)</h4>
-                    <div class="space-y-2 text-xs font-serif text-slate-700 mb-4" id="print-base-events"></div>
+        <!-- Table 1: Strategic Executive Sentiment Matrix -->
+        <div class="pdf-section-title">1. Executive Tactical Summary</div>
+        <table class="pdf-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Target Asset Pair</th>
+                    <th style="width: 25%;">Execution Date</th>
+                    <th style="width: 30%;">System Tactical Verdict</th>
+                    <th style="width: 20%; text-align: right;">Net Calendar Weight</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="table-print-pair" class="font-bold">EUR/AUD</td>
+                    <td id="table-print-date">Loading...</td>
+                    <td id="table-print-verdict" class="font-bold tracking-wide uppercase">No Active Bias Registered</td>
+                    <td id="table-print-weight" class="font-bold font-mono text-right">0</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="bg-slate-50/50">
+                        <span class="font-bold text-[10px] uppercase font-mono text-slate-400 block mb-0.5">System Rule Logic Analysis Context</span>
+                        <p id="table-print-reason" class="text-slate-600 font-serif italic text-xs">Awaiting evaluation catalysts...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-                    <h4 class="text-xs font-bold text-slate-800 uppercase mt-2 mb-1" id="print-quote-title">AUD Events (Quote)</h4>
-                    <div class="space-y-2 text-xs font-serif text-slate-700" id="print-quote-events"></div>
-                </div>
+        <!-- Table 2: Unified Macro Economic Data Catalyst Grid -->
+        <div class="pdf-section-title">2. Fundamental Calendar Core Catalyst Matrix</div>
+        <table class="pdf-table">
+            <thead>
+                <tr>
+                    <th style="width: 20%;">Asset Focus</th>
+                    <th style="width: 30%;">Economic Event Parameter</th>
+                    <th style="width: 20%;">Directional Bias Alignment</th>
+                    <th style="width: 30%;">Analyst Execution Note / Market Target Bounds</th>
+                </tr>
+            </thead>
+            <tbody id="table-print-catalysts-body">
+                <!-- Injected via JavaScript -->
+            </tbody>
+        </table>
 
-                <div>
-                    <h3 class="text-sm font-bold text-slate-950 uppercase tracking-wider border-b border-slate-950 pb-1 mb-3 font-mono">2. Strategic Scorecard Vectors</h3>
-                    <table class="w-full text-left text-xs font-serif border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-300">
-                                <th class="py-1.5 font-bold text-slate-500 uppercase tracking-wider font-mono">System Metric</th>
-                                <th class="py-1.5 text-right font-bold text-slate-500 uppercase tracking-wider font-mono">System Alignment</th>
-                            </tr>
-                        </thead>
-                        <tbody id="print-pillars-body" class="divide-y divide-slate-200"></tbody>
-                    </table>
-                </div>
-            </div>
+        <!-- Table 3: System Scorecard Vector Alignments -->
+        <div class="pdf-section-title">3. Quantitative Scorecard Metric Alignment Vectors</div>
+        <table class="pdf-table">
+            <thead>
+                <tr>
+                    <th style="width: 60%;">Strategic System Metric Factor Pillar</th>
+                    <th style="width: 40%; text-align: right;">Pillar Strategic Alignment Result</th>
+                </tr>
+            </thead>
+            <tbody id="table-print-pillars-body">
+                <!-- Injected via JavaScript -->
+            </tbody>
+        </table>
 
-            <!-- Right side dossiers -->
-            <div class="space-y-6">
-                <div>
-                    <h3 class="text-sm font-bold text-slate-950 uppercase tracking-wider border-b border-slate-950 pb-1 mb-3 font-mono">3. Valuation Deviations</h3>
-                    <p id="print-note-valuation" class="text-xs font-serif text-slate-700 whitespace-pre-wrap leading-relaxed"></p>
-                </div>
+        <!-- Table 4: Structured Cross-Asset Analyst Intelligence Dossier -->
+        <div class="pdf-section-title">4. Core Macro Regime Risk Intelligence Dossier</div>
+        <table class="pdf-table">
+            <thead>
+                <tr>
+                    <th style="width: 30%;">Regime Vector Domain</th>
+                    <th style="width: 70%;">Analyst Evaluation & Cross-Asset Divergence Model Observations</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="font-bold uppercase tracking-wider font-mono bg-slate-50/50">Market Valuation Deviations</td>
+                    <td id="table-print-note-valuation" class="font-serif leading-relaxed text-slate-700 whitespace-pre-wrap"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold uppercase tracking-wider font-mono bg-slate-50/50">Monetary Policy Trajectories</td>
+                    <td id="table-print-note-cb" class="font-serif leading-relaxed text-slate-700 whitespace-pre-wrap"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold uppercase tracking-wider font-mono bg-slate-50/50">Geopolitical Hazards & Risks</td>
+                    <td id="table-print-note-geo" class="font-serif leading-relaxed text-slate-700 whitespace-pre-wrap"></td>
+                </tr>
+            </tbody>
+        </table>
 
-                <div>
-                    <h3 class="text-sm font-bold text-slate-950 uppercase tracking-wider border-b border-slate-950 pb-1 mb-3 font-mono">4. Monetary Trajectories</h3>
-                    <p id="print-note-cb" class="text-xs font-serif text-slate-700 whitespace-pre-wrap leading-relaxed"></p>
-                </div>
-
-                <div>
-                    <h3 class="text-sm font-bold text-slate-950 uppercase tracking-wider border-b border-slate-950 pb-1 mb-3 font-mono">5. Geopolitical Analysis</h3>
-                    <p id="print-note-geo" class="text-xs font-serif text-slate-700 whitespace-pre-wrap leading-relaxed"></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer block -->
-        <div class="border-t border-slate-300 mt-12 pt-4 flex justify-between items-center text-[9px] text-slate-400 font-mono">
+        <!-- Corporate Footnote Block -->
+        <div class="border-t border-slate-300 mt-8 pt-3 flex justify-between items-center text-[9px] text-slate-400 font-mono">
             <span>KAIROS CURRENCY SENTIMENT ENGINE™</span>
-            <span>RESTRICTED DISTRO // PROPRIETARY RESEARCH DESK</span>
+            <span>RESTRICTED DISTRIBUTION // INTERNAL TRADING DESK AUDIT</span>
         </div>
     </div>
 
@@ -787,122 +846,120 @@
         function prepareAndPrint() {
             const baseCurr = document.getElementById('base-currency-select').value;
             const quoteCurr = document.getElementById('quote-currency-select').value;
-
-            document.getElementById('print-target-pair').textContent = `${baseCurr}/${quoteCurr}`;
-            document.getElementById('print-date').textContent = new Date().toLocaleDateString('en-US', {
+            const formattedDate = new Date().toLocaleDateString('en-US', {
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             });
 
-            const decPanelColor = document.getElementById('print-exec-callout');
+            // 1. Setup Header & Table 1 Summary Info
+            document.getElementById('print-target-pair').textContent = `${baseCurr}/${quoteCurr}`;
+            document.getElementById('print-date').textContent = formattedDate;
+            
+            document.getElementById('table-print-pair').textContent = `${baseCurr}/${quoteCurr}`;
+            document.getElementById('table-print-date').textContent = formattedDate;
+            
             const decText = document.getElementById('decision-status').textContent;
             const decReason = document.getElementById('decision-reason').textContent;
             
-            document.getElementById('print-decision').textContent = decText;
-            document.getElementById('print-reason').textContent = decReason;
-            document.getElementById('print-net-weight').textContent = (currentCalculatedWeight > 0 ? '+' : '') + currentCalculatedWeight;
+            document.getElementById('table-print-verdict').textContent = decText;
+            document.getElementById('table-print-reason').textContent = decReason;
+            document.getElementById('table-print-weight').textContent = (currentCalculatedWeight > 0 ? '+' : '') + currentCalculatedWeight;
 
-            if (decText.includes("APPROVED")) {
-                decPanelColor.className = "border-2 border-slate-950 p-5 mb-8 bg-emerald-50/20 flex flex-col md:flex-row justify-between items-center gap-4";
-            } else {
-                decPanelColor.className = "border-2 border-slate-950 p-5 mb-8 bg-slate-50 flex flex-col md:flex-row justify-between items-center gap-4";
+            // 2. Setup Table 2 Fundamental Catalyst Matrix Grid
+            const catalystBody = document.getElementById('table-print-catalysts-body');
+            catalystBody.innerHTML = '';
+            let validRowsCount = 0;
+
+            const formatBias = (bias) => {
+                if (bias === 'very_bullish') return '🟢 Very Bullish';
+                if (bias === 'bullish') return '🟡 Bullish';
+                if (bias === 'bearish') return '🟠 Bearish';
+                if (bias === 'very_bearish') return '🔴 Very Bearish';
+                return '— Neutral';
+            };
+
+            // Pull Base Rows
+            document.querySelectorAll('.base-event-row').forEach(row => {
+                const type = row.querySelector('.event-type').value;
+                const bias = row.querySelector('.event-bias').value;
+                const note = row.querySelector('.event-note').value;
+                if (type !== 'none') {
+                    validRowsCount++;
+                    catalystBody.innerHTML += `
+                        <tr>
+                            <td class="font-bold font-mono">${baseCurr} <span class="text-slate-400 text-[10px] font-normal">(Base)</span></td>
+                            <td class="font-semibold">${type}</td>
+                            <td>${formatBias(bias)}</td>
+                            <td class="font-mono text-slate-500 text-[10px]">${note || '—'}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            // Pull Quote Rows
+            document.querySelectorAll('.quote-event-row').forEach(row => {
+                const type = row.querySelector('.event-type').value;
+                const bias = row.querySelector('.event-bias').value;
+                const note = row.querySelector('.event-note').value;
+                if (type !== 'none') {
+                    validRowsCount++;
+                    catalystBody.innerHTML += `
+                        <tr>
+                            <td class="font-bold font-mono">${quoteCurr} <span class="text-slate-400 text-[10px] font-normal">(Quote)</span></td>
+                            <td class="font-semibold">${type}</td>
+                            <td>${formatBias(bias)}</td>
+                            <td class="font-mono text-slate-500 text-[10px]">${note || '—'}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if (validRowsCount === 0) {
+                catalystBody.innerHTML = `<tr><td colspan="4" class="text-slate-400 text-center italic py-4">No data catalyst macro events registered for this calculation sequence.</td></tr>`;
             }
 
-            const valText = document.getElementById('web-note-valuation').value.trim();
-            const cbText = document.getElementById('web-note-cb').value.trim();
-            const geoText = document.getElementById('web-note-geo').value.trim();
-
-            document.getElementById('print-note-valuation').textContent = valText || "No active cross-asset yield model deviations registered for the cycle.";
-            document.getElementById('print-note-cb').textContent = cbText || "Monetary targets remain fully constrained inside central bank pricing channels.";
-            document.getElementById('print-note-geo').textContent = geoText || "No active geopolitical hazards registered.";
-
-            document.getElementById('print-base-title').textContent = `${baseCurr} Catalyst Matrix (Base)`;
-            const baseEventsDiv = document.getElementById('print-base-events');
-            baseEventsDiv.innerHTML = '';
-            
-            const baseRows = document.querySelectorAll('.base-event-row');
-            if (baseRows.length === 0) {
-                baseEventsDiv.innerHTML = '<p class="text-slate-400 italic">No base macro events registered.</p>';
-            } else {
-                baseRows.forEach(row => {
-                    const type = row.querySelector('.event-type').value;
-                    const bias = row.querySelector('.event-bias').value;
-                    const note = row.querySelector('.event-note').value;
-                    if (type !== 'none') {
-                        const biasSymbol = bias === 'very_bullish' ? '🟢 Very Bullish' : (bias === 'bullish' ? '🟡 Bullish' : (bias === 'bearish' ? '🟠 Bearish' : (bias === 'very_bearish' ? '🔴 Very Bearish' : '— Neutral')));
-                        baseEventsDiv.innerHTML += `
-                            <div class="border-l-2 border-slate-900 pl-2 py-1">
-                                <span class="font-bold text-slate-950">${type}</span> — <span class="font-semibold">${biasSymbol}</span>
-                                ${note ? `<p class="text-slate-500 text-[11px] mt-0.5 font-mono">${note}</p>` : ''}
-                            </div>
-                        `;
-                    }
-                });
-            }
-
-            document.getElementById('print-quote-title').textContent = `${quoteCurr} Catalyst Matrix (Quote)`;
-            const quoteEventsDiv = document.getElementById('print-quote-events');
-            quoteEventsDiv.innerHTML = '';
-            
-            const quoteRows = document.querySelectorAll('.quote-event-row');
-            if (quoteRows.length === 0) {
-                quoteEventsDiv.innerHTML = '<p class="text-slate-400 italic">No quote macro events registered.</p>';
-            } else {
-                quoteRows.forEach(row => {
-                    const type = row.querySelector('.event-type').value;
-                    const bias = row.querySelector('.event-bias').value;
-                    const note = row.querySelector('.event-note').value;
-                    if (type !== 'none') {
-                        const biasSymbol = bias === 'very_bullish' ? '🟢 Very Bullish' : (bias === 'bullish' ? '🟡 Bullish' : (bias === 'bearish' ? '🟠 Bearish' : (bias === 'very_bearish' ? '🔴 Very Bearish' : '— Neutral')));
-                        quoteEventsDiv.innerHTML += `
-                            <div class="border-l-2 border-slate-900 pl-2 py-1">
-                                <span class="font-bold text-slate-950">${type}</span> — <span class="font-semibold">${biasSymbol}</span>
-                                ${note ? `<p class="text-slate-500 text-[11px] mt-0.5 font-mono">${note}</p>` : ''}
-                            </div>
-                        `;
-                    }
-                });
-            }
-
-            const tableBody = document.getElementById('print-pillars-body');
-            tableBody.innerHTML = '';
+            // 3. Setup Table 3 Strategic Scorecard Pillars View
+            const pillarBody = document.getElementById('table-print-pillars-body');
+            pillarBody.innerHTML = '';
 
             const pillarDefinitions = [
-                { id: 2, title: 'Retail Sentiment (SSI Models)' },
-                { id: 3, title: 'Valuation Tracking Analysis' },
-                { id: 4, title: 'VIX, Oil & Gold Multi-Markets' },
-                { id: 5, title: 'Central Bank Rate Divergences' },
-                { id: 6, title: 'Consensus Boundary Limits' }
+                { id: 2, title: 'Retail Sentiment Model Tracking (SSI Filters)' },
+                { id: 3, title: 'Valuation Tracking Analysis (Historical Multi-Cycle Models)' },
+                { id: 4, title: 'Risk & Commodity Multi-Markets (VIX, Gold, Crude Oil Trends)' },
+                { id: 5, title: 'Monetary Policy Divergences (Central Bank Target Interest Rates)' },
+                { id: 6, title: 'Consensus Boundary Limits (Economic Indicator Trigger Boundaries)' }
             ];
 
             pillarDefinitions.forEach(p => {
-                let alignText = '— Neutral';
-                let cellClass = 'text-slate-500';
-                
-                if (state[`p${p.id}`] === 'buy') {
-                    alignText = '🟢 Supports Buy';
-                    cellClass = 'text-emerald-700 font-bold';
-                } else if (state[`p${p.id}`] === 'sell') {
-                    alignText = '🔴 Supports Sell';
-                    cellClass = 'text-red-700 font-bold';
-                }
+                let alignText = '— Neutral Alignment';
+                if (state[`p${p.id}`] === 'buy') alignText = '🟢 Supports Buy Bias';
+                if (state[`p${p.id}`] === 'sell') alignText = '🔴 Supports Sell Bias';
 
-                let extraDetails = '';
+                let executionMetadata = '';
                 if (p.id === 6) {
                     const eventSel = document.getElementById('p6-event-select').value;
                     const lowVal = document.getElementById('p6-low').value;
                     const highVal = document.getElementById('p6-high').value;
                     if (eventSel !== 'none' || lowVal || highVal) {
-                        extraDetails = `<div class="text-[10px] text-slate-400 mt-0.5">${eventSel !== 'none' ? eventSel : 'Target'} Sweep Bounds: Low Limit [${lowVal || '—'}] / High Limit [${highVal || '—'}]</div>`;
+                        executionMetadata = `<div class="text-[9px] text-slate-400 font-mono mt-0.5">Boundary Target [${eventSel !== 'none' ? eventSel : 'Macro'}]: Min Balance Limit (${lowVal || '—'}) / Max Balance Limit (${highVal || '—'})</div>`;
                     }
                 }
 
-                tableBody.innerHTML += `
+                pillarBody.innerHTML += `
                     <tr>
-                        <td class="py-2 text-slate-950 font-semibold">${p.title} ${extraDetails}</td>
-                        <td class="py-2 text-right ${cellClass}">${alignText}</td>
+                        <td class="font-medium text-slate-900">${p.title} ${executionMetadata}</td>
+                        <td class="text-right font-bold tracking-wide">${alignText}</td>
                     </tr>
                 `;
             });
+
+            // 4. Setup Table 4 Analyst Intelligence Dossier Notes View
+            const valText = document.getElementById('web-note-valuation').value.trim();
+            const cbText = document.getElementById('web-note-cb').value.trim();
+            const geoText = document.getElementById('web-note-geo').value.trim();
+
+            document.getElementById('table-print-note-valuation').textContent = valText || "No active macro asset yield valuation or cross-market deviations loaded for this current trading framework pipeline loop.";
+            document.getElementById('table-print-note-cb').textContent = cbText || "Monetary tracking profiles remain entirely consolidated inside central bank policy guidance bands.";
+            document.getElementById('table-print-note-geo').textContent = geoText || "No material geopolitical risk parameters or tail risk elements logged for this sequence loop.";
 
             window.print();
         }
