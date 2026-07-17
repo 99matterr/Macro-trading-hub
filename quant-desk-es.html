@@ -107,7 +107,7 @@
     <!-- ========================================== -->
     <div id="web-app-interface" class="flex-grow flex flex-col justify-between">
         
-        <!-- Global Header Tick -->
+        <!-- Punto de Inyección del Menú de Encabezado Global -->
         <div id="global-header"></div>
 
         <!-- Cinta de Cotizaciones en Vivo de TradingView -->
@@ -323,7 +323,7 @@
                                     <div>
                                         <label class="block text-[8px] font-bold text-zinc-500 uppercase mb-1">Evento Programado</label>
                                         <select id="p6-event-select" onchange="saveToLocalStorage()" class="w-full bg-[#020203] border border-zinc-900 text-[10px] p-2 rounded text-zinc-300 focus:outline-none focus:border-cyan-500/50 cursor-pointer">
-                                            <option value="none">-- SELECCIONAR --</option>
+                                            <option value="none">-- SELECCIONAL --</option>
                                             <optgroup label="Inflación y Precios" class="bg-[#020203]">
                                                 <option value="CPI">IPC / Inflación PCE</option>
                                                 <option value="PPI">IPP (Precios Productor)</option>
@@ -387,6 +387,9 @@
                 </button>
             </div>
         </section>
+
+        <!-- Punto de Inyección del Pie de Página Global -->
+        <div id="global-footer"></div>
     </div>
 
     <!-- ========================================== -->
@@ -435,19 +438,21 @@
 
         <!-- Tabla 2: Matriz de Catalizadores del Calendario Fundamental -->
         <div class="pdf-section-title">2. Matriz de Catalizadores Clave del Calendario Fundamental</div>
-        <table class="pdf-table">
-            <thead>
-                <tr>
-                    <th style="width: 20%;">Activo de Enfoque</th>
-                    <th style="width: 30%;">Parámetro de Evento Económico</th>
-                    <th style="width: 20%;">Alineación de Sesgo Direccional</th>
-                    <th style="width: 30%;">Nota de Ejecución del Analista / Límites de Objetivo</th>
-                </tr>
-            </thead>
-            <tbody id="table-print-catalysts-body">
-                <!-- Inyectado vía JavaScript -->
-            </tbody>
-        </table>
+        <div class="overflow-x-auto">
+            <table class="pdf-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Activo de Enfoque</th>
+                        <th style="width: 30%;">Parámetro de Evento Económico</th>
+                        <th style="width: 20%;">Alineación de Sesgo Direccional</th>
+                        <th style="width: 30%;">Nota de Ejecución del Analista / Límites de Objetivo</th>
+                    </tr>
+                </thead>
+                <tbody id="table-print-catalysts-body">
+                    <!-- Inyectado vía JavaScript -->
+                </tbody>
+            </table>
+        </div>
 
         <!-- Table 3: Vectores de Alineación del Cuadro de Mando Cuantitativo -->
         <div class="pdf-section-title">3. Vectores de Alineación de Métricas del Cuadro de Mando Cuantitativo</div>
@@ -469,7 +474,7 @@
             <thead>
                 <tr>
                     <th style="width: 30%;">Dominio del Vector de Régimen</th>
-                    <th style="width: 70%;">Evaluación del Analista y Observaciones del Modelo de Divergencia</th>
+                    <th style="width: 70%;">Evaluación del Analista y Observations del Modelo de Divergencia</th>
                 </tr>
             </thead>
             <tbody>
@@ -494,6 +499,9 @@
             <span>DISTRIBUCIÓN RESTRINGIDA // AUDITORÍA DE MESA DE TRADING INTERNA</span>
         </div>
     </div>
+
+    <!-- Script de Inyección Global de Componentes -->
+    <script src="inject-engine.js"></script>
 
     <script>
         const state = {
