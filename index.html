@@ -16,8 +16,10 @@
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
 
+    <!-- 1. GLOBAL HEADER (Injected via JS) -->
     <div id="global-header"></div>
 
+    <!-- 2. TICKER TAPE WIDGET -->
     <div class="w-full bg-[#020203] border-b border-zinc-900 overflow-hidden h-[46px] flex items-center shrink-0">
         <div class="tradingview-widget-container w-full h-full">
             <div class="tradingview-widget-container__widget h-full w-full"></div>
@@ -33,17 +35,30 @@
         </div>
     </div>
 
-    <main class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
-        <header class="font-mono space-y-4">
-            <span class="text-cyan-500 font-bold text-[10px] tracking-widest uppercase block">// ARCHITECTURE DESK PORTAL</span>
-            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase leading-none">
-                Macro-Quantamental Modeling & Systemic Variance Management
-            </h1>
-            <p class="text-xs text-zinc-400 font-sans max-w-2xl pt-1">
-                Welcome to the digital node for Kairos Global Research. This system acts as a decentralized risk engine engineered to process cross-border structural changes and verify position parameters.
-            </p>
-        </header>
+    <!-- 3. HERO SECTION (With dynamic blur transition behind the text) -->
+    <div class="relative w-full h-[320px] sm:h-[380px] flex items-end overflow-hidden border-b border-zinc-900/50">
+        <!-- Background Asset Placeolder -->
+        <img src="hero-dashboard.jpg" alt="Portal Hero Background" class="absolute inset-0 w-full h-full object-cover object-center opacity-35" />
+        
+        <!-- Blur & Gradient Mask Layer -->
+        <div class="absolute inset-0 bg-gradient-to-t from-[#020203] via-[#020203]/70 to-transparent backdrop-blur-[3px]"></div>
 
+        <!-- Title Content (Positioned exactly over the blur initiation) -->
+        <div class="relative w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 z-10">
+            <header class="font-mono space-y-4">
+                <span class="text-cyan-500 font-bold text-[10px] tracking-widest uppercase block">// ARCHITECTURE DESK PORTAL</span>
+                <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase leading-none max-w-3xl">
+                    Macro-Quantamental Modeling & Systemic Variance Management
+                </h1>
+                <p class="text-xs text-zinc-400 font-sans max-w-2xl pt-1">
+                    Welcome to the digital node for Kairos Global Research. This system acts as a decentralized risk engine engineered to process cross-border structural changes and verify position parameters.
+                </p>
+            </header>
+        </div>
+    </div>
+
+    <!-- 4. MAIN CONTENT CARDS -->
+    <main class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         <section class="bg-[#040406] border border-zinc-900 rounded-xl p-6 font-mono text-xs space-y-5">
             <div class="space-y-2">
                 <span class="text-[9px] text-zinc-600 block tracking-widest uppercase">// CURRENT CYCLE FOCUS CHANNELS</span>
@@ -68,3 +83,26 @@
                     <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Weekly Intelligence Briefing</span>
                 </div>
                 <p class="text-zinc-400 font-sans text-xs leading-relaxed pl-3.5 max-w-2xl">
+                    Macro parameters indicate low volatility dispersion across core dollar pairings early this cycle. Monitor high-impact calendar risk data releases for trend expansion verification benchmarks. Detailed strategic outlines are processed inside the Research Feed logs dashboard.
+                </p>
+            </div>
+        </section>
+
+        <section class="bg-[#08080c] border border-zinc-900 rounded-xl p-6 font-mono flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="text-xs font-bold text-white uppercase tracking-wider">Access Proprietary Calculators</div>
+                <p class="text-zinc-500 text-[11px] font-sans">Navigate directly to the live tools hub to process quantitative cross positions.</p>
+            </div>
+            <a href="tools.html" class="bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-cyan-400 hover:border-cyan-500/40 transition-all text-center rounded-lg px-5 py-2 text-xs font-bold tracking-wider uppercase whitespace-nowrap">
+                Open Trading Tools &rarr;
+            </a>
+        </section>
+    </main>
+
+    <!-- 5. GLOBAL FOOTER (Injected via JS) -->
+    <div id="global-footer"></div>
+
+    <!-- Injection Script Execution -->
+    <script src="inject-engine.js"></script>
+</body>
+</html>
