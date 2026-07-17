@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FX Quantamental Workspace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Active Button Colors for Web UI */
+    .active-buy { background-color: #10B981 !important; color: white !important; border-color: #10B981 !important; }
+    .active-sell { background-color: #EF4444 !important; color: white !important; border-color: #EF4444 !important; }
+    .active-neutral { background-color: #4B5563 !important; color: white !important; border-color: #4B5563 !important; }
+
+    /* --- THE DUAL-LAYOUT PRINT CONTROLLER --- */
+    #pdf-report-container {
+      display: none; /* Keep hidden on screen */
+    }
+
+    @media print {
+      /* 1. Vaporize the entire interactive web app */
+      body, html {
+        background-color: white !important;
+        color: #111827 !important;
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif !important;
+      }
+      #web-app-interface {
+        display: none !important;
+      }
+      
+      /* 2. Reveal and format the pristine analyst PDF */
+      #pdf-report-container {
+        display: block !important;
+        width: 100% !important;
+        background: white !important;
+        color: #111827 !important;
+      }
+
+      /* Clean margins for standard letter/A4 printing */
+      @page {
+        size: portrait;
+        margin: 1.5cm;
+      }
+      
+      /* Keep colors exact on print */
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen font-sans pb-12">
+
+  <!-- ========================================== -->
+  <!-- 💻 THE INTERACTIVE WEB SCREEN APP (HIDDEN ON PRINT) -->
+  <!-- ========================================== -->
+  <div id="web-app-interface">
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-gray-950 p-6 mb-8">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <h1 class="text-2xl font-bold tracking-wider text-emerald-400">📊 FX QUANTAMENTAL DASHBOARD</h1>
+          <p class="text-xs text-gray-400 mt-1">Rule of Three Flow • Side-by-Side Catalyst Matrix</p>
+        </div>
+        <div class="flex space-x-3 w-full md:w-auto justify-end">
+          <button onclick="prepareAndPrint()" class="bg-blue-600 hover:bg-blue-700 text-sm font-semibold px-4 py-2 rounded transition shadow w-full md:w-auto">
+            🖨️ Export PDF Report
+          </button>
+          <button onclick="resetDashboard()" class="bg-gray-800 hover:bg-gray-700 text-sm font-semibold px-4 py-2 rounded transition shadow w-full md:w-auto">
+            🔄 Reset Workspace
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- LEFT SIDEBAR: Sunday Global Notes -->
+      <section class="lg:col-span-1 space-y-6">
+        <div class="bg-blue-950/40 border border-blue-800/80 rounded-xl p-4 text-xs text-blue-300">
+          💡 <strong>Pro-Tip:</strong> Enter your data below. When you click <strong>"Export PDF Report"</strong>, the tool will automatically strip away all form fields and compile your entry into a clean, professional PDF.
+        </div>
+
+        <div class="bg-gray-950 border border-gray-800 rounded-xl p-5 shadow-lg">
+          <h2 class="text-lg font-bold text-gray-200 border-b border-gray-800 pb-2 mb-4">📓 Sunday Prep Notes</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Global Valuation</label>
+              <textarea id="web-note-valuation" class="w-full bg-gray-900 border border-gray-800 rounded p-2 text-sm text-gray-300 focus:outline-none focus:border-emerald-500 h-24" placeholder="e.g., EUR undervalued against USD based on dynamic yield spreads..."></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Central Bank Stances</label>
+              <textarea id="web-note-cb" class="w-full bg-gray-900 border border-gray-800 rounded p-2 text-sm text-gray-300 focus:outline-none focus:border-emerald-500 h-24" placeholder="e.g., ECB leaning hawkish due to sticky services inflation; RBA neutral..."></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Geopolitical Notes</label>
+              <textarea id="web-note-geo" class="w-full bg-gray-900 border border-gray-800 rounded p-2 text-sm text-gray-300 focus:outline-none focus:border-emerald-500 h-24" placeholder="e.g., Escalation in Red Sea impacting oil..."></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT CONTENT: The Interactive Funnel -->
+      <section class="lg:col-span-2 space-y-6">
+        <div class="bg-gray-950 border border-gray-800 rounded-xl p-6 shadow-lg">
+          
+          <!-- Target Pair Selector & Decision Status -->
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-800 pb-4 mb-6 gap-4">
+            <div>
+              <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest block mb-1">Target Pair</span>
+              <div class="flex items-center space-x-2 bg-gray-900 border border-gray-800 rounded px-2 py-1">
+                <!-- Base Currency Selector -->
+                <select id="base-currency-select" onchange="updateCurrencyLabels()" class="bg-transparent text-2xl font-extrabold focus:outline-none text-white cursor-pointer hover:text-emerald-400 transition">
+                  <option value="EUR" class="bg-gray-900">EUR</option>
+                  <option value="USD" class="bg-gray-900">USD</option>
+                  <option value="GBP" class="bg-gray-900">GBP</option>
+                  <option value="AUD" class="bg-gray-900">AUD</option>
+                  <option value="NZD" class="bg-gray-900">NZD</option>
+                  <option value="CAD" class="bg-gray-900">CAD</option>
+                  <option value="CHF" class="bg-gray-900">CHF</option>
+                  <option value="JPY" class="bg-gray-900">JPY</option>
+                </select>
+                
+                <span class="text-gray-600 text-xl font-bold">/</span>
+
+                <!-- Quote Currency Selector -->
+                <select id="quote-currency-select" onchange="updateCurrencyLabels()" class="bg-transparent text-2xl font-extrabold focus:outline-none text-white cursor-pointer hover:text-emerald-400 transition">
+                  <option value="EUR" class="bg-gray-900">EUR</option>
+                  <option value="USD" class="bg-gray-900">USD</option>
+                  <option value="GBP" class="bg-gray-900">GBP</option>
+                  <option value="AUD" class="bg-gray-900" selected>AUD</option>
+                  <option value="NZD" class="bg-gray-900">NZD</option>
+                  <option value="CAD" class="bg-gray-900">CAD</option>
+                  <option value="CHF" class="bg-gray-900">CHF</option>
+                  <option value="JPY" class="bg-gray-900">JPY</option>
+                </select>
+              </div>
+            </div>
+            
+            <div id="decision-panel" class="p-4 rounded-xl border flex flex-col items-center justify-center w-full sm:w-64 bg-gray-900 border-gray-800">
+              <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Decision Status</span>
+              <span id="decision-status" class="text-xl font-black mt-1 text-gray-500">NO CATALYST</span>
+              <span id="decision-reason" class="text-xxs text-gray-400 mt-1 text-center font-medium">Log a core event bias first.</span>
+            </div>
+          </div>
+
+          <!-- POINT 1: SIDE-BY-SIDE EVENT ENGINE -->
+          <div class="bg-gray-900 border-l-4 border-emerald-500 p-4 rounded-r-lg mb-6 shadow-inner">
+            <div class="flex justify-between items-center mb-4">
+              <div>
+                <span class="text-xs font-bold text-emerald-400 uppercase">Point 1: Filtered Calendar & Catalyst Engine</span>
+                <h3 class="text-md font-bold text-white mt-0.5">Log Catalyst Events</h3>
+              </div>
+              <div class="text-xs text-gray-400">
+                Net Calendar Weight: <span id="net-calendar-weight" class="font-bold text-white">0</span>
+              </div>
+            </div>
+            
+            <!-- Side-By-Side Column Layout -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <!-- LEFT: Base Currency Column -->
+              <div class="bg-gray-950 p-3 rounded border border-gray-800">
+                <div class="flex justify-between items-center border-b border-gray-800 pb-2 mb-3">
+                  <span id="base-col-title" class="text-xs font-bold text-emerald-400 uppercase">EUR Events (Base)</span>
+                  <button type="button" onclick="addNewEventRow('base')" class="bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300 text-xxs font-bold px-2 py-1 rounded transition">
+                    ➕ Add Event
+                  </button>
+                </div>
+                <div id="base-events-list" class="space-y-3">
+                  <!-- Dynamic Base Events Go Here -->
+                </div>
+              </div>
+
+              <!-- RIGHT: Quote Currency Column -->
+              <div class="bg-gray-950 p-3 rounded border border-gray-800">
+                <div class="flex justify-between items-center border-b border-gray-800 pb-2 mb-3">
+                  <span id="quote-col-title" class="text-xs font-bold text-emerald-400 uppercase">AUD Events (Quote)</span>
+                  <button type="button" onclick="addNewEventRow('quote')" class="bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300 text-xxs font-bold px-2 py-1 rounded transition">
+                    ➕ Add Event
+                  </button>
+                </div>
+                <div id="quote-events-list" class="space-y-3">
+                  <!-- Dynamic Quote Events Go Here -->
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- POINTS 2 to 6: Supporting Pillars -->
+          <div class="space-y-4">
+            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Step 2: Supporting Pillar Verification (At least 2 must align)</h4>
+
+            <!-- POINT 2: Retail Sentiment -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-900 border border-gray-800 p-4 rounded-lg gap-4">
+              <div class="flex-1">
+                <span class="text-xs font-bold text-gray-400">Point 2</span>
+                <h5 class="text-sm font-semibold text-white">Retail Sentiment (SSI)</h5>
+                <p class="text-xs text-gray-500">Are retail traders heavily short (supports buy) or long (supports sell)?</p>
+              </div>
+              <div class="flex flex-wrap gap-1.5 w-full sm:w-auto shrink-0 sm:justify-end">
+                <button onclick="togglePillar(2, 'buy')" id="p2-buy" class="flex-1 sm:flex-initial text-center min-w-[100px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 hover:bg-gray-700">Supports Buy</button>
+                <button onclick="togglePillar(2, 'sell')" id="p2-sell" class="flex-1 sm:flex-initial text-center min-w-[100px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 hover:bg-gray-700">Supports Sell</button>
+                <button onclick="togglePillar(2, 'neutral')" id="p2-neutral" class="flex-1 sm:flex-initial text-center min-w-[80px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 active-neutral">Neutral</button>
+              </div>
+            </div>
+
+            <!-- POINT 3: Valuation -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-900 border border-gray-800 p-4 rounded-lg gap-4">
+              <div class="flex-1">
+                <span class="text-xs font-bold text-gray-400">Point 3</span>
+                <h5 class="text-sm font-semibold text-white">Valuation Model</h5>
+                <p class="text-xs text-gray-500">Does your weekly valuation model show the pair is cheap (supports buy) or expensive (supports sell)?</p>
+              </div>
+              <div class="flex flex-wrap gap-1.5 w-full sm:w-auto shrink-0 sm:justify-end">
+                <button onclick="togglePillar(3, 'buy')" id="p3-buy" class="flex-1 sm:flex-initial text-center min-w-[100px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 hover:bg-gray-700">Supports Buy</button>
+                <button onclick="togglePillar(3, 'sell')" id="p3-sell" class="flex-1 sm:flex-initial text-center min-w-[100px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 hover:bg-gray-700">Supports Sell</button>
+                <button onclick="togglePillar(3, 'neutral')" id="p3-neutral" class="flex-1 sm:flex-initial text-center min-w-[80px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 active-neutral">Neutral</button>
+              </div>
+            </div>
+
+            <!-- POINT 4: VIX, Oil, Gold -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-900 border border-gray-800 p-4 rounded-lg gap-4">
+              <div class="flex-1">
+                <span class="text-xs font-bold text-gray-400">Point 4</span>
+                <h5 class="text-sm font-semibold text-white">VIX, Oil, Gold (Intermarket Risk)</h5>
+                <p class="text-xs text-gray-500">Do broader raw risk indices and commodity trends support risk-on or risk-off?</p>
+              </div>
+              <div class="flex flex-wrap gap-1.5 w-full sm:w-auto shrink-0 sm:justify-end">
+                <button onclick="togglePillar(4, 'buy')" id="p4-buy" class="flex-1 sm:flex-initial text-center min-w-[100px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 hover:bg-gray-700">Supports Buy</button>
+                <button onclick="togglePillar(4, 'sell')" id="p4-sell" class="flex-1 sm:flex-initial text-center min-w-[100px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 hover:bg-gray-700">Supports Sell</button>
+                <button onclick="togglePillar(4, 'neutral')" id="p4-neutral" class="flex-1 sm:flex-initial text-center min-w-[80px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 active-neutral">Neutral</button>
+              </div>
+            </div>
+
+            <!-- POINT 5: CB Divergences -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-900 border border-gray-800 p-4 rounded-lg gap-4">
+              <div class="flex-1">
+                <span class="text-xs font-bold text-gray-400">Point 5</span>
+                <h5 class="text-sm font-semibold text-white">Central Bank Divergences</h5>
+                <p class="text-xs text-gray-500">Does the monetary policy yield spread support buying or selling this pair?</p>
+              </div>
+              <div class="flex flex-wrap gap-1.5 w-full sm:w-auto shrink-0 sm:justify-end">
+                <button onclick="togglePillar(5, 'buy')" id="p5-buy" class="flex-1 sm:flex-initial text-center min-w-[100px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 hover:bg-gray-700">Supports Buy</button>
+                <button onclick="togglePillar(5, 'sell')" id="p5-sell" class="flex-1 sm:flex-initial text-center min-w-[100px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 hover:bg-gray-700">Supports Sell</button>
+                <button onclick="togglePillar(5, 'neutral')" id="p5-neutral" class="flex-1 sm:flex-initial text-center min-w-[80px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 active-neutral">Neutral</button>
+              </div>
+            </div>
+
+            <!-- POINT 6: Consensus Limits -->
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center bg-gray-900 border border-gray-800 p-4 rounded-lg gap-4">
+              <div class="flex-1 w-full">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs font-bold text-gray-400">Point 6</span>
+                  <span id="consensus-badge" class="text-xxs bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded font-semibold border border-gray-700 transition">Normal Consensus Range</span>
+                </div>
+                <h5 class="text-sm font-semibold text-white mt-1">Consensus limits (Low-High / L.E.)</h5>
+                <p class="text-xs text-gray-500 mt-0.5">Define extreme expectations boundary limits to map out algorithmic execution triggers.</p>
+                
+                <!-- 3-Column Inputs -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3 w-full">
+                  <div>
+                    <label class="block text-xxs font-bold text-gray-400 uppercase mb-1">Target Event</label>
+                    <select id="p6-event-select" class="w-full bg-gray-950 border border-gray-800 text-xs p-2 rounded text-white focus:outline-none focus:border-emerald-500 cursor-pointer">
+                      <option value="none">-- Select Event --</option>
+                      <option value="CPI">CPI / Inflation</option>
+                      <option value="NFP">NFP / Employment</option>
+                      <option value="Retail Sales">Retail Sales</option>
+                      <option value="PMIs">PMIs</option>
+                      <option value="GDP">GDP</option>
+                      <option value="Central Bank">CB Decision/Minutes</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xxs font-bold text-gray-400 uppercase mb-1">L.E. Low Limit</label>
+                    <input type="text" id="p6-low" placeholder="e.g. 0.1%" class="w-full bg-gray-950 border border-gray-800 rounded p-2 text-xs focus:outline-none focus:border-emerald-500 text-white">
+                  </div>
+                  <div>
+                    <label class="block text-xxs font-bold text-gray-400 uppercase mb-1">L.E. High Limit</label>
+                    <input type="text" id="p6-high" placeholder="e.g. 0.5%" class="w-full bg-gray-950 border border-gray-800 rounded p-2 text-xs focus:outline-none focus:border-emerald-500 text-white">
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Support Toggles -->
+              <div class="flex flex-wrap gap-1.5 w-full lg:w-auto shrink-0 justify-end lg:self-end">
+                <button onclick="togglePillar(6, 'buy')" id="p6-buy" class="flex-1 lg:flex-initial text-center min-w-[100px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 hover:bg-gray-700">Supports Buy</button>
+                <button onclick="togglePillar(6, 'sell')" id="p6-sell" class="flex-1 lg:flex-initial text-center min-w-[100px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 hover:bg-gray-700">Supports Sell</button>
+                <button onclick="togglePillar(6, 'neutral')" id="p6-neutral" class="flex-1 lg:flex-initial text-center min-w-[80px] bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 active-neutral">Neutral</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 📄 PRINT-ONLY PRISTINE FINANCIAL REPORT CONTAINER -->
+  <!-- ========================================== -->
+  <div id="pdf-report-container" class="p-8 text-slate-900 leading-relaxed max-w-4xl mx-auto">
+    <!-- Corporate Header Letterhead -->
+    <div class="border-b-4 border-slate-900 pb-4 mb-6 flex justify-between items-end">
+      <div>
+        <h1 class="text-3xl font-black tracking-tight text-slate-900 uppercase">Quantamental FX Intelligence Report</h1>
+        <p class="text-sm text-slate-500 uppercase tracking-widest font-mono mt-1">Weekly Sunday Analysis Desk & Strategy Slate</p>
+      </div>
+      <div class="text-right">
+        <div class="text-xl font-bold font-mono text-slate-800" id="print-target-pair">EUR/AUD</div>
+        <div class="text-xs text-slate-500" id="print-date">July 16, 2026</div>
+      </div>
+    </div>
+
+    <!-- Executive Decision Callout Box -->
+    <div id="print-exec-callout" class="border-2 border-slate-900 p-5 mb-8 bg-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div>
+        <h2 class="text-xs font-bold tracking-widest text-slate-500 uppercase">Executive Trade Verdict</h2>
+        <div id="print-decision" class="text-2xl font-black text-slate-900 mt-1 uppercase">TRADE APPROVED (BUY)</div>
+        <p id="print-reason" class="text-sm text-slate-600 mt-1 font-serif">Direction supported by structural macroeconomic catalyst divergence.</p>
+      </div>
+      <div class="text-center bg-slate-900 text-white px-5 py-3 rounded">
+        <div class="text-xxs uppercase tracking-wider text-slate-400">Net Catalyst Weight</div>
+        <div id="print-net-weight" class="text-2xl font-black font-mono">+2</div>
+      </div>
+    </div>
+
+    <!-- Multi-Column Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Left Column: Catalyst Records & Pillars -->
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-bold text-slate-950 uppercase tracking-wider border-b border-slate-900 pb-1 mb-3">1. Dynamic Event Matrix</h3>
+          
+          <h4 class="text-xs font-bold text-slate-800 uppercase mt-2 mb-1" id="print-base-title">EUR Events (Base)</h4>
+          <div class="space-y-2 text-xs font-serif text-slate-700 mb-4" id="print-base-events">
+            <!-- Populated via Javascript -->
+          </div>
+
+          <h4 class="text-xs font-bold text-slate-800 uppercase mt-2 mb-1" id="print-quote-title">AUD Events (Quote)</h4>
+          <div class="space-y-2 text-xs font-serif text-slate-700" id="print-quote-events">
+            <!-- Populated via Javascript -->
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-bold text-slate-950 uppercase tracking-wider border-b border-slate-900 pb-1 mb-3">2. Core Pillar Scorecard</h3>
+          <table class="w-full text-left text-xs font-serif border-collapse">
+            <thead>
+              <tr class="border-b border-slate-300">
+                <th class="py-1 font-bold text-slate-500 uppercase tracking-wider">Strategic Pillar</th>
+                <th class="py-1 text-right font-bold text-slate-500 uppercase tracking-wider">Alignment</th>
+              </tr>
+            </thead>
+            <tbody id="print-pillars-body" class="divide-y divide-slate-200">
+              <!-- Populated via Javascript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Right Column: Structural Macro Notes -->
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-bold text-slate-950 uppercase tracking-wider border-b border-slate-900 pb-1 mb-3">3. Global Valuation Framework</h3>
+          <p id="print-note-valuation" class="text-xs font-serif text-slate-700 whitespace-pre-wrap leading-relaxed">No valuation parameters declared.</p>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-bold text-slate-950 uppercase tracking-wider border-b border-slate-900 pb-1 mb-3">4. Monetary Policy & Central Bank Divergences</h3>
+          <p id="print-note-cb" class="text-xs font-serif text-slate-700 whitespace-pre-wrap leading-relaxed">No central bank stances declared.</p>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-bold text-slate-950 uppercase tracking-wider border-b border-slate-900 pb-1 mb-3">5. Geopolitical Analysis</h3>
+          <p id="print-note-geo" class="text-xs font-serif text-slate-700 whitespace-pre-wrap leading-relaxed">No geopolitical updates declared.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Professional Footer -->
+    <div class="border-t border-slate-300 mt-12 pt-4 flex justify-between items-center text-[10px] text-slate-400 font-mono">
+      <span>QUANTAMENTAL INSIGHTS ENGINE™</span>
+      <span>CONFIDENTIAL FOR INTERNAL STRATEGY DESK ONLY</span>
+    </div>
+  </div>
+
+  <!-- JavaScript App Logic -->
+  <script>
+    // State storage for Points 2-6
+    const state = {
+      p2: 'neutral',
+      p3: 'neutral',
+      p4: 'neutral',
+      p5: 'neutral',
+      p6: 'neutral'
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateCurrencyLabels();
+      addNewEventRow('base');
+      addNewEventRow('quote');
+    });
+
+    function updateCurrencyLabels() {
+      const base = document.getElementById('base-currency-select').value;
+      const quote = document.getElementById('quote-currency-select').value;
+
+      document.getElementById('base-col-title').textContent = `${base} Events (Base)`;
+      document.getElementById('quote-col-title').textContent = `${quote} Events (Quote)`;
+      
+      calculateLogic();
+    }
+
+    let rowCounter = 0;
+    function addNewEventRow(side) {
+      rowCounter++;
+      const containerId = side === 'base' ? 'base-events-list' : 'quote-events-list';
+      const container = document.getElementById(containerId);
+      
+      const row = document.createElement('div');
+      row.id = `event-row-${rowCounter}`;
+      row.className = `${side}-event-row bg-gray-900 border border-gray-800 rounded p-3 space-y-2 relative`;
+      
+      row.innerHTML = `
+        <div class="flex items-center gap-2">
+          <select onchange="handleRowChange(${rowCounter})" class="event-type flex-grow bg-gray-950 border border-gray-800 text-xxs p-1.5 rounded text-white focus:outline-none focus:border-emerald-500 cursor-pointer min-w-0">
+            <option value="none">-- Select Event --</option>
+            <option value="Inflation">Inflation (CPI/PCE)</option>
+            <option value="Employment">Employment (NFP/UR)</option>
+            <option value="PMIs">PMIs (Mfg/Services)</option>
+            <option value="Retail Sales">Retail Sales</option>
+            <option value="Industrial Production">Industrial Prod.</option>
+            <option value="Central Bank">Central Bank Minutes</option>
+            <option value="Geopolitics">Geopolitics / War Risk</option>
+          </select>
+
+          <select onchange="calculateLogic()" class="event-bias w-24 shrink-0 bg-gray-950 border border-gray-800 text-xxs p-1.5 rounded text-white focus:outline-none focus:border-emerald-500 font-bold cursor-pointer">
+            <option value="none">-- Bias --</option>
+            <option value="bullish" class="text-emerald-400">🟢 Bullish</option>
+            <option value="bearish" class="text-red-400">🔴 Bearish</option>
+          </select>
+
+          <button type="button" onclick="deleteEventRow(${rowCounter})" class="delete-btn text-gray-500 hover:text-red-400 text-xs px-1 font-bold shrink-0">
+            ✕
+          </button>
+        </div>
+
+        <div>
+          <input type="text" id="note-input-${rowCounter}" class="event-note w-full bg-gray-950 border border-gray-800 text-xxs p-1.5 rounded text-gray-300 focus:outline-none focus:border-emerald-500" placeholder="Consensus actual, deviation, or notes...">
+        </div>
+      `;
+      
+      container.appendChild(row);
+      calculateLogic();
+    }
+
+    function handleRowChange(rowId) {
+      const row = document.getElementById(`event-row-${rowId}`);
+      const selectType = row.querySelector('.event-type').value;
+      const noteInput = document.getElementById(`note-input-${rowId}`);
+
+      if (selectType === 'Geopolitics') {
+        noteInput.placeholder = "⚠️ Manual Note: Detail the random geopolitical headlines, safe-haven flows & conflicts...";
+        noteInput.className = "event-note w-full bg-amber-950/20 border border-amber-800/80 text-xxs p-1.5 rounded text-amber-300 placeholder-amber-600 focus:outline-none focus:border-amber-400";
+      } else {
+        noteInput.placeholder = "Consensus actual, deviation, or notes...";
+        noteInput.className = "event-note w-full bg-gray-950 border border-gray-800 text-xxs p-1.5 rounded text-gray-300 focus:outline-none focus:border-emerald-500";
+      }
+      calculateLogic();
+    }
+
+    function deleteEventRow(rowId) {
+      const row = document.getElementById(`event-row-${rowId}`);
+      if (row) {
+        row.remove();
+      }
+      calculateLogic();
+    }
+
+    function togglePillar(pillarNum, status) {
+      state[`p${pillarNum}`] = status;
+
+      const buttons = ['buy', 'sell', 'neutral'];
+      buttons.forEach(btn => {
+        const el = document.getElementById(`p${pillarNum}-${btn}`);
+        el.className = "flex-1 sm:flex-none bg-gray-800 border border-gray-700 text-xs px-3 py-1.5 rounded font-semibold text-gray-300 hover:bg-gray-700";
+      });
+
+      const activeEl = document.getElementById(`p${pillarNum}-${status}`);
+      if (status === 'buy') activeEl.classList.add('active-buy');
+      if (status === 'sell') activeEl.classList.add('active-sell');
+      if (status === 'neutral') activeEl.classList.add('active-neutral');
+
+      calculateLogic();
+    }
+
+    let currentCalculatedWeight = 0;
+    let currentCalculatedDirection = 'none';
+
+    function calculateLogic() {
+      const base = document.getElementById('base-currency-select').value;
+      const quote = document.getElementById('quote-currency-select').value;
+      const decisionPanel = document.getElementById('decision-panel');
+      const decisionStatus = document.getElementById('decision-status');
+      const decisionReason = document.getElementById('decision-reason');
+      const consensusBadge = document.getElementById('consensus-badge');
+
+      const baseRows = document.querySelectorAll('.base-event-row');
+      const quoteRows = document.querySelectorAll('.quote-event-row');
+
+      let netWeight = 0;
+      let activeEventsCount = 0;
+      let geopoliticalSelected = false;
+
+      baseRows.forEach(row => {
+        const type = row.querySelector('.event-type').value;
+        const bias = row.querySelector('.event-bias').value;
+        if (type === 'Geopolitics') geopoliticalSelected = true;
+
+        if (bias === 'bullish') {
+          netWeight += 1;
+          activeEventsCount++;
+        } else if (bias === 'bearish') {
+          netWeight -= 1;
+          activeEventsCount++;
+        }
+      });
+
+      quoteRows.forEach(row => {
+        const type = row.querySelector('.event-type').value;
+        const bias = row.querySelector('.event-bias').value;
+        if (type === 'Geopolitics') geopoliticalSelected = true;
+
+        if (bias === 'bullish') {
+          netWeight -= 1; 
+          activeEventsCount++;
+        } else if (bias === 'bearish') {
+          netWeight += 1; 
+          activeEventsCount++;
+        }
+      });
+
+      currentCalculatedWeight = netWeight;
+      document.getElementById('net-calendar-weight').textContent = (netWeight > 0 ? '+' : '') + netWeight;
+
+      if (geopoliticalSelected) {
+        consensusBadge.className = "text-xxs bg-amber-950 text-amber-400 px-1.5 py-0.5 rounded font-semibold border border-amber-800 transition";
+        consensusBadge.textContent = "⚠️ High Risk Regime (Geopolitical Focus)";
+      } else {
+        consensusBadge.className = "text-xxs bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded font-semibold border border-gray-700 transition";
+        consensusBadge.textContent = "Normal Consensus Range";
+      }
+
+      if (activeEventsCount === 0 || netWeight === 0) {
+        decisionStatus.textContent = 'NO BIAS';
+        decisionStatus.className = 'text-xl font-black mt-1 text-gray-500';
+        decisionReason.textContent = 'Add/Assign Event Direction to generate active pair bias.';
+        decisionPanel.className = "p-4 rounded-xl border flex flex-col items-center justify-center w-full sm:w-64 bg-gray-900 border-gray-800";
+        currentCalculatedDirection = 'none';
+        return;
+      }
+
+      const step1Direction = netWeight > 0 ? 'buy' : 'sell';
+      currentCalculatedDirection = step1Direction;
+
+      let matchCount = 0;
+      for (let i = 2; i <= 6; i++) {
+        if (state[`p${i}`] === step1Direction) {
+          matchCount++;
+        }
+      }
+
+      if (matchCount >= 2) {
+        decisionStatus.textContent = `TRADE APPROVED (${step1Direction.toUpperCase()})`;
+        decisionStatus.className = 'text-lg font-black mt-1 text-emerald-400 text-center';
+        decisionReason.textContent = `Net Weight: ${netWeight > 0 ? '+' : ''}${netWeight}. Matched with ${matchCount}/5 supporting pillars.`;
+        decisionPanel.className = "p-4 rounded-xl border flex flex-col items-center justify-center w-full sm:w-64 bg-emerald-950/20 border-emerald-900";
+      } else {
+        decisionStatus.textContent = 'NO TRADE';
+        decisionStatus.className = 'text-xl font-black mt-1 text-yellow-500';
+        decisionReason.textContent = `Directional consensus exists, but lacks enough pillars (${matchCount}/5).`;
+        decisionPanel.className = "p-4 rounded-xl border flex flex-col items-center justify-center w-full sm:w-64 bg-yellow-950/20 border-yellow-900";
+      }
+    }
+
+    // --- POPULATES THE PRINT LAYOUT WITH DATA ---
+    function prepareAndPrint() {
+      const baseCurr = document.getElementById('base-currency-select').value;
+      const quoteCurr = document.getElementById('quote-currency-select').value;
+
+      // 1. Header Metadata
+      document.getElementById('print-target-pair').textContent = `${baseCurr}/${quoteCurr}`;
+      document.getElementById('print-date').textContent = new Date().toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+
+      // 2. Main Executive Decision Box
+      const decPanelColor = document.getElementById('print-exec-callout');
+      const decText = document.getElementById('decision-status').textContent;
+      const decReason = document.getElementById('decision-reason').textContent;
+      
+      document.getElementById('print-decision').textContent = decText;
+      document.getElementById('print-reason').textContent = decReason;
+      document.getElementById('print-net-weight').textContent = (currentCalculatedWeight > 0 ? '+' : '') + currentCalculatedWeight;
+
+      if (decText.includes("APPROVED")) {
+        decPanelColor.className = "border-2 border-emerald-900 p-5 mb-8 bg-emerald-50/50 flex flex-col md:flex-row justify-between items-center gap-4";
+      } else {
+        decPanelColor.className = "border-2 border-amber-900 p-5 mb-8 bg-amber-50/50 flex flex-col md:flex-row justify-between items-center gap-4";
+      }
+
+      // 3. Populate Note Passages (Clean paragraphs)
+      const valText = document.getElementById('web-note-valuation').value.trim();
+      const cbText = document.getElementById('web-note-cb').value.trim();
+      const geoText = document.getElementById('web-note-geo').value.trim();
+
+      document.getElementById('print-note-valuation').textContent = valText || "No active valuation deviations or yield gaps reported for the week.";
+      document.getElementById('print-note-cb').textContent = cbText || "Monetary policy trajectory remains aligned with general consensus baselines.";
+      document.getElementById('print-note-geo').textContent = geoText || "No major geopolitical catalysts active.";
+
+      // 4. Populate Base Events Column
+      document.getElementById('print-base-title').textContent = `${baseCurr} Catalyst Matrix (Base)`;
+      const baseEventsDiv = document.getElementById('print-base-events');
+      baseEventsDiv.innerHTML = '';
+      
+      const baseRows = document.querySelectorAll('.base-event-row');
+      if (baseRows.length === 0) {
+        baseEventsDiv.innerHTML = '<p class="text-slate-400 italic">No scheduled macro events registered.</p>';
+      } else {
+        baseRows.forEach(row => {
+          const type = row.querySelector('.event-type').value;
+          const bias = row.querySelector('.event-bias').value;
+          const note = row.querySelector('.event-note').value;
+          if (type !== 'none') {
+            const biasSymbol = bias === 'bullish' ? '🟢 Bullish' : (bias === 'bearish' ? '🔴 Bearish' : '— Neutral');
+            baseEventsDiv.innerHTML += `
+              <div class="border-l-2 border-slate-300 pl-2 py-1">
+                <span class="font-bold text-slate-900">${type}</span> — <span class="font-semibold">${biasSymbol}</span>
+                ${note ? `<p class="text-slate-500 text-[11px] mt-0.5">${note}</p>` : ''}
+              </div>
+            `;
+          }
+        });
+      }
+
+      // 5. Populate Quote Events Column
+      document.getElementById('print-quote-title').textContent = `${quoteCurr} Catalyst Matrix (Quote)`;
+      const quoteEventsDiv = document.getElementById('print-quote-events');
+      quoteEventsDiv.innerHTML = '';
+      
+      const quoteRows = document.querySelectorAll('.quote-event-row');
+      if (quoteRows.length === 0) {
+        quoteEventsDiv.innerHTML = '<p class="text-slate-400 italic">No scheduled macro events registered.</p>';
+      } else {
+        quoteRows.forEach(row => {
+          const type = row.querySelector('.event-type').value;
+          const bias = row.querySelector('.event-bias').value;
+          const note = row.querySelector('.event-note').value;
+          if (type !== 'none') {
+            const biasSymbol = bias === 'bullish' ? '🟢 Bullish' : (bias === 'bearish' ? '🔴 Bearish' : '— Neutral');
+            quoteEventsDiv.innerHTML += `
+              <div class="border-l-2 border-slate-300 pl-2 py-1">
+                <span class="font-bold text-slate-900">${type}</span> — <span class="font-semibold">${biasSymbol}</span>
+                ${note ? `<p class="text-slate-500 text-[11px] mt-0.5">${note}</p>` : ''}
+              </div>
+            `;
+          }
+        });
+      }
+
+      // 6. Populate Scorecard Table Pillars
+      const tableBody = document.getElementById('print-pillars-body');
+      tableBody.innerHTML = '';
+
+      const pillarDefinitions = [
+        { id: 2, title: 'Retail Sentiment (SSI)' },
+        { id: 3, title: 'Valuation Model' },
+        { id: 4, title: 'VIX, Oil, Gold (Risk Environment)' },
+        { id: 5, title: 'Central Bank Divergences' },
+        { id: 6, title: 'Consensus Bounds (Limits / L.E.)' }
+      ];
+
+      pillarDefinitions.forEach(p => {
+        let alignText = '— Neutral';
+        let cellClass = 'text-slate-500';
+        
+        if (state[`p${p.id}`] === 'buy') {
+          alignText = '🟢 Supports Buy';
+          cellClass = 'text-emerald-700 font-bold';
+        } else if (state[`p${p.id}`] === 'sell') {
+          alignText = '🔴 Supports Sell';
+          cellClass = 'text-red-700 font-bold';
+        }
+
+        let extraDetails = '';
+        if (p.id === 6) {
+          const eventSel = document.getElementById('p6-event-select').value;
+          const lowVal = document.getElementById('p6-low').value;
+          const highVal = document.getElementById('p6-high').value;
+          if (eventSel !== 'none' || lowVal || highVal) {
+            extraDetails = `<div class="text-[10px] text-slate-400 mt-0.5">${eventSel !== 'none' ? eventSel : 'Target'} Boundaries: Low Limit [${lowVal || '—'}] / High Limit [${highVal || '—'}]</div>`;
+          }
+        }
+
+        tableBody.innerHTML += `
+          <tr>
+            <td class="py-2 text-slate-900 font-semibold">${p.title} ${extraDetails}</td>
+            <td class="py-2 text-right ${cellClass}">${alignText}</td>
+          </tr>
+        `;
+      });
+
+      // 7. Fire Print Driver
+      window.print();
+    }
+
+    function resetDashboard() {
+      if (confirm('Do you want to reset this scorecard? All dynamic events and global notes will be cleared.')) {
+        document.getElementById('base-currency-select').value = 'EUR';
+        document.getElementById('quote-currency-select').value = 'AUD';
+        document.getElementById('p6-event-select').value = 'none';
+        document.getElementById('p6-low').value = '';
+        document.getElementById('p6-high').value = '';
+        
+        document.getElementById('web-note-valuation').value = '';
+        document.getElementById('web-note-cb').value = '';
+        document.getElementById('web-note-geo').value = '';
+
+        document.getElementById('base-events-list').innerHTML = '';
+        document.getElementById('quote-events-list').innerHTML = '';
+        
+        for (let i = 2; i <= 6; i++) {
+          togglePillar(i, 'neutral');
+        }
+
+        updateCurrencyLabels();
+        addNewEventRow('base');
+        addNewEventRow('quote');
+      }
+    }
+  </script>
+</body>
+</html>
