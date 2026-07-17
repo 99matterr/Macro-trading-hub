@@ -35,10 +35,9 @@
         </div>
     </div>
 
-    <!-- 3. HERO SECTION (Adjusted padding to pull the title upward) -->
+    <!-- 3. HERO SECTION -->
     <div class="relative w-full pt-8 pb-14 sm:pt-10 sm:pb-16 overflow-hidden border-b border-zinc-900/50">
         <img src="hero-dashboard.jpg" alt="" class="absolute inset-0 w-full h-full object-cover object-center opacity-35" />
-        <!-- Re-balanced gradient to match the closer text positioning -->
         <div class="absolute inset-0 bg-gradient-to-t from-[#020203] via-[#020203]/40 to-transparent backdrop-blur-[3px]"></div>
 
         <div class="relative w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
@@ -54,8 +53,32 @@
         </div>
     </div>
 
-    <!-- 4. STREAMLINED CONTENT BODY -->
+    <!-- 4. MAIN CONTENT BODY -->
     <main class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        
+        <!-- NEW MODULE: Functional Tools Notification Banner -->
+        <section class="bg-[#040406] border border-cyan-950 rounded-xl p-4 sm:p-5 font-mono text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_0_20px_rgba(6,182,212,0.03)]">
+            <div class="flex items-start gap-3.5">
+                <!-- Pulsing Online Engine Light -->
+                <span class="relative flex h-2 w-2 mt-1 shrink-0">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <div class="space-y-0.5">
+                    <span class="text-[9px] text-emerald-400 font-bold block tracking-widest uppercase">// INFRASTRUCTURE NOTICE</span>
+                    <div class="text-white font-bold tracking-wide uppercase text-[11px]">Proprietary Tools Interface Online</div>
+                    <p class="text-zinc-400 font-sans text-xs pt-0.5 max-w-xl">
+                        The quantitative analytics suite is fully operational. Terminal access parameters have cleared verification protocols. 
+                    </p>
+                </div>
+            </div>
+            <!-- Functional Link Button -->
+            <a href="tools.html" class="bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-cyan-400 hover:border-cyan-500/40 transition-all text-center rounded-lg px-4 py-2 text-[11px] font-bold tracking-wider uppercase whitespace-nowrap sm:self-center">
+                Access Tools Terminal &rarr;
+            </a>
+        </section>
+
+        <!-- Focus Channels Module -->
         <section class="bg-[#040406] border border-zinc-900 rounded-xl p-6 font-mono text-xs space-y-5">
             <div class="space-y-2">
                 <span class="text-[9px] text-zinc-600 block tracking-widest uppercase">// CURRENT CYCLE FOCUS CHANNELS</span>
