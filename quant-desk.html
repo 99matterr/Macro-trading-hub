@@ -111,15 +111,15 @@
                     
                     <div>
                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Global Valuation Deviations</label>
-                        <textarea id="web-note-valuation" class="w-full bg-[#020203] border border-zinc-900 rounded-lg p-2.5 text-xs text-zinc-300 focus:outline-none focus:border-cyan-500/50 h-24 font-mono transition" placeholder="Log weekly cross-asset yield gap discrepancies..."></textarea>
+                        <textarea id="web-note-valuation" oninput="saveToLocalStorage()" class="w-full bg-[#020203] border border-zinc-900 rounded-lg p-2.5 text-xs text-zinc-300 focus:outline-none focus:border-cyan-500/50 h-24 font-mono transition" placeholder="Log weekly cross-asset yield gap discrepancies..."></textarea>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Monetary Policy Parameters</label>
-                        <textarea id="web-note-cb" class="w-full bg-[#020203] border border-zinc-900 rounded-lg p-2.5 text-xs text-zinc-300 focus:outline-none focus:border-cyan-500/50 h-24 font-mono transition" placeholder="Record rate projections & policy trajectories..."></textarea>
+                        <textarea id="web-note-cb" oninput="saveToLocalStorage()" class="w-full bg-[#020203] border border-zinc-900 rounded-lg p-2.5 text-xs text-zinc-300 focus:outline-none focus:border-cyan-500/50 h-24 font-mono transition" placeholder="Record rate projections & policy trajectories..."></textarea>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Geopolitical Hazards</label>
-                        <textarea id="web-note-geo" class="w-full bg-[#020203] border border-zinc-900 rounded-lg p-2.5 text-xs text-zinc-300 focus:outline-none focus:border-cyan-500/50 h-24 font-mono transition" placeholder="Monitor safe-haven structural shifts & conflicts..."></textarea>
+                        <textarea id="web-note-geo" oninput="saveToLocalStorage()" class="w-full bg-[#020203] border border-zinc-900 rounded-lg p-2.5 text-xs text-zinc-300 focus:outline-none focus:border-cyan-500/50 h-24 font-mono transition" placeholder="Monitor safe-haven structural shifts & conflicts..."></textarea>
                     </div>
                 </div>
             </section>
@@ -283,7 +283,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3 w-full">
                                     <div>
                                         <label class="block text-[8px] font-bold text-zinc-500 uppercase mb-1">Consensus Event</label>
-                                        <select id="p6-event-select" class="w-full bg-[#020203] border border-zinc-900 text-[10px] p-2 rounded text-zinc-300 focus:outline-none focus:border-cyan-500/50 cursor-pointer">
+                                        <select id="p6-event-select" onchange="saveToLocalStorage()" class="w-full bg-[#020203] border border-zinc-900 text-[10px] p-2 rounded text-zinc-300 focus:outline-none focus:border-cyan-500/50 cursor-pointer">
                                             <option value="none">-- SELECT TRIGGER --</option>
                                             <optgroup label="Inflation & Prices" class="bg-[#020203]">
                                                 <option value="CPI">CPI / PCE Inflation</option>
@@ -315,11 +315,11 @@
                                     </div>
                                     <div>
                                         <label class="block text-[8px] font-bold text-zinc-500 uppercase mb-1">Limit Low (Min)</label>
-                                        <input type="text" id="p6-low" placeholder="e.g. -0.2%" class="w-full bg-[#020203] border border-zinc-900 rounded p-2 text-[10px] focus:outline-none focus:border-cyan-500/50 text-white">
+                                        <input type="text" id="p6-low" oninput="saveToLocalStorage()" placeholder="e.g. -0.2%" class="w-full bg-[#020203] border border-zinc-900 rounded p-2 text-[10px] focus:outline-none focus:border-cyan-500/50 text-white">
                                     </div>
                                     <div>
                                         <label class="block text-[8px] font-bold text-zinc-500 uppercase mb-1">Limit High (Max)</label>
-                                        <input type="text" id="p6-high" placeholder="e.g. +0.4%" class="w-full bg-[#020203] border border-zinc-900 rounded p-2 text-[10px] focus:outline-none focus:border-cyan-500/50 text-white">
+                                        <input type="text" id="p6-high" oninput="saveToLocalStorage()" placeholder="e.g. +0.4%" class="w-full bg-[#020203] border border-zinc-900 rounded p-2 text-[10px] focus:outline-none focus:border-cyan-500/50 text-white">
                                     </div>
                                 </div>
                             </div>
@@ -451,10 +451,106 @@
         };
 
         window.addEventListener('DOMContentLoaded', () => {
-            updateCurrencyLabels();
-            addNewEventRow('base');
-            addNewEventRow('quote');
+            loadFromLocalStorage();
         });
+
+        // --- LOCAL STORAGE DATA PERSISTENCE SYSTEMS ---
+        function saveToLocalStorage() {
+            const data = {
+                baseCurrency: document.getElementById('base-currency-select').value,
+                quoteCurrency: document.getElementById('quote-currency-select').value,
+                noteValuation: document.getElementById('web-note-valuation').value,
+                noteCB: document.getElementById('web-note-cb').value,
+                noteGeo: document.getElementById('web-note-geo').value,
+                p6Event: document.getElementById('p6-event-select').value,
+                p6Low: document.getElementById('p6-low').value,
+                p6High: document.getElementById('p6-high').value,
+                state: state,
+                baseEvents: [],
+                quoteEvents: []
+            };
+
+            document.querySelectorAll('.base-event-row').forEach(row => {
+                const typeEl = row.querySelector('.event-type');
+                const biasEl = row.querySelector('.event-bias');
+                const noteEl = row.querySelector('.event-note');
+                if (typeEl && biasEl && noteEl) {
+                    data.baseEvents.push({
+                        type: typeEl.value,
+                        bias: biasEl.value,
+                        note: noteEl.value
+                    });
+                }
+            });
+
+            document.querySelectorAll('.quote-event-row').forEach(row => {
+                const typeEl = row.querySelector('.event-type');
+                const biasEl = row.querySelector('.event-bias');
+                const noteEl = row.querySelector('.event-note');
+                if (typeEl && biasEl && noteEl) {
+                    data.quoteEvents.push({
+                        type: typeEl.value,
+                        bias: biasEl.value,
+                        note: noteEl.value
+                    });
+                }
+            });
+
+            localStorage.setItem('kairos_sentiment_definer_data', JSON.stringify(data));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('kairos_sentiment_definer_data');
+            if (!saved) {
+                // Load default empty workspace rows
+                updateCurrencyLabels();
+                addNewEventRow('base');
+                addNewEventRow('quote');
+                return;
+            }
+
+            const data = JSON.parse(saved);
+
+            document.getElementById('base-currency-select').value = data.baseCurrency || 'EUR';
+            document.getElementById('quote-currency-select').value = data.quoteCurrency || 'AUD';
+            document.getElementById('web-note-valuation').value = data.noteValuation || '';
+            document.getElementById('web-note-cb').value = data.noteCB || '';
+            document.getElementById('web-note-geo').value = data.noteGeo || '';
+            document.getElementById('p6-event-select').value = data.p6Event || 'none';
+            document.getElementById('p6-low').value = data.p6Low || '';
+            document.getElementById('p6-high').value = data.p6High || '';
+
+            // Restore scorecard pillars silently (prevent looping autosave calls during load)
+            if (data.state) {
+                for (let i = 2; i <= 6; i++) {
+                    if (data.state[`p${i}`]) {
+                        togglePillar(i, data.state[`p${i}`], false);
+                    }
+                }
+            }
+
+            document.getElementById('base-events-list').innerHTML = '';
+            document.getElementById('quote-events-list').innerHTML = '';
+
+            if (data.baseEvents && data.baseEvents.length > 0) {
+                data.baseEvents.forEach(evt => {
+                    addNewEventRow('base', evt.type, evt.bias, evt.note);
+                });
+            } else {
+                addNewEventRow('base');
+            }
+
+            if (data.quoteEvents && data.quoteEvents.length > 0) {
+                data.quoteEvents.forEach(evt => {
+                    addNewEventRow('quote', evt.type, evt.bias, evt.note);
+                });
+            } else {
+                addNewEventRow('quote');
+            }
+
+            updateCurrencyLabels();
+            calculateLogic(false);
+        }
 
         function updateCurrencyLabels() {
             const base = document.getElementById('base-currency-select').value;
@@ -467,7 +563,7 @@
         }
 
         let rowCounter = 0;
-        function addNewEventRow(side) {
+        function addNewEventRow(side, optType = 'none', optBias = 'none', optNote = '') {
             rowCounter++;
             const containerId = side === 'base' ? 'base-events-list' : 'quote-events-list';
             const container = document.getElementById(containerId);
@@ -481,41 +577,41 @@
                     <select onchange="handleRowChange(${rowCounter})" class="event-type flex-grow bg-[#040406] border border-zinc-900 text-[10px] p-1.5 rounded text-zinc-300 focus:outline-none focus:border-cyan-500/50 cursor-pointer min-w-0 font-mono">
                         <option value="none">-- SELECT EVENT --</option>
                         <optgroup label="Inflation & Prices" class="bg-[#020203]">
-                            <option value="Inflation">Inflation (CPI/PCE)</option>
-                            <option value="PPI">PPI (Producer Inflation)</option>
+                            <option value="Inflation" ${optType === 'Inflation' ? 'selected' : ''}>Inflation (CPI/PCE)</option>
+                            <option value="PPI" ${optType === 'PPI' ? 'selected' : ''}>PPI (Producer Inflation)</option>
                         </optgroup>
                         <optgroup label="Labor Market" class="bg-[#020203]">
-                            <option value="Employment">Employment (NFP/UR)</option>
-                            <option value="Jobless Claims">Jobless Claims (Weekly)</option>
-                            <option value="JOLTs">JOLTs (Job Openings)</option>
-                            <option value="Wages">Wages & Earnings (GBP/EUR)</option>
+                            <option value="Employment" ${optType === 'Employment' ? 'selected' : ''}>Employment (NFP/UR)</option>
+                            <option value="Jobless Claims" ${optType === 'Jobless Claims' ? 'selected' : ''}>Jobless Claims (Weekly)</option>
+                            <option value="JOLTs" ${optType === 'JOLTs' ? 'selected' : ''}>JOLTs (Job Openings)</option>
+                            <option value="Wages" ${optType === 'Wages' ? 'selected' : ''}>Wages & Earnings (GBP/EUR)</option>
                         </optgroup>
                         <optgroup label="Economic Activity" class="bg-[#020203]">
-                            <option value="GDP">GDP (Growth Rate)</option>
-                            <option value="PMIs">PMIs (Mfg/Services)</option>
-                            <option value="PMI Flash">PMI (Flash/Prelim)</option>
-                            <option value="Retail Sales">Retail Sales</option>
-                            <option value="Industrial Production">Industrial Prod.</option>
-                            <option value="Trade Balance">Trade Balance</option>
-                            <option value="Consumer Sentiment">Consumer Sentiment / Sentix</option>
+                            <option value="GDP" ${optType === 'GDP' ? 'selected' : ''}>GDP (Growth Rate)</option>
+                            <option value="PMIs" ${optType === 'PMIs' ? 'selected' : ''}>PMIs (Mfg/Services)</option>
+                            <option value="PMI Flash" ${optType === 'PMI Flash' ? 'selected' : ''}>PMI (Flash/Prelim)</option>
+                            <option value="Retail Sales" ${optType === 'Retail Sales' ? 'selected' : ''}>Retail Sales</option>
+                            <option value="Industrial Production" ${optType === 'Industrial Production' ? 'selected' : ''}>Industrial Prod.</option>
+                            <option value="Trade Balance" ${optType === 'Trade Balance' ? 'selected' : ''}>Trade Balance</option>
+                            <option value="Consumer Sentiment" ${optType === 'Consumer Sentiment' ? 'selected' : ''}>Consumer Sentiment / Sentix</option>
                         </optgroup>
                         <optgroup label="Central Banks" class="bg-[#020203]">
-                            <option value="CB Press">C.B. Decisions / Press Conf</option>
-                            <option value="Central Bank">Central Bank Minutes</option>
+                            <option value="CB Press" ${optType === 'CB Press' ? 'selected' : ''}>C.B. Decisions / Press Conf</option>
+                            <option value="Central Bank" ${optType === 'Central Bank' ? 'selected' : ''}>Central Bank Minutes</option>
                         </optgroup>
                         <optgroup label="Currency-Specific / Commodities" class="bg-[#020203]">
-                            <option value="Oil Inventories">OPEC / Oil Inventory (CAD)</option>
-                            <option value="GDT Auction">GDT Dairy Auction (NZD)</option>
+                            <option value="Oil Inventories" ${optType === 'Oil Inventories' ? 'selected' : ''}>OPEC / Oil Inventory (CAD)</option>
+                            <option value="GDT Auction" ${optType === 'GDT Auction' ? 'selected' : ''}>GDT Dairy Auction (NZD)</option>
                         </optgroup>
                         <optgroup label="Risk & Tail Hazards" class="bg-[#020203]">
-                            <option value="Geopolitics">Geopolitics / War Risk</option>
+                            <option value="Geopolitics" ${optType === 'Geopolitics' ? 'selected' : ''}>Geopolitics / War Risk</option>
                         </optgroup>
                     </select>
 
                     <select onchange="calculateLogic()" class="event-bias w-24 shrink-0 bg-[#040406] border border-zinc-900 text-[10px] p-1.5 rounded text-zinc-300 focus:outline-none focus:border-cyan-500/50 font-bold cursor-pointer font-mono">
                         <option value="none">-- BIAS --</option>
-                        <option value="bullish" class="text-cyan-400">🟢 BULLISH</option>
-                        <option value="bearish" class="text-rose-400">🔴 BEARISH</option>
+                        <option value="bullish" ${optBias === 'bullish' ? 'selected' : ''}>🟢 BULLISH</option>
+                        <option value="bearish" ${optBias === 'bearish' ? 'selected' : ''}>🔴 BEARISH</option>
                     </select>
 
                     <button type="button" onclick="deleteEventRow(${rowCounter})" class="text-zinc-600 hover:text-rose-500 text-xs px-1 font-bold shrink-0 transition">
@@ -524,11 +620,12 @@
                 </div>
 
                 <div>
-                    <input type="text" id="note-input-${rowCounter}" class="event-note w-full bg-[#040406] border border-zinc-900 text-[10px] p-1.5 rounded text-zinc-300 focus:outline-none focus:border-cyan-500/50 font-mono" placeholder="Consensus targets, metrics, notes...">
+                    <input type="text" id="note-input-${rowCounter}" value="${optNote}" oninput="saveToLocalStorage()" class="event-note w-full bg-[#040406] border border-zinc-900 text-[10px] p-1.5 rounded text-zinc-300 focus:outline-none focus:border-cyan-500/50 font-mono" placeholder="Consensus targets, metrics, notes...">
                 </div>
             `;
             
             container.appendChild(row);
+            handleRowChange(rowCounter);
             calculateLogic();
         }
 
@@ -555,7 +652,7 @@
             calculateLogic();
         }
 
-        function togglePillar(pillarNum, status) {
+        function togglePillar(pillarNum, status, autoSave = true) {
             state[`p${pillarNum}`] = status;
 
             const buttons = ['buy', 'sell', 'neutral'];
@@ -570,13 +667,13 @@
             if (status === 'sell') activeEl.classList.add('active-sell');
             if (status === 'neutral') activeEl.classList.add('active-neutral');
 
-            calculateLogic();
+            calculateLogic(autoSave);
         }
 
         let currentCalculatedWeight = 0;
         let currentCalculatedDirection = 'none';
 
-        function calculateLogic() {
+        function calculateLogic(autoSave = true) {
             const base = document.getElementById('base-currency-select').value;
             const quote = document.getElementById('quote-currency-select').value;
             const decisionPanel = document.getElementById('decision-panel');
@@ -636,6 +733,7 @@
                 decisionReason.textContent = 'Log a baseline event driver first.';
                 decisionPanel.className = "p-4 rounded-xl border flex flex-col items-center justify-center w-full sm:w-64 bg-[#020203] border-zinc-900";
                 currentCalculatedDirection = 'none';
+                if (autoSave) saveToLocalStorage();
                 return;
             }
 
@@ -659,6 +757,10 @@
                 decisionStatus.className = 'text-md font-black mt-1 text-rose-400 font-mono tracking-wider';
                 decisionReason.textContent = `Catalyst lacks sufficient supporting scorecard parameters (${matchCount}/5).`;
                 decisionPanel.className = "p-4 rounded-xl border flex flex-col items-center justify-center w-full sm:w-64 bg-rose-950/10 border-rose-500/30";
+            }
+
+            if (autoSave) {
+                saveToLocalStorage();
             }
         }
 
@@ -787,7 +889,10 @@
         }
 
         function resetDashboard() {
-            if (confirm('Reboot quantamental workspace? All active models, logged events, and Sunday notes will be wiped.')) {
+            if (confirm('Reboot Currency Sentiment Definer? All saved cache data will be wiped.')) {
+                // Clear the Cache from the Browser
+                localStorage.removeItem('kairos_sentiment_definer_data');
+
                 document.getElementById('base-currency-select').value = 'EUR';
                 document.getElementById('quote-currency-select').value = 'AUD';
                 document.getElementById('p6-event-select').value = 'none';
@@ -802,7 +907,7 @@
                 document.getElementById('quote-events-list').innerHTML = '';
                 
                 for (let i = 2; i <= 6; i++) {
-                    togglePillar(i, 'neutral');
+                    togglePillar(i, 'neutral', false);
                 }
 
                 updateCurrencyLabels();
