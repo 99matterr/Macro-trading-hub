@@ -285,12 +285,32 @@
                                         <label class="block text-[8px] font-bold text-zinc-500 uppercase mb-1">Consensus Event</label>
                                         <select id="p6-event-select" class="w-full bg-[#020203] border border-zinc-900 text-[10px] p-2 rounded text-zinc-300 focus:outline-none focus:border-cyan-500/50 cursor-pointer">
                                             <option value="none">-- SELECT TRIGGER --</option>
-                                            <option value="CPI">CPI / PCE Inflation</option>
-                                            <option value="NFP">NFP / Employment</option>
-                                            <option value="Retail Sales">Retail Sales</option>
-                                            <option value="PMIs">PMIs</option>
-                                            <option value="GDP">GDP Growth</option>
-                                            <option value="Central Bank">CB Decision/Minutes</option>
+                                            <optgroup label="Inflation & Prices" class="bg-[#020203]">
+                                                <option value="CPI">CPI / PCE Inflation</option>
+                                                <option value="PPI">PPI (Producer Inflation)</option>
+                                            </optgroup>
+                                            <optgroup label="Labor Market" class="bg-[#020203]">
+                                                <option value="NFP">NFP / Employment</option>
+                                                <option value="Jobless Claims">Jobless Claims (Weekly)</option>
+                                                <option value="JOLTs">JOLTs (Job Openings)</option>
+                                                <option value="Wages">Wages & Earnings</option>
+                                            </optgroup>
+                                            <optgroup label="Economic Activity" class="bg-[#020203]">
+                                                <option value="GDP">GDP Growth</option>
+                                                <option value="PMIs">PMIs (Mfg/Services)</option>
+                                                <option value="PMI Flash">PMI (Flash/Prelim)</option>
+                                                <option value="Retail Sales">Retail Sales</option>
+                                                <option value="Trade Balance">Trade Balance</option>
+                                                <option value="Consumer Sentiment">Consumer Sentiment / Sentix</option>
+                                            </optgroup>
+                                            <optgroup label="Central Banks" class="bg-[#020203]">
+                                                <option value="CB Decisions">C.B. Decisions / Press Conf</option>
+                                                <option value="Central Bank">Central Bank Minutes</option>
+                                            </optgroup>
+                                            <optgroup label="Specific Commodities" class="bg-[#020203]">
+                                                <option value="Oil Inventories">OPEC / Oil Inventory (CAD)</option>
+                                                <option value="GDT Auction">GDT Dairy Auction (NZD)</option>
+                                            </optgroup>
                                         </select>
                                     </div>
                                     <div>
@@ -417,6 +437,7 @@
         </div>
     </div>
 
+    <div id="global-footer"></div>
     <script src="inject-engine.js"></script>
     
     <!-- JavaScript Application Logic -->
@@ -459,13 +480,36 @@
                 <div class="flex items-center gap-2">
                     <select onchange="handleRowChange(${rowCounter})" class="event-type flex-grow bg-[#040406] border border-zinc-900 text-[10px] p-1.5 rounded text-zinc-300 focus:outline-none focus:border-cyan-500/50 cursor-pointer min-w-0 font-mono">
                         <option value="none">-- SELECT EVENT --</option>
-                        <option value="Inflation">Inflation (CPI/PCE)</option>
-                        <option value="Employment">Employment (NFP/UR)</option>
-                        <option value="PMIs">PMIs (Mfg/Services)</option>
-                        <option value="Retail Sales">Retail Sales</option>
-                        <option value="Industrial Production">Industrial Prod.</option>
-                        <option value="Central Bank">Central Bank Minutes</option>
-                        <option value="Geopolitics">Geopolitics / War Risk</option>
+                        <optgroup label="Inflation & Prices" class="bg-[#020203]">
+                            <option value="Inflation">Inflation (CPI/PCE)</option>
+                            <option value="PPI">PPI (Producer Inflation)</option>
+                        </optgroup>
+                        <optgroup label="Labor Market" class="bg-[#020203]">
+                            <option value="Employment">Employment (NFP/UR)</option>
+                            <option value="Jobless Claims">Jobless Claims (Weekly)</option>
+                            <option value="JOLTs">JOLTs (Job Openings)</option>
+                            <option value="Wages">Wages & Earnings (GBP/EUR)</option>
+                        </optgroup>
+                        <optgroup label="Economic Activity" class="bg-[#020203]">
+                            <option value="GDP">GDP (Growth Rate)</option>
+                            <option value="PMIs">PMIs (Mfg/Services)</option>
+                            <option value="PMI Flash">PMI (Flash/Prelim)</option>
+                            <option value="Retail Sales">Retail Sales</option>
+                            <option value="Industrial Production">Industrial Prod.</option>
+                            <option value="Trade Balance">Trade Balance</option>
+                            <option value="Consumer Sentiment">Consumer Sentiment / Sentix</option>
+                        </optgroup>
+                        <optgroup label="Central Banks" class="bg-[#020203]">
+                            <option value="CB Press">C.B. Decisions / Press Conf</option>
+                            <option value="Central Bank">Central Bank Minutes</option>
+                        </optgroup>
+                        <optgroup label="Currency-Specific / Commodities" class="bg-[#020203]">
+                            <option value="Oil Inventories">OPEC / Oil Inventory (CAD)</option>
+                            <option value="GDT Auction">GDT Dairy Auction (NZD)</option>
+                        </optgroup>
+                        <optgroup label="Risk & Tail Hazards" class="bg-[#020203]">
+                            <option value="Geopolitics">Geopolitics / War Risk</option>
+                        </optgroup>
                     </select>
 
                     <select onchange="calculateLogic()" class="event-bias w-24 shrink-0 bg-[#040406] border border-zinc-900 text-[10px] p-1.5 rounded text-zinc-300 focus:outline-none focus:border-cyan-500/50 font-bold cursor-pointer font-mono">
