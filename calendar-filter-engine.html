@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Excel Institutional Risk Report Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SheetJS Engine for Excel Parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; padding: 0 !important; margin: 0 !important; }
+      .page-break { page-break-before: always; }
+      .report-card { border: none !important; box-shadow: none !important; padding: 0 !important; }
+    }
+    .badge-USD { background-color: #D9E1F2; color: #1E293B; }
+    .badge-EUR { background-color: #FFF2CC; color: #1E293B; }
+    .badge-GBP { background-color: #E2EFDA; color: #1E293B; }
+    .badge-JPY { background-color: #FCE4D6; color: #1E293B; }
+    .badge-CAD { background-color: #E1D5E7; color: #1E293B; }
+    .badge-AUD { background-color: #D5E8D4; color: #1E293B; }
+    .badge-NZD { background-color: #DAE8FC; color: #1E293B; }
+    .badge-CHF { background-color: #F8CECC; color: #1E293B; }
+    .badge-CNH, .badge-CNY { background-color: #FFE6CC; color: #1E293B; }
+    .badge-DEFAULT { background-color: #E2E8F0; color: #1E293B; }
+  </style>
+</head>
+<body class="bg-slate-900 min-h-screen text-slate-800 font-sans p-4 md:p-8">
+
+  <div class="max-w-5xl mx-auto space-y-4 no-print">
+    <!-- Header -->
+    <div class="bg-slate-800 text-white p-6 rounded-xl border border-slate-700 shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
+      <div>
+        <h1 class="text-xl font-bold tracking-tight">Excel Risk Report Engine</h1>
+        <p class="text-slate-400 text-xs">Upload Excel (.xlsx) spreadsheets from iPad/PC to build reports</p>
+      </div>
+      <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2.5 rounded-lg font-semibold shadow transition">
+        Print / Save PDF
+      </button>
+    </div>
+
+    <!-- Drop Zone for .xlsx files -->
+    <div id="dropZone" class="bg-slate-800/80 border-2 border-dashed border-slate-600 hover:border-blue-500 rounded-xl p-8 text-center transition cursor-pointer">
+      <input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event)" />
+      <div class="space-y-2">
+        <svg class="mx-auto h-10 w-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <div class="text-sm font-medium text-slate-200">
+          Drop your <span class="text-blue-400">Excel (.xlsx) file here</span>, or click to browse
+        </div>
+        <p class="text-xs text-slate-400">Directly supports files exported from iPad Google Sheets</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Output Area -->
+  <div class="max-w-5xl mx-auto my-6">
+    <div id="outputContainer">
+      <div id="placeholder" class="bg-slate-800 text-slate-400 text-center py-16 rounded-xl border border-slate-700 no-print">
+        Upload your <strong>.xlsx</strong> file above to generate Spanish & English reports.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WHITELIST = {
+      UNIVERSAL: ['interest rate decision', 'monetary policy statement', 'press conference', 'meeting minutes', 'speaks', 'speech', 'president speaks'],
+      USD: ['nfp', 'nonfarm payrolls', 'adp', 'unemployment rate', 'average hourly earnings', 'jobless claims', 'cpi', 'pce', 'ppi', 'gdp', 'ism', 'pmi', 'industrial production', 'retail sales', 'consumer sentiment', 'building permits', 'home sales', 'trade balance'],
+      CAD: ['monetary policy report', 'cpi', 'ppi', 'ippi', 'gdp', 'employment change', 'unemployment rate', 'retail sales', 'trade balance', 'ivey pmi'],
+      EUR: ['cpi', 'ppi', 'gdp', 'pmi', 'zew', 'retail sales', 'industrial production', 'trade balance', 'ifo', 'business climate', 'unemployment', 'consumer climate'],
+      CHF: ['cpi', 'ppi', 'gdp', 'industrial production', 'pmi', 'retail sales', 'unemployment'],
+      GBP: ['cpi', 'rpi', 'ppi', 'gdp', 'unemployment rate', 'claimant count', 'average earnings', 'pmi', 'retail sales'],
+      JPY: ['ppi', 'cgpi', 'tankan', 'cpi', 'gdp', 'trade balance', 'household spending', 'exports', 'imports'],
+      AUD: ['cpi', 'ppi', 'employment change', 'unemployment rate', 'gdp', 'retail sales', 'westpac', 'trade balance', 'pmi'],
+      NZD: ['cpi', 'ppi', 'gdt', 'gdp', 'employment change', 'unemployment rate', 'pmi', 'retail sales', 'trade balance'],
+      CNH: ['lpr', 'loan prime rate', 'cpi', 'ppi', 'gdp', 'pmi', 'industrial production', 'retail sales', 'trade balance']
+    };
+
+    const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH', 'CNY', 'DE', 'FR', 'UK', 'EU', 'CH', 'CA', 'US'];
+
+    const dropZone = document.getElementById('dropZone');
+    const excelInput = document.getElementById('excelInput');
+
+    dropZone.addEventListener('click', () => excelInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-blue-500'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-blue-500');
+      if (e.dataTransfer.files.length) processExcelFile(e.dataTransfer.files[0]);
+    });
+
+    function handleFileSelect(e) {
+      if (e.target.files.length) processExcelFile(e.target.files[0]);
+    }
+
+    function isWhitelisted(ccy, eventName) {
+      if (!eventName) return false;
+      const lower = String(eventName).toLowerCase();
+      if (lower.includes('fed regional') || lower.includes('mpc member') || lower.includes('executive board member')) return false;
+      if (WHITELIST.UNIVERSAL.some(term => lower.includes(term))) return true;
+      const terms = WHITELIST[ccy] || [];
+      return terms.some(term => lower.includes(term));
+    }
+
+    function getCategorySentimentTitle(ccy, eventName) {
+      if (!eventName) return `${ccy} SENTIMENT`;
+      const lower = eventName.toLowerCase();
+
+      if (lower.includes('cpi') || lower.includes('pce') || lower.includes('rpi') || lower.includes('inflation')) return `${ccy} INFLATION (CPI) SENTIMENT`;
+      if (lower.includes('ppi') || lower.includes('ippi') || lower.includes('producer price')) return `${ccy} PRODUCER PRICES (PPI) SENTIMENT`;
+      if (lower.includes('unemployment') || lower.includes('employment') || lower.includes('jobless') || lower.includes('nfp') || lower.includes('adp') || lower.includes('claimant') || lower.includes('earnings')) return `${ccy} LABOR MARKET & EARNINGS SENTIMENT`;
+      if (lower.includes('pmi') || lower.includes('ism')) return `${ccy} PURCHASING MANAGERS INDEX (PMI) SENTIMENT`;
+      if (lower.includes('interest rate') || lower.includes('monetary policy') || lower.includes('ecb press') || lower.includes('fomc') || lower.includes('rate decision') || lower.includes('loan prime')) return `${ccy} CENTRAL BANK POLICY & RATES SENTIMENT`;
+      if (lower.includes('retail sales')) return `${ccy} RETAIL SALES SENTIMENT`;
+      if (lower.includes('trade balance') || lower.includes('exports') || lower.includes('imports')) return `${ccy} TRADE BALANCE SENTIMENT`;
+      if (lower.includes('gdp')) return `${ccy} GROSS DOMESTIC PRODUCT (GDP) SENTIMENT`;
+      if (lower.includes('zew')) return `${ccy} ZEW ECONOMIC SENTIMENT SENTIMENT`;
+      if (lower.includes('gdt') || lower.includes('dairy')) return `${ccy} GDT PRICE INDEX SENTIMENT`;
+      if (lower.includes('consumer climate') || lower.includes('consumer sentiment')) return `${ccy} CONSUMER CLIMATE SENTIMENT`;
+      if (lower.includes('building permit') || lower.includes('home sales')) return `${ccy} HOUSING MARKET SENTIMENT`;
+
+      const firstWord = eventName.split(' ')[0].toUpperCase();
+      return `${ccy} ${firstWord} SENTIMENT`;
+    }
+
+    function processExcelFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+
+        // CRITICAL FIX: Ensure 'raw: false' is passed to sheet_to_json so dates aren't output as raw integers
+        // Using 'dateNF' guarantees a predictable ISO date format layout across all machines
+        const rawRows = XLSX.utils.sheet_to_json(sheet, { 
+          header: 1, 
+          defval: "", 
+          raw: false, 
+          dateNF: "yyyy-mm-dd" 
+        });
+        
+        parseSpreadsheetData(rawRows);
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function parseSpreadsheetData(rows) {
+      const daysData = {};
+      let currentDay = "MONDAY";
+
+      rows.forEach(row => {
+        if (!row || row.length === 0) return;
+
+        const cleanRow = row.map(cell => cell === null || cell === undefined ? "" : String(cell).trim());
+        const rowString = cleanRow.join(" ").trim();
+        if (!rowString) return;
+
+        // Skip table header rows
+        if (/Time/i.test(cleanRow[1] || "") && /Cur/i.test(cleanRow[2] || "") && /Event/i.test(cleanRow[3] || "")) {
+          return;
+        }
+
+        // --- BULLETPROOF UTC DAY & DATE DETECTION ---
+        let detectedDay = null;
+
+        if (/^(SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY)/i.test(rowString)) {
+          detectedDay = rowString.toUpperCase();
+        } 
+        else {
+          for (let cell of cleanRow) {
+            // Match ISO Date (YYYY-MM-DD), US Date (MM/DD/YYYY), or Excel Serial Number (e.g., 46209)
+            if (/^\d{4}-\d{2}-\d{2}/.test(cell) || /^\d{1,2}\/\d{1,2}\/\d{2,4}/.test(cell) || /^\d{5}(\.\d+)?$/.test(cell)) {
+              let d;
+              
+              if (/^\d{5}(\.\d+)?$/.test(cell)) {
+                // Convert raw Excel Serial Number to accurate JS Date (Excel epoch bug accounted for)
+                const serial = parseFloat(cell);
+                if (serial > 40000 && serial < 60000) {
+                  d = new Date(Math.round((serial - 25569) * 86400 * 1000));
+                }
+              } else {
+                let dateVal = cell.includes(' ') ? cell.split(' ')[0] : cell;
+                
+                // Construct Date natively in UTC to prevent browser timezone shifting bugs
+                if (dateVal.includes('-')) {
+                  const parts = dateVal.split('-');
+                  d = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+                } else if (dateVal.includes('/')) {
+                  const parts = dateVal.split('/');
+                  let y = parseInt(parts[2]);
+                  if (y < 100) y += 2000;
+                  d = new Date(Date.UTC(y, parseInt(parts[0]) - 1, parseInt(parts[1])));
+                }
+              }
+
+              // Apply the correctly mapped Day and format explicitly in UTC
+              if (d && !isNaN(d.getTime())) {
+                const dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+                const dayName = dayNames[d.getUTCDay()];
+                const dateStr = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
+                detectedDay = `${dayName}, ${dateStr}`;
+                break; 
+              }
+            }
+          }
+        }
+
+        if (detectedDay) {
+          currentDay = detectedDay;
+          if (!daysData[currentDay]) daysData[currentDay] = [];
+          return;
+        }
+
+        // --- ROW DATA PARSING (7 COLUMNS) ---
+        let time = "", ccy = "", event = "", actual = "", forecast = "", previous = "";
+        let foundCcyIdx = -1;
+
+        for (let i = 0; i < cleanRow.length; i++) {
+          if (CURRENCIES.includes(cleanRow[i].toUpperCase())) {
+            foundCcyIdx = i;
+            ccy = cleanRow[i].toUpperCase();
+            break;
+          }
+        }
+
+        if (foundCcyIdx !== -1) {
+          for (let i = 0; i < foundCcyIdx; i++) {
+            if (/^\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM)?$/i.test(cleanRow[i]) || /^\d{1,2}\.\d{2}/.test(cleanRow[i])) {
+              time = cleanRow[i];
+              break;
+            }
+          }
+
+          if (foundCcyIdx + 1 < cleanRow.length) {
+            event = cleanRow[foundCcyIdx + 1];
+          }
+
+          const postEvent = cleanRow.slice(foundCcyIdx + 2);
+          if (postEvent.length >= 3) {
+            actual = postEvent[0] === "" ? postEvent[1] : postEvent[0];
+            forecast = postEvent[0] === "" ? postEvent[2] : postEvent[1];
+            previous = postEvent[0] === "" ? postEvent[3] || "" : postEvent[2] || "";
+          } else if (postEvent.length === 2) {
+            actual = postEvent[0];
+            forecast = postEvent[1];
+          } else if (postEvent.length === 1) {
+            actual = postEvent[0];
+          }
+        }
+
+        if (!ccy || !event) return;
+
+        let mappedCCY = ccy;
+        if (['DE', 'FR', 'EU'].includes(ccy)) mappedCCY = 'EUR';
+        if (ccy === 'UK') mappedCCY = 'GBP';
+        if (ccy === 'CH') mappedCCY = 'CHF';
+        if (ccy === 'CA') mappedCCY = 'CAD';
+        if (ccy === 'US') mappedCCY = 'USD';
+
+        if (isWhitelisted(mappedCCY, event)) {
+          if (!daysData[currentDay]) daysData[currentDay] = [];
+          daysData[currentDay].push({ time, ccy: mappedCCY, event, actual, forecast, previous });
+        }
+      });
+
+      const esHTML = renderReport(daysData, 'es');
+      const enHTML = renderReport(daysData, 'en');
+
+      document.getElementById('outputContainer').innerHTML = `
+        <div class="space-y-6">
+          <div class="text-xs font-bold text-slate-400 uppercase text-center no-print">— Spanish Document —</div>
+          ${esHTML}
+          <div class="page-break"></div>
+          <div class="text-xs font-bold text-slate-400 uppercase text-center no-print">— English Document —</div>
+          ${enHTML}
+        </div>
+      `;
+    }
+
+    function renderReport(data, lang) {
+      const isEs = lang === 'es';
+
+      const text = {
+        title: isEs ? "Calendario Económico Semanal — Reporte de Riesgo" : "WEEKLY ECONOMIC CALENDAR — RISK REPORT",
+        subtitle: isEs ? "Plantilla Semanal · Eventos Agrupados con Marcado Manual de Sentimiento" : "Weekly Template · Grouped Events with Manual Sentiment Marking",
+        matrixTitle: isEs ? "MATRIZ DE FUERZA GLOBAL E INTERMERCADO" : "GLOBAL & INTERMARKET STRENGTH MATRIX",
+        instructionsTitle: isEs ? "Instrucciones de Operación:" : "Operating Instructions:",
+        instructionsBody: isEs 
+          ? "Al cierre de cada dato macro, cambio geopolítico o evento clave, asigne el puntaje correspondiente en la columna de la Semana Actual para medir divergencias absolutas y flujos de capital intermercado.<br>• Impacto Alto: Muy Bueno (+2) | Bueno (+1) | En Línea (0) | Malo (-1) | Muy Malo (-2)<br>• Impacto Medio/Bajo o Geopolítica: Positivo (+1) | Neutral (0) | Negativo (-1)"
+          : "At the release of each macro dataset, geopolitical shift, or key event, assign the score in the Current Week column to measure absolute divergences and intermarket capital flows.<br>• High Impact: Very Good (+2) | Good (+1) | In Line (0) | Bad (-1) | Very Bad (-2)<br>• Medium/Low Impact or Geopolitics: Positive (+1) | Neutral (0) | Negative (-1)",
+        thAsset: isEs ? "ACTIVO / DIVISA" : "ASSET / CURRENCY",
+        thPrev: isEs ? "SEMANA PREVIA" : "PREVIOUS WEEK",
+        thCurr: isEs ? "SEMANA ACTUAL" : "CURRENT WEEK",
+        secA: isEs ? "SECCIÓN A: DIVISAS (FOREX CORE)" : "SECTION A: CURRENCIES (FOREX CORE)",
+        secB: isEs ? "SECCIÓN B: CATALIZADORES MACRO E INTERMERCADO" : "SECTION B: MACRO CATALYSTS & INTERMARKET",
+        vix: isEs ? "VIX (Volatilidad S&P 500)" : "VIX (S&P 500 Volatility)",
+        oil: isEs ? "Petróleo (Crudo WTI/Brent)" : "Oil (Crude Oil - WTI/Brent)",
+        gold: isEs ? "Oro (XAU/USD)" : "Gold (Gold - XAU/USD)",
+        time: isEs ? "HORA" : "TIME",
+        ccy: isEs ? "DIVISA" : "CCY",
+        event: isEs ? "EVENTO" : "EVENT",
+        actual: isEs ? "ACTUAL" : "ACTUAL",
+        forecast: isEs ? "PRONÓSTICO" : "FORECAST",
+        previous: isEs ? "PREVIO" : "PREVIOUS",
+        sentiment: isEs ? "SENTIMIENTO" : "SENTIMENT",
+        notes: isEs ? "Notas Diarias (Noticias Inesperadas / Eventos Geopolíticos / Giros Intermercado):" : "Daily Notes (Unexpected News / Geopolitical Events / Intermarket Shifts):",
+        footer: isEs ? "Inteligencia Institucional de Riesgo Forex · Calendario Económico Filtrado · Columna de sentimiento dejada en blanco intencionalmente para marcado manual" : "Institutional Forex Risk Intelligence · Filtered Economic Calendar · Sentiment column intentionally left blank for manual marking"
+      };
+
+      let html = `
+        <div class="report-card bg-white p-8 rounded-xl shadow-lg border border-slate-200 font-sans mb-12">
+          <h1 style="font-size: 18px; font-weight: bold; color: #0F172A; margin: 0; border-bottom: 2px solid #0F172A; padding-bottom: 4px;">${text.title}</h1>
+          <h2 style="font-size: 11px; color: #475569; margin: 4px 0 14px 0; font-style: italic;">${text.subtitle}</h2>
+
+          <!-- Matrix Block -->
+          <div style="background-color: #F8FAFC; border: 1px solid #CBD5E1; padding: 10px; border-radius: 4px; margin-bottom: 16px;">
+            <div style="font-size: 11px; font-weight: bold; color: #0F172A; margin-bottom: 6px;">${text.matrixTitle}</div>
+            <p style="font-size: 9px; margin: 0 0 8px 0; color: #334155; line-height: 1.3;">
+              <strong>${text.instructionsTitle}</strong> ${text.instructionsBody}
+            </p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+              <thead>
+                <tr style="background-color: #0F172A; color: white;">
+                  <th style="padding: 5px; text-align: left; width: 50%;">${text.thAsset}</th>
+                  <th style="padding: 5px; text-align: center; width: 25%;">${text.thPrev}</th>
+                  <th style="padding: 5px; text-align: center; width: 25%;">${text.thCurr}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background-color: #CBD5E1; font-weight: bold;"><td colspan="3" style="padding: 3px 5px;">${text.secA}</td></tr>
+                ${['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNY/CNH'].map(asset => `
+                  <tr style="border-bottom: 1px solid #E2E8F0;">
+                    <td style="padding: 3px 5px; font-weight: bold;">${asset}</td>
+                    <td style="border-left: 1px solid #E2E8F0;"></td>
+                    <td style="border-left: 1px solid #E2E8F0;"></td>
+                  </tr>
+                `).join('')}
+                <tr style="background-color: #CBD5E1; font-weight: bold;"><td colspan="3" style="padding: 3px 5px;">${text.secB}</td></tr>
+                ${[text.vix, text.oil, text.gold].map(asset => `
+                  <tr style="border-bottom: 1px solid #E2E8F0;">
+                    <td style="padding: 3px 5px; font-weight: bold;">${asset}</td>
+                    <td style="border-left: 1px solid #E2E8F0;"></td>
+                    <td style="border-left: 1px solid #E2E8F0;"></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+      `;
+
+      Object.keys(data).forEach(day => {
+        const events = data[day];
+        if (!events || events.length === 0) return;
+
+        html += `
+          <div style="background-color: #1F385C; color: white; padding: 6px 10px; font-weight: bold; font-size: 11px; margin-top: 14px; text-transform: uppercase;">
+            ${day}
+          </div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 4px;">
+            <thead>
+              <tr style="border-bottom: 2px solid #1F385C; text-align: left; background-color: #F1F5F9;">
+                <th style="padding: 5px; width: 9%;">${text.time}</th>
+                <th style="padding: 5px; width: 8%;">${text.ccy}</th>
+                <th style="padding: 5px; width: 39%;">${text.event}</th>
+                <th style="padding: 5px; width: 11%;">${text.actual}</th>
+                <th style="padding: 5px; width: 11%;">${text.forecast}</th>
+                <th style="padding: 5px; width: 11%;">${text.previous}</th>
+                <th style="padding: 5px; width: 11%;">${text.sentiment}</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        events.forEach((item, idx) => {
+          const badgeClass = `badge-${['USD','EUR','GBP','JPY','CAD','AUD','NZD','CHF','CNH','CNY'].includes(item.ccy) ? item.ccy : 'DEFAULT'}`;
+
+          html += `
+            <tr style="border-bottom: 1px solid #E2E8F0;">
+              <td style="padding: 4px 5px; font-family: monospace;">${item.time}</td>
+              <td style="padding: 4px 5px;"><span class="${badgeClass}" style="padding: 1px 4px; border-radius: 3px; font-weight: bold; font-size: 9px;">${item.ccy}</span></td>
+              <td style="padding: 4px 5px;">${item.event}</td>
+              <td style="padding: 4px 5px;">${item.actual}</td>
+              <td style="padding: 4px 5px;">${item.forecast}</td>
+              <td style="padding: 4px 5px;">${item.previous}</td>
+              <td style="padding: 4px 5px; border-left: 1px solid #E2E8F0;"></td>
+            </tr>
+          `;
+
+          const nextItem = events[idx + 1];
+          if (!nextItem || nextItem.time !== item.time || nextItem.ccy !== item.ccy) {
+            const categoryTitle = getCategorySentimentTitle(item.ccy, item.event);
+            html += `
+              <tr style="background-color: #FDF8E7; border-top: 1px solid #D9D9D9; border-bottom: 1px solid #D9D9D9;">
+                <td colspan="7" style="padding: 5px 8px; font-style: italic; font-weight: bold; color: #854D0E; font-size: 9px;">
+                  ${categoryTitle}
+                </td>
+              </tr>
+            `;
+          }
+        });
+
+        html += `
+            </tbody>
+          </table>
+
+          <div style="border: 1px dashed #94A3B8; height: 65px; border-radius: 4px; padding: 6px; margin-bottom: 12px; background-color: #FAFAFA;">
+            <span style="font-size: 9px; font-weight: bold; color: #64748B;">
+              ${text.notes}
+            </span>
+          </div>
+        `;
+      });
+
+      html += `
+        <div style="margin-top: 20px; border-top: 1px solid #CBD5E1; padding-top: 6px; text-align: center; font-size: 8px; color: #64748B;">
+          ${text.footer}
+        </div>
+      </div>`;
+
+      return html;
+    }
+  </script>
+</body>
+</html>
