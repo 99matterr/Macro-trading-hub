@@ -599,34 +599,41 @@
                 <div class="flex items-center gap-2">
                     <select onchange="handleRowChange(${rowCounter})" class="event-type flex-grow bg-[#040406] border border-zinc-900 text-[10px] p-1.5 rounded text-zinc-300 focus:outline-none focus:border-cyan-500/50 cursor-pointer min-w-0 font-mono">
                         <option value="none">-- SELECT EVENT --</option>
-                        <optgroup label="Inflation & Prices" class="bg-[#020203]">
-                            <option value="Inflation" ${optType === 'Inflation' ? 'selected' : ''}>Inflation (CPI/PCE)</option>
-                            <option value="PPI" ${optType === 'PPI' ? 'selected' : ''}>PPI (Producer Inflation)</option>
-                        </optgroup>
-                        <optgroup label="Labor Market" class="bg-[#020203]">
-                            <option value="Employment" ${optType === 'Employment' ? 'selected' : ''}>Employment (NFP/UR)</option>
-                            <option value="Jobless Claims" ${optType === 'Jobless Claims' ? 'selected' : ''}>Jobless Claims (Weekly)</option>
-                            <option value="JOLTs" ${optType === 'JOLTs' ? 'selected' : ''}>JOLTs (Job Openings)</option>
-                            <option value="Wages" ${optType === 'Wages' ? 'selected' : ''}>Wages & Earnings (GBP/EUR)</option>
-                        </optgroup>
-                        <optgroup label="Economic Activity" class="bg-[#020203]">
-                            <option value="GDP" ${optType === 'GDP' ? 'selected' : ''}>GDP (Growth Rate)</option>
-                            <option value="PMIs" ${optType === 'PMIs' ? 'selected' : ''}>PMIs (Mfg/Services)</option>
-                            <option value="PMI Flash" ${optType === 'PMI Flash' ? 'selected' : ''}>PMI (Flash/Prelim)</option>
-                            <option value="Retail Sales" ${optType === 'Retail Sales' ? 'selected' : ''}>Retail Sales</option>
-                            <option value="Industrial Production" ${optType === 'Industrial Production' ? 'selected' : ''}>Industrial Prod.</option>
-                            <option value="Trade Balance" ${optType === 'Trade Balance' ? 'selected' : ''}>Trade Balance</option>
-                            <option value="Consumer Sentiment" ${optType === 'Consumer Sentiment' ? 'selected' : ''}>Consumer Sentiment / Sentix</option>
-                        </optgroup>
+                        
                         <optgroup label="Central Banks" class="bg-[#020203]">
                             <option value="CB Press" ${optType === 'CB Press' ? 'selected' : ''}>C.B. Decisions / Press Conf</option>
                             <option value="Central Bank" ${optType === 'Central Bank' ? 'selected' : ''}>Central Bank Minutes</option>
                         </optgroup>
-                        <optgroup label="Currency-Specific / Commodities" class="bg-[#020203]">
-                            <option value="Oil Inventories" ${optType === 'Oil Inventories' ? 'selected' : ''}>OPEC / Oil Inventory (CAD)</option>
-                            <option value="GDT Auction" ${optType === 'GDT Auction' ? 'selected' : ''}>GDT Dairy Auction (NZD)</option>
+
+                        <optgroup label="Economic Activity & Growth" class="bg-[#020203]">
+                            <option value="Business Confidence" ${optType === 'Business Confidence' ? 'selected' : ''}>Business Confidence</option>
+                            <option value="Business Expectations" ${optType === 'Business Expectations' ? 'selected' : ''}>Business Expectations</option>
+                            <option value="Consumer Sentiment" ${optType === 'Consumer Sentiment' ? 'selected' : ''}>Consumer Sentiment / Sentix</option>
+                            <option value="GDP" ${optType === 'GDP' ? 'selected' : ''}>GDP (Growth Rate)</option>
+                            <option value="Industrial Production" ${optType === 'Industrial Production' ? 'selected' : ''}>Industrial Prod.</option>
+                            <option value="PMIs" ${optType === 'PMIs' ? 'selected' : ''}>PMIs (Mfg/Services)</option>
+                            <option value="PMI Flash" ${optType === 'PMI Flash' ? 'selected' : ''}>PMI (Flash/Prelim)</option>
+                            <option value="Retail Sales" ${optType === 'Retail Sales' ? 'selected' : ''}>Retail Sales</option>
+                            <option value="Trade Balance" ${optType === 'Trade Balance' ? 'selected' : ''}>Trade Balance</option>
+                            <option value="ZEW Conditions" ${optType === 'ZEW Conditions' ? 'selected' : ''}>ZEW Economic Conditions</option>
+                            <option value="ZEW Sentiment" ${optType === 'ZEW Sentiment' ? 'selected' : ''}>ZEW Economic Sentiment</option>
                         </optgroup>
-                        <optgroup label="Risk & Tail Hazards" class="bg-[#020203]">
+
+                        <optgroup label="Inflation & Prices" class="bg-[#020203]">
+                            <option value="Inflation" ${optType === 'Inflation' ? 'selected' : ''}>Inflation (CPI/PCE)</option>
+                            <option value="PPI" ${optType === 'PPI' ? 'selected' : ''}>PPI (Producer Inflation)</option>
+                        </optgroup>
+
+                        <optgroup label="Labor Market & Earnings" class="bg-[#020203]">
+                            <option value="Average Earnings" ${optType === 'Average Earnings' ? 'selected' : ''}>Average Earnings</option>
+                            <option value="Employment" ${optType === 'Employment' ? 'selected' : ''}>Employment (NFP/UR)</option>
+                            <option value="Jobless Claims" ${optType === 'Jobless Claims' ? 'selected' : ''}>Jobless Claims (Weekly)</option>
+                            <option value="JOLTs" ${optType === 'JOLTs' ? 'selected' : ''}>JOLTs (Job Openings)</option>
+                            <option value="Labor Market" ${optType === 'Labor Market' ? 'selected' : ''}>Labor Market</option>
+                            <option value="Wages" ${optType === 'Wages' ? 'selected' : ''}>Wages & Earnings (GBP/EUR)</option>
+                        </optgroup>
+
+                        <optgroup label="Risk & Geopolitics" class="bg-[#020203]">
                             <option value="Geopolitics" ${optType === 'Geopolitics' ? 'selected' : ''}>Geopolitics / War Risk</option>
                         </optgroup>
                     </select>
