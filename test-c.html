@@ -38,14 +38,14 @@
     .badge-CNH, .badge-CNY { background-color: #FFE6CC; color: #1E293B; }
     .badge-DEFAULT { background-color: #E2E8F0; color: #1E293B; }
 
-    /* Botones de Sentimiento Activos */
+    /* Botones de Sentimiento Activos en Pantalla */
     .score-btn-active-p2 { background-color: #059669 !important; color: white !important; border-color: #10b981 !important; font-weight: bold; }
     .score-btn-active-p1 { background-color: #10b981 !important; color: white !important; border-color: #34d399 !important; font-weight: bold; }
     .score-btn-active-0  { background-color: #3f3f46 !important; color: white !important; border-color: #71717a !important; font-weight: bold; }
     .score-btn-active-m1 { background-color: #f43f5e !important; color: white !important; border-color: #fb7185 !important; font-weight: bold; }
     .score-btn-active-m2 { background-color: #be123c !important; color: white !important; border-color: #e11d48 !important; font-weight: bold; }
 
-    /* Clases Dinámicas de Escala de Colores */
+    /* Clases Dinámicas de Escala de Colores para Interfaz Web */
     .score-scale-strong-bullish { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; border: 1px solid rgba(16, 185, 129, 0.4) !important; }
     .score-scale-bullish { background-color: rgba(234, 179, 8, 0.15) !important; color: #facc15 !important; border: 1px solid rgba(234, 179, 8, 0.4) !important; }
     .score-scale-neutral { background-color: rgba(63, 63, 70, 0.3) !important; color: #a1a1aa !important; border: 1px solid rgba(113, 113, 122, 0.3) !important; }
@@ -126,7 +126,8 @@
               <tr class="bg-[#020203] text-zinc-500 text-[10px] border-b border-zinc-800">
                 <th class="p-2">DIVISA</th>
                 <th class="p-2 text-center">PREVIO</th>
-                <th class="p-2 text-center">ACTUAL (AUTO)</th>
+                <th class="p-2 text-center">EVENTOS</th>
+                <th class="p-2 text-center">TOTAL COMBINADO</th>
               </tr>
             </thead>
             <tbody id="matrixForexBody"></tbody>
@@ -135,13 +136,14 @@
 
         <!-- Catalizadores Intermercado (Sección B) -->
         <div>
-          <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2">SECCIÓN B: COMMODITIES Y RIESGO (EVALUACIÓN INTERACTIVA)</span>
+          <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2">SECCIÓN B: COMMODITIES Y RIESGO</span>
           <table class="w-full text-xs text-left">
             <thead>
               <tr class="bg-[#020203] text-zinc-500 text-[10px] border-b border-zinc-800">
                 <th class="p-2">ACTIVO</th>
-                <th class="p-2 text-center">VALORACIÓN INTERACTIVA</th>
-                <th class="p-2 text-center">ACTUAL</th>
+                <th class="p-2 text-center">PREVIO</th>
+                <th class="p-2 text-center">EVALUACIÓN</th>
+                <th class="p-2 text-center">TOTAL COMBINADO</th>
               </tr>
             </thead>
             <tbody id="matrixIntermarketBody"></tbody>
@@ -173,14 +175,13 @@
     };
 
     const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH', 'CNY', 'DE', 'FR', 'UK', 'EU', 'CH', 'CA', 'US'];
-    
-    // JERARQUÍA OFICIAL DEL MERCADO FOREX (PARA NOMBRE DE PARES ESTÁNDAR)
     const CURRENCY_HIERARCHY = ['EUR', 'GBP', 'AUD', 'NZD', 'USD', 'CAD', 'CHF', 'JPY'];
 
     // ESTADO GLOBAL CON PERSISTENCIA
     let globalState = {
       daysData: {},
       categoryScores: {},
+      matrixEvents: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
       matrixTotals: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
       matrixPrev: { USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 },
       intermarketScores: { VIX: 0, Oil: 0, Gold: 0 },
@@ -396,6 +397,16 @@
       return 'score-scale-strong-bearish font-black';
     }
 
+    // ESTILO DE INSIGNIA DE COLOR EN PDF
+    function getPdfBadgeStyle(score) {
+      const num = parseInt(score) || 0;
+      if (num === 2) return 'background-color: #d1fae5; color: #065f46; border: 1px solid #34d399;';
+      if (num === 1) return 'background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;';
+      if (num === -1) return 'background-color: #fff1f2; color: #b91c1c; border: 1px solid #fecdd3;';
+      if (num === -2) return 'background-color: #ffe4e6; color: #9f1239; border: 1px solid #fda4af;';
+      return 'background-color: #f3f4f6; color: #374151; border: 1px solid #e5e7eb;';
+    }
+
     function renderMatrixTables() {
       const forexCurrencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'];
       const intermarketAssets = ['VIX', 'Oil', 'Gold'];
@@ -411,6 +422,7 @@
           <td class="p-2 text-center text-zinc-500 font-mono">
             <input type="number" value="${globalState.matrixPrev[asset] || 0}" onchange="updatePrevMatrix('${asset}', this.value)" class="w-12 bg-[#020203] border border-zinc-800 rounded text-center text-xs text-zinc-400 focus:outline-none focus:border-cyan-500 font-mono">
           </td>
+          <td id="live-events-${asset}" class="p-2 text-center font-mono text-xs text-zinc-400">0</td>
           <td id="live-matrix-${asset}" class="p-2 text-center font-mono text-xs rounded transition-all">0</td>
         </tr>
       `).join('');
@@ -420,6 +432,9 @@
         return `
         <tr class="border-b border-zinc-900/60 hover:bg-[#08080c]">
           <td class="p-2 font-bold text-white">${asset}</td>
+          <td class="p-2 text-center text-zinc-500 font-mono">
+            <input type="number" value="${globalState.matrixPrev[asset] || 0}" onchange="updatePrevMatrix('${asset}', this.value)" class="w-12 bg-[#020203] border border-zinc-800 rounded text-center text-xs text-zinc-400 focus:outline-none focus:border-cyan-500 font-mono">
+          </td>
           <td class="p-2 text-center font-mono">
             <div class="flex items-center justify-center gap-1">
               <button onclick="setIntermarketScore('${asset}', 2)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-emerald-500 ${curScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
@@ -562,33 +577,46 @@
       recalculateMatrixAndDivergences();
     }
 
+    // RECALCULAR SUMA COMBINADA (PREVIO + EVENTOS SEMANA ACTUAL)
     function recalculateMatrixAndDivergences() {
       const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'];
       const intermarket = ['VIX', 'Oil', 'Gold'];
 
-      currencies.forEach(c => globalState.matrixTotals[c] = 0);
-      intermarket.forEach(i => globalState.matrixTotals[i] = globalState.intermarketScores[i] || 0);
+      // Resetear suma de eventos
+      currencies.forEach(c => globalState.matrixEvents[c] = 0);
+      intermarket.forEach(i => globalState.matrixEvents[i] = globalState.intermarketScores[i] || 0);
 
+      // Sumar eventos de la semana actual
       Object.keys(globalState.categoryScores).forEach(catId => {
         const item = globalState.categoryScores[catId];
-        if (item && globalState.matrixTotals[item.ccy] !== undefined) {
-          globalState.matrixTotals[item.ccy] += item.score;
+        if (item && globalState.matrixEvents[item.ccy] !== undefined) {
+          globalState.matrixEvents[item.ccy] += item.score;
         }
       });
 
+      // Calcular Total Combinado = Previo + Eventos Semana Actual
       [...currencies, ...intermarket].forEach(c => {
-        const el = document.getElementById(`live-matrix-${c}`);
-        if (el) {
+        const prev = globalState.matrixPrev[c] || 0;
+        const ev = globalState.matrixEvents[c] || 0;
+        globalState.matrixTotals[c] = prev + ev;
+
+        // Actualizar UI
+        const eventsEl = document.getElementById(`live-events-${c}`);
+        if (eventsEl) {
+          eventsEl.textContent = ev > 0 ? `+${ev}` : ev;
+        }
+
+        const totalEl = document.getElementById(`live-matrix-${c}`);
+        if (totalEl) {
           const val = globalState.matrixTotals[c];
-          el.textContent = val > 0 ? `+${val}` : val;
-          el.className = `p-2 text-center font-mono text-xs rounded transition-all ${getScoreScaleClass(val)}`;
+          totalEl.textContent = val > 0 ? `+${val}` : val;
+          totalEl.className = `p-2 text-center font-mono text-xs rounded transition-all ${getScoreScaleClass(val)}`;
         }
       });
 
       scanDivergences();
     }
 
-    // FORMATEAR PAR SEGÚN JERARQUÍA INSTITUCIONAL FOREX (EUR > GBP > AUD > NZD > USD > CAD > CHF > JPY)
     function formatStandardForexPair(curr1, curr2, score1, score2) {
       const strong = score1 > score2 ? curr1 : curr2;
       const weak = score1 > score2 ? curr2 : curr1;
@@ -676,6 +704,7 @@
         globalState = {
           daysData: {},
           categoryScores: {},
+          matrixEvents: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
           matrixTotals: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
           matrixPrev: { USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 },
           intermarketScores: { VIX: 0, Oil: 0, Gold: 0 },
@@ -687,7 +716,6 @@
       }
     }
 
-    // DISPARADOR RENDERIZADO EXPLICITO DE IMPRESIÓN
     function triggerPrint() {
       renderPDFPrintPreview();
       setTimeout(() => {
@@ -743,28 +771,34 @@
             <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
               <thead>
                 <tr style="background-color: #0F172A; color: white;">
-                  <th style="padding: 5px; text-align: left; width: 50%;">${text.thAsset}</th>
-                  <th style="padding: 5px; text-align: center; width: 25%;">${text.thPrev}</th>
-                  <th style="padding: 5px; text-align: center; width: 25%;">${text.thCurr}</th>
+                  <th style="padding: 5px; text-align: left; width: 40%;">${text.thAsset}</th>
+                  <th style="padding: 5px; text-align: center; width: 30%;">${text.thPrev}</th>
+                  <th style="padding: 5px; text-align: center; width: 30%;">TOTAL COMBINADO</th>
                 </tr>
               </thead>
               <tbody>
                 <tr style="background-color: #CBD5E1; font-weight: bold;"><td colspan="3" style="padding: 3px 5px;">${text.secA}</td></tr>
-                ${['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'].map(asset => `
+                ${['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'].map(asset => {
+                  const tot = globalState.matrixTotals[asset] || 0;
+                  const prev = globalState.matrixPrev[asset] || 0;
+                  return `
                   <tr style="border-bottom: 1px solid #E2E8F0;">
                     <td style="padding: 3px 5px; font-weight: bold;">${asset}</td>
-                    <td style="border-left: 1px solid #E2E8F0; text-align: center;">${globalState.matrixPrev[asset] || 0}</td>
-                    <td style="border-left: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #0F172A;">${globalState.matrixTotals[asset] > 0 ? '+' : ''}${globalState.matrixTotals[asset] || 0}</td>
+                    <td style="border-left: 1px solid #E2E8F0; text-align: center;">${prev > 0 ? '+' : ''}${prev}</td>
+                    <td style="border-left: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #0F172A;">${tot > 0 ? '+' : ''}${tot}</td>
                   </tr>
-                `).join('')}
+                `}).join('')}
                 <tr style="background-color: #CBD5E1; font-weight: bold;"><td colspan="3" style="padding: 3px 5px;">${text.secB}</td></tr>
-                ${[['VIX', text.vix], ['Oil', text.oil], ['Gold', text.gold]].map(asset => `
+                ${[['VIX', text.vix], ['Oil', text.oil], ['Gold', text.gold]].map(asset => {
+                  const tot = globalState.matrixTotals[asset[0]] || 0;
+                  const prev = globalState.matrixPrev[asset[0]] || 0;
+                  return `
                   <tr style="border-bottom: 1px solid #E2E8F0;">
                     <td style="padding: 3px 5px; font-weight: bold;">${asset[1]}</td>
-                    <td style="border-left: 1px solid #E2E8F0; text-align: center;">${globalState.matrixPrev[asset[0]] || 0}</td>
-                    <td style="border-left: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #0F172A;">${globalState.matrixTotals[asset[0]] > 0 ? '+' : ''}${globalState.matrixTotals[asset[0]] || 0}</td>
+                    <td style="border-left: 1px solid #E2E8F0; text-align: center;">${prev > 0 ? '+' : ''}${prev}</td>
+                    <td style="border-left: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #0F172A;">${tot > 0 ? '+' : ''}${tot}</td>
                   </tr>
-                `).join('')}
+                `}).join('')}
               </tbody>
             </table>
           </div>
@@ -813,15 +847,19 @@
             const categoryTitle = getCategorySentimentTitle(item.ccy, item.event);
             const categoryId = `${day}-${item.ccy}-${categoryTitle}`.replace(/[^a-zA-Z0-9]/g, '-');
             const scoreItem = globalState.categoryScores[categoryId];
-            const scoreVal = scoreItem ? (scoreItem.score > 0 ? `+${scoreItem.score}` : scoreItem.score) : '0';
+            const scoreVal = scoreItem ? scoreItem.score : 0;
+            const formattedVal = scoreVal > 0 ? `+${scoreVal}` : scoreVal;
+            const pdfBadgeStyle = getPdfBadgeStyle(scoreVal);
 
             html += `
               <tr style="background-color: #FDF8E7; border-top: 1px solid #D9D9D9; border-bottom: 1px solid #D9D9D9;">
                 <td colspan="6" style="padding: 5px 8px; font-style: italic; font-weight: bold; color: #854D0E; font-size: 9px;">
                   ${categoryTitle}
                 </td>
-                <td style="padding: 5px 8px; font-weight: bold; text-align: center; font-size: 10px; color: #0F172A; border-left: 1px solid #CBD5E1;">
-                  ${scoreVal}
+                <td style="padding: 4px; text-align: center; border-left: 1px solid #CBD5E1;">
+                  <span style="display: inline-block; padding: 1px 6px; border-radius: 3px; font-weight: bold; font-size: 9px; font-family: monospace; ${pdfBadgeStyle}">
+                    ${formattedVal}
+                  </span>
                 </td>
               </tr>
             `;
