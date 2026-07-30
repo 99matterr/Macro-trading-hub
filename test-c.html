@@ -13,10 +13,15 @@
     ::-webkit-scrollbar-track { background: #020203; }
     ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 3px; }
 
-    /* ESTILOS PARA IMPRESIÓN Y PDF */
+    /* REGLAS EXPLICITAS PARA IMPRESIÓN Y EXPORTACIÓN A PDF */
+    @media screen {
+      #outputContainer { display: none !important; }
+    }
+    
     @media print {
       .no-print { display: none !important; }
       body, html { background: white !important; color: #0f172a !important; padding: 0 !important; margin: 0 !important; }
+      #outputContainer { display: block !important; width: 100% !important; background: white !important; color: #0f172a !important; }
       .page-break { page-break-before: always; }
       .report-card { border: none !important; box-shadow: none !important; padding: 0 !important; background: white !important; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -64,7 +69,7 @@
         <button onclick="resetAllScores()" class="bg-rose-950/30 hover:bg-rose-900/50 text-rose-300 border border-rose-800/50 text-xs px-3.5 py-2.5 rounded-xl font-mono transition">
           🗑️ Reiniciar Todo
         </button>
-        <button onclick="window.print()" class="bg-cyan-500 hover:bg-cyan-400 text-black text-xs px-5 py-2.5 rounded-xl font-bold font-mono shadow-[0_0_15px_rgba(34,211,238,0.2)] transition">
+        <button onclick="triggerPrint()" class="bg-cyan-500 hover:bg-cyan-400 text-black text-xs px-5 py-2.5 rounded-xl font-bold font-mono shadow-[0_0_15px_rgba(34,211,238,0.2)] transition">
           IMPRIMIR / GUARDAR PDF &rarr;
         </button>
       </div>
@@ -150,8 +155,8 @@
 
   </div>
 
-  <!-- ÁREA DE SALIDA DE IMPRESIÓN (OCULTA EN PANTALLA) -->
-  <div id="outputContainer" class="hidden"></div>
+  <!-- ÁREA DE IMPRESIÓN PDF -->
+  <div id="outputContainer"></div>
 
   <script>
     const WHITELIST = {
@@ -168,6 +173,9 @@
     };
 
     const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH', 'CNY', 'DE', 'FR', 'UK', 'EU', 'CH', 'CA', 'US'];
+    
+    // JERARQUÍA OFICIAL DEL MERCADO FOREX (PARA NOMBRE DE PARES ESTÁNDAR)
+    const CURRENCY_HIERARCHY = ['EUR', 'GBP', 'AUD', 'NZD', 'USD', 'CAD', 'CHF', 'JPY'];
 
     // ESTADO GLOBAL CON PERSISTENCIA
     let globalState = {
@@ -373,7 +381,6 @@
       renderLiveInteractiveApp();
     }
 
-    // RENDERS PRINCIPALES EN PANTALLA
     function renderLiveInteractiveApp() {
       document.getElementById('liveMatrixContainer').classList.remove('hidden');
       renderMatrixTables();
@@ -381,7 +388,6 @@
       recalculateMatrixAndDivergences();
     }
 
-    // OBTENER ESTILO DE ESCALA DE COLORES SEGÚN PUNTAJE TOTAL
     function getScoreScaleClass(score) {
       if (score >= 4) return 'score-scale-strong-bullish font-black';
       if (score >= 1) return 'score-scale-bullish font-bold';
@@ -520,7 +526,6 @@
       });
     }
 
-    // CONTROLES DE INTERACCIÓN
     function setCategoryScore(categoryId, ccy, scoreVal, btn) {
       globalState.categoryScores[categoryId] = { ccy: ccy, score: parseInt(scoreVal) };
 
@@ -561,11 +566,9 @@
       const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'];
       const intermarket = ['VIX', 'Oil', 'Gold'];
 
-      // Reiniciar acumuladores
       currencies.forEach(c => globalState.matrixTotals[c] = 0);
       intermarket.forEach(i => globalState.matrixTotals[i] = globalState.intermarketScores[i] || 0);
 
-      // Sumar puntuaciones de las categorías del calendario
       Object.keys(globalState.categoryScores).forEach(catId => {
         const item = globalState.categoryScores[catId];
         if (item && globalState.matrixTotals[item.ccy] !== undefined) {
@@ -573,7 +576,6 @@
         }
       });
 
-      // Actualizar DOM de la Matriz Viva con Escala de Colores
       [...currencies, ...intermarket].forEach(c => {
         const el = document.getElementById(`live-matrix-${c}`);
         if (el) {
@@ -583,11 +585,38 @@
         }
       });
 
-      // Escanear Divergencias
       scanDivergences();
+    }
 
-      // Renderizar vista previa para PDF
-      renderPDFPrintPreview();
+    // FORMATEAR PAR SEGÚN JERARQUÍA INSTITUCIONAL FOREX (EUR > GBP > AUD > NZD > USD > CAD > CHF > JPY)
+    function formatStandardForexPair(curr1, curr2, score1, score2) {
+      const strong = score1 > score2 ? curr1 : curr2;
+      const weak = score1 > score2 ? curr2 : curr1;
+
+      const rank1 = CURRENCY_HIERARCHY.indexOf(curr1);
+      const rank2 = CURRENCY_HIERARCHY.indexOf(curr2);
+
+      let base, quote, actionText;
+
+      if (rank1 !== -1 && rank2 !== -1) {
+        if (rank1 < rank2) {
+          base = curr1; quote = curr2;
+          actionText = (strong === curr1) ? `COMPRA ${base}/${quote}` : `VENTA ${base}/${quote}`;
+        } else {
+          base = curr2; quote = curr1;
+          actionText = (strong === curr2) ? `COMPRA ${base}/${quote}` : `VENTA ${base}/${quote}`;
+        }
+      } else {
+        base = strong; quote = weak;
+        actionText = `COMPRA ${base}/${quote}`;
+      }
+
+      return {
+        pairName: `${base}/${quote}`,
+        actionBadge: actionText,
+        strong: strong,
+        weak: weak
+      };
     }
 
     function scanDivergences() {
@@ -607,12 +636,14 @@
           const diff = Math.abs(scoreA - scoreB);
 
           if (diff >= 3) {
-            const strong = scoreA > scoreB ? cA : cB;
-            const weak = scoreA > scoreB ? cB : cA;
+            const formatted = formatStandardForexPair(cA, cB, scoreA, scoreB);
             divergencesFound.push({
-              pair: `${strong}/${weak}`,
-              strongScore: globalState.matrixTotals[strong],
-              weakScore: globalState.matrixTotals[weak],
+              pair: formatted.pairName,
+              actionBadge: formatted.actionBadge,
+              strong: formatted.strong,
+              weak: formatted.weak,
+              strongScore: globalState.matrixTotals[formatted.strong],
+              weakScore: globalState.matrixTotals[formatted.weak],
               diff: diff
             });
           }
@@ -629,8 +660,8 @@
               <span class="font-black text-cyan-400 text-sm block">${d.pair}</span>
             </div>
             <div class="text-right">
-              <span class="bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-bold block mb-0.5">COMPRA ${d.pair.split('/')[0]}</span>
-              <span class="text-[9px] text-zinc-500">Spread: ${d.diff} pts (${d.pair.split('/')[0]}: ${d.strongScore > 0 ? '+' : ''}${d.strongScore} vs ${d.pair.split('/')[1]}: ${d.weakScore > 0 ? '+' : ''}${d.weakScore})</span>
+              <span class="${d.actionBadge.includes('COMPRA') ? 'bg-emerald-950 text-emerald-400 border-emerald-500/30' : 'bg-rose-950 text-rose-400 border-rose-500/30'} border px-2 py-0.5 rounded text-[10px] font-bold block mb-0.5">${d.actionBadge}</span>
+              <span class="text-[9px] text-zinc-500">Spread: ${d.diff} pts (${d.strong}: ${d.strongScore > 0 ? '+' : ''}${d.strongScore} vs ${d.weak}: ${d.weakScore > 0 ? '+' : ''}${d.weakScore})</span>
             </div>
           </div>
         `).join('');
@@ -656,6 +687,14 @@
       }
     }
 
+    // DISPARADOR RENDERIZADO EXPLICITO DE IMPRESIÓN
+    function triggerPrint() {
+      renderPDFPrintPreview();
+      setTimeout(() => {
+        window.print();
+      }, 200);
+    }
+
     function renderPDFPrintPreview() {
       const outputContainer = document.getElementById('outputContainer');
       const esHTML = renderReportTemplate(globalState.daysData, 'es');
@@ -671,7 +710,7 @@
         instructionsTitle: isEs ? "Instrucciones de Operación:" : "Operating Instructions:",
         instructionsBody: isEs 
           ? "Matriz calculada automáticamente mediante el Motor Integrado de Riesgo Kairos.<br>• Impacto Alto: Muy Bueno (+2) | Bueno (+1) | En Línea (0) | Malo (-1) | Muy Malo (-2)<br>• Impacto Medio/Bajo o Geopolítica: Positivo (+1) | Neutral (0) | Negativo (-1)"
-          : "Matrix automatically calculated via Kairos Integrated Risk Engine.<br>• High Impact: Very Good (+2) | Good (+1) | In Line (0) | Bad (-1) | Very Bad (-2)<br>• Medium/Low Impact or Geopolitics: Positive (+1) | Neutral (0) | Negative (-1)",
+          : "Matrix automatically calculated via Kairos Integrated Risk Engine.<br>• High Impact: Very Good (+2) | Good (+1) | In Line (0) | Bad (-1) | Very Bad (-2)<br>• Medium/Low Impact or Geopolitics: Positive (+1) | Negative (-1) | Neutral (0)",
         thAsset: isEs ? "ACTIVO / DIVISA" : "ASSET / CURRENCY",
         thPrev: isEs ? "SEMANA PREVIA" : "PREVIOUS WEEK",
         thCurr: isEs ? "SEMANA ACTUAL" : "CURRENT WEEK",
@@ -696,7 +735,6 @@
           <h1 style="font-size: 18px; font-weight: bold; color: #0F172A; margin: 0; border-bottom: 2px solid #0F172A; padding-bottom: 4px;">${text.title}</h1>
           <h2 style="font-size: 11px; color: #475569; margin: 4px 0 14px 0; font-style: italic;">${text.subtitle}</h2>
 
-          <!-- Matrix Block -->
           <div style="background-color: #F8FAFC; border: 1px solid #CBD5E1; padding: 10px; border-radius: 4px; margin-bottom: 16px;">
             <div style="font-size: 11px; font-weight: bold; color: #0F172A; margin-bottom: 6px;">${text.matrixTitle}</div>
             <p style="font-size: 9px; margin: 0 0 8px 0; color: #334155; line-height: 1.3;">
