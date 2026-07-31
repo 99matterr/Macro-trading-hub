@@ -63,7 +63,7 @@
       <div>
         <span class="text-cyan-400 font-bold text-[10px] font-mono tracking-widest uppercase block mb-1">// KAIROS QUANT DESK</span>
         <h1 class="text-2xl font-black tracking-tight text-white uppercase">Calendar Filter & Risk Engine</h1>
-        <p class="text-zinc-400 text-xs mt-0.5">Estado autoguardado en tiempo real. Los datos persisten al recargar la página.</p>
+        <p class="text-zinc-400 text-xs mt-0.5">Edita manualmente la sesión previa y evalúa eventos en tiempo real.</p>
       </div>
       <div class="flex items-center gap-3">
         <button onclick="resetAllScores()" class="bg-rose-950/30 hover:bg-rose-900/50 text-rose-300 border border-rose-800/50 text-xs px-3.5 py-2.5 rounded-xl font-mono transition">
@@ -125,8 +125,8 @@
             <thead>
               <tr class="bg-[#020203] text-zinc-500 text-[10px] border-b border-zinc-800">
                 <th class="p-2">DIVISA</th>
-                <th class="p-2 text-center">PREVIO</th>
-                <th class="p-2 text-center">EVENTOS</th>
+                <th class="p-2 text-center">PREVIO (MANUAL)</th>
+                <th class="p-2 text-center">EVENTOS (AUTO)</th>
                 <th class="p-2 text-center">TOTAL COMBINADO</th>
               </tr>
             </thead>
@@ -141,7 +141,7 @@
             <thead>
               <tr class="bg-[#020203] text-zinc-500 text-[10px] border-b border-zinc-800">
                 <th class="p-2">ACTIVO</th>
-                <th class="p-2 text-center">PREVIO</th>
+                <th class="p-2 text-center">PREVIO (MANUAL)</th>
                 <th class="p-2 text-center">EVALUACIÓN</th>
                 <th class="p-2 text-center">TOTAL COMBINADO</th>
               </tr>
@@ -177,7 +177,7 @@
     const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH', 'CNY', 'DE', 'FR', 'UK', 'EU', 'CH', 'CA', 'US'];
     const CURRENCY_HIERARCHY = ['EUR', 'GBP', 'AUD', 'NZD', 'USD', 'CAD', 'CHF', 'JPY'];
 
-    // ESTADO GLOBAL CON PERSISTENCIA
+    // ESTADO GLOBAL CON ESTRUCTURA BLINDADA
     let globalState = {
       daysData: {},
       categoryScores: {},
@@ -212,7 +212,13 @@
       const saved = localStorage.getItem('kairos_macro_engine_state');
       if (saved) {
         try {
-          globalState = JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          globalState.daysData = parsed.daysData || {};
+          globalState.categoryScores = parsed.categoryScores || {};
+          globalState.matrixPrev = Object.assign({ USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 }, parsed.matrixPrev || {});
+          globalState.intermarketScores = Object.assign({ VIX: 0, Oil: 0, Gold: 0 }, parsed.intermarketScores || {});
+          globalState.dailyNotes = parsed.dailyNotes || {};
+          
           if (Object.keys(globalState.daysData).length > 0) {
             renderLiveInteractiveApp();
           }
@@ -397,7 +403,6 @@
       return 'score-scale-strong-bearish font-black';
     }
 
-    // ESTILO DE INSIGNIA DE COLOR EN PDF
     function getPdfBadgeStyle(score) {
       const num = parseInt(score) || 0;
       if (num === 2) return 'background-color: #d1fae5; color: #065f46; border: 1px solid #34d399;';
@@ -420,9 +425,9 @@
             <span id="matrix-badge-${asset}" class="badge-${asset === 'CNH' ? 'CNY' : asset} text-[9px] px-2 py-0.5 rounded font-mono">${asset}</span>
           </td>
           <td class="p-2 text-center text-zinc-500 font-mono">
-            <input type="number" value="${globalState.matrixPrev[asset] || 0}" onchange="updatePrevMatrix('${asset}', this.value)" class="w-12 bg-[#020203] border border-zinc-800 rounded text-center text-xs text-zinc-400 focus:outline-none focus:border-cyan-500 font-mono">
+            <input type="number" value="${globalState.matrixPrev[asset] !== undefined ? globalState.matrixPrev[asset] : 0}" oninput="updatePrevMatrix('${asset}', this.value)" class="w-14 bg-[#020203] border border-cyan-500/40 rounded px-1 py-0.5 text-center text-xs text-white focus:outline-none focus:border-cyan-400 font-mono font-bold">
           </td>
-          <td id="live-events-${asset}" class="p-2 text-center font-mono text-xs text-zinc-400">0</td>
+          <td id="live-events-${asset}" class="p-2 text-center font-mono text-xs text-zinc-300 font-bold">0</td>
           <td id="live-matrix-${asset}" class="p-2 text-center font-mono text-xs rounded transition-all">0</td>
         </tr>
       `).join('');
@@ -433,7 +438,7 @@
         <tr class="border-b border-zinc-900/60 hover:bg-[#08080c]">
           <td class="p-2 font-bold text-white">${asset}</td>
           <td class="p-2 text-center text-zinc-500 font-mono">
-            <input type="number" value="${globalState.matrixPrev[asset] || 0}" onchange="updatePrevMatrix('${asset}', this.value)" class="w-12 bg-[#020203] border border-zinc-800 rounded text-center text-xs text-zinc-400 focus:outline-none focus:border-cyan-500 font-mono">
+            <input type="number" value="${globalState.matrixPrev[asset] !== undefined ? globalState.matrixPrev[asset] : 0}" oninput="updatePrevMatrix('${asset}', this.value)" class="w-14 bg-[#020203] border border-cyan-500/40 rounded px-1 py-0.5 text-center text-xs text-white focus:outline-none focus:border-cyan-400 font-mono font-bold">
           </td>
           <td class="p-2 text-center font-mono">
             <div class="flex items-center justify-center gap-1">
@@ -577,30 +582,38 @@
       recalculateMatrixAndDivergences();
     }
 
-    // RECALCULAR SUMA COMBINADA (PREVIO + EVENTOS SEMANA ACTUAL)
+    // MOTOR BLINDADO DE SUMA Y CÁLCULO DE TOTAL COMBINADO
     function recalculateMatrixAndDivergences() {
       const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'];
       const intermarket = ['VIX', 'Oil', 'Gold'];
 
-      // Resetear suma de eventos
+      if (!globalState.matrixEvents) globalState.matrixEvents = {};
+      if (!globalState.matrixTotals) globalState.matrixTotals = {};
+      if (!globalState.matrixPrev) globalState.matrixPrev = {};
+
       currencies.forEach(c => globalState.matrixEvents[c] = 0);
       intermarket.forEach(i => globalState.matrixEvents[i] = globalState.intermarketScores[i] || 0);
 
-      // Sumar eventos de la semana actual
-      Object.keys(globalState.categoryScores).forEach(catId => {
-        const item = globalState.categoryScores[catId];
-        if (item && globalState.matrixEvents[item.ccy] !== undefined) {
-          globalState.matrixEvents[item.ccy] += item.score;
-        }
-      });
+      // Sumar puntuaciones del calendario
+      if (globalState.categoryScores) {
+        Object.keys(globalState.categoryScores).forEach(catId => {
+          const item = globalState.categoryScores[catId];
+          if (item && item.ccy && typeof item.score === 'number') {
+            if (globalState.matrixEvents[item.ccy] !== undefined) {
+              globalState.matrixEvents[item.ccy] += item.score;
+            } else {
+              globalState.matrixEvents[item.ccy] = item.score;
+            }
+          }
+        });
+      }
 
-      // Calcular Total Combinado = Previo + Eventos Semana Actual
+      // TOTAL COMBINADO = PREVIO (MANUAL) + EVENTOS (SEMANA ACTUAL)
       [...currencies, ...intermarket].forEach(c => {
-        const prev = globalState.matrixPrev[c] || 0;
-        const ev = globalState.matrixEvents[c] || 0;
+        const prev = parseInt(globalState.matrixPrev[c]) || 0;
+        const ev = parseInt(globalState.matrixEvents[c]) || 0;
         globalState.matrixTotals[c] = prev + ev;
 
-        // Actualizar UI
         const eventsEl = document.getElementById(`live-events-${c}`);
         if (eventsEl) {
           eventsEl.textContent = ev > 0 ? `+${ev}` : ev;
@@ -659,8 +672,8 @@
         for (let j = i + 1; j < forexList.length; j++) {
           const cA = forexList[i];
           const cB = forexList[j];
-          const scoreA = globalState.matrixTotals[cA];
-          const scoreB = globalState.matrixTotals[cB];
+          const scoreA = globalState.matrixTotals[cA] || 0;
+          const scoreB = globalState.matrixTotals[cB] || 0;
           const diff = Math.abs(scoreA - scoreB);
 
           if (diff >= 3) {
@@ -670,8 +683,8 @@
               actionBadge: formatted.actionBadge,
               strong: formatted.strong,
               weak: formatted.weak,
-              strongScore: globalState.matrixTotals[formatted.strong],
-              weakScore: globalState.matrixTotals[formatted.weak],
+              strongScore: globalState.matrixTotals[formatted.strong] || 0,
+              weakScore: globalState.matrixTotals[formatted.weak] || 0,
               diff: diff
             });
           }
