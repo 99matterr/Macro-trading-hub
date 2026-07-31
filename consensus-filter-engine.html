@@ -1,5 +1,520 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"><!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kairos Macro Hub // Motor de Expectativas y Consenso</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Motor SheetJS para lectura de Excel y CSV -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body { background-color: #030305; color: #d4d4d8; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #030305; }
+    ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 3px; }
+
+    /* REGLAS PARA IMPRESIÓN Y EXPORTACIÓN A PDF */
+    @media screen {
+      #outputContainer { display: none !important; }
+    }
+    
+    @media print {
+      .no-print { display: none !important; }
+      body, html { background: white !important; color: #0f172a !important; padding: 0 !important; margin: 0 !important; }
+      #outputContainer { display: block !important; width: 100% !important; background: white !important; margin: 0 !important; }
+      .page-break { page-break-before: always; }
+      .report-card { border: none !important; box-shadow: none !important; padding: 0 !important; background: white !important; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+
+    /* Insignias por País / Divisa */
+    .badge-US, .badge-USA, .badge-USD { background-color: #D9E1F2; color: #1E293B; }
+    .badge-EMU, .badge-EU, .badge-EUR, .badge-DE, .badge-FR { background-color: #FFF2CC; color: #1E293B; }
+    .badge-GB, .badge-UK, .badge-GBP { background-color: #E2EFDA; color: #1E293B; }
+    .badge-JP, .badge-JPY { background-color: #FCE4D6; color: #1E293B; }
+    .badge-CA, .badge-CAD { background-color: #E1D5E7; color: #1E293B; }
+    .badge-AU, .badge-AUD { background-color: #D5E8D4; color: #1E293B; }
+    .badge-NZ, .badge-NZD { background-color: #DAE8FC; color: #1E293B; }
+    .badge-CH, .badge-CHF { background-color: #F8CECC; color: #1E293B; }
+    .badge-CN, .badge-CNH, .badge-CNY { background-color: #FFE6CC; color: #1E293B; }
+    .badge-DEFAULT { background-color: #E2E8F0; color: #1E293B; }
+  </style>
+</head>
+<body class="bg-[#030305] min-h-screen text-zinc-300 font-sans p-3 md:p-6 antialiased">
+
+  <!-- CONTENEDOR PRINCIPAL INTERACTIVO (PUBLICADO EN PANTALLA) -->
+  <div class="max-w-6xl mx-auto space-y-6 no-print">
+    
+    <!-- Encabezado Principal Kairos Style -->
+    <div class="bg-[#090a10] p-5 md:p-6 rounded-2xl border border-zinc-800 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+          <span>🎯</span> Kairos Consensus Hub
+        </h1>
+        <p class="text-zinc-400 text-xs mt-1">Visor y filtro de expectativas y rangos de consenso macroeconómico</p>
+      </div>
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <button onclick="resetConsensusData()" class="bg-rose-950/20 hover:bg-rose-900/40 text-rose-300 border border-rose-900/40 text-xs px-3 py-2 rounded-lg transition">
+          🗑️ Borrar Memoria
+        </button>
+        <button onclick="triggerPrint()" class="bg-cyan-500 hover:bg-cyan-400 text-black text-xs px-4 py-2 rounded-lg font-bold shadow-md transition">
+          Exportar PDF &rarr;
+        </button>
+      </div>
+    </div>
+
+    <!-- Zona Clicable / Dropzone para Excel o CSV -->
+    <div id="dropZone" class="bg-[#07080d] border border-dashed border-zinc-800 hover:border-cyan-500/60 rounded-2xl p-6 text-center transition cursor-pointer group">
+      <input type="file" id="excelInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleFileSelect(event)" />
+      <div class="space-y-1.5">
+        <svg class="mx-auto h-8 w-8 text-zinc-500 group-hover:text-cyan-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <div class="text-xs font-medium text-zinc-300">
+          Arrastra tu archivo <span class="text-cyan-400 font-semibold">Excel (.xlsx) o CSV aquí</span> o haz clic para explorar
+        </div>
+        <p class="text-xs text-zinc-600 font-mono">Los datos filtrados quedarán guardados en pantalla automáticamente</p>
+      </div>
+    </div>
+
+    <!-- MENSAJE DE ESPERA / ESTADO VACÍO -->
+    <div id="emptyState" class="bg-[#07080d] border border-zinc-800/80 rounded-2xl p-12 text-center text-zinc-500 space-y-2">
+      <span class="text-3xl block mb-2">📋</span>
+      <h3 class="text-sm font-semibold text-zinc-300">No hay tabla de consenso publicada</h3>
+      <p class="text-xs max-w-md mx-auto">Sube una tabla de expectativas en la zona superior. Una vez filtrada, tus datos se mantendrán publicados en esta página permanentemente.</p>
+    </div>
+
+    <!-- RESUMEN INFORMATIVO DE COBERTERA Y REGIONES -->
+    <div id="summaryBar" class="hidden bg-[#07080d] border border-zinc-800/80 p-4 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-3 text-xs font-mono">
+      <div class="flex items-center gap-2 text-zinc-400">
+        <span class="text-cyan-400">🌐 Regiones Filtradas:</span>
+        <span class="text-zinc-200 font-bold">EE.UU., Eurozona, Reino Unido, Japón, Canadá, Australia, Nueva Zelanda, Suiza, China</span>
+      </div>
+      <div id="totalEventsBadge" class="bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 px-3 py-1 rounded-lg text-[11px] font-bold">
+        0 Datos de Consenso Filtrados
+      </div>
+    </div>
+
+    <!-- CONTENEDOR DE TABLAS DE CONSENSO (MÓDULOS DE DÍAS PUBLICADOS) -->
+    <div id="liveConsensusContainer" class="space-y-8"></div>
+
+  </div>
+
+  <!-- ÁREA DE IMPRESIÓN / PDF EN ESPAÑOL -->
+  <div id="outputContainer"></div>
+
+  <script>
+    const ALLOWED_GEOS = [
+      'US', 'USA', 'USD', 'AU', 'AUS', 'AUD', 'CH', 'CHE', 'CHF',
+      'NZ', 'NZL', 'NZD', 'CN', 'CHN', 'CNH', 'CNY', 'JP', 'JPN', 'JPY',
+      'GB', 'UK', 'GBP', 'EMU', 'EU', 'EUR', 'DE', 'DEU', 'FR', 'FRA', 'CA', 'CAN', 'CAD'
+    ];
+
+    let globalState = {
+      daysData: {}
+    };
+
+    const dropZone = document.getElementById('dropZone');
+    const excelInput = document.getElementById('excelInput');
+
+    dropZone.addEventListener('click', () => excelInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-cyan-500'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-cyan-500'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-cyan-500');
+      if (e.dataTransfer.files.length) processFile(e.dataTransfer.files[0]);
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadFromLocalStorage();
+    });
+
+    function saveToLocalStorage() {
+      localStorage.setItem('kairos_consensus_hub_state', JSON.stringify(globalState));
+    }
+
+    function loadFromLocalStorage() {
+      const saved = localStorage.getItem('kairos_consensus_hub_state');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          globalState.daysData = parsed.daysData || {};
+          if (Object.keys(globalState.daysData).length > 0) {
+            renderLiveConsensusApp();
+          }
+        } catch (e) {
+          console.error("Error al cargar datos desde memoria local", e);
+        }
+      }
+    }
+
+    function handleFileSelect(e) {
+      if (e.target.files.length) processFile(e.target.files[0]);
+    }
+
+    function isAllowedGeo(geoCode) {
+      if (!geoCode) return false;
+      return ALLOWED_GEOS.includes(String(geoCode).trim().toUpperCase());
+    }
+
+    function isValidConsensus(val) {
+      if (val === null || val === undefined) return false;
+      const str = String(val).trim().toUpperCase();
+      if (str === "" || str === "-" || str === "--" || str === "N/A" || str === "NULL" || str === "UNDEFINED") {
+        return false;
+      }
+      return true;
+    }
+
+    function translateDateHeader(headerStr) {
+      if (!headerStr) return headerStr;
+      let str = headerStr.toUpperCase();
+      const replacements = {
+        'SUNDAY': 'DOMINGO', 'MONDAY': 'LUNES', 'TUESDAY': 'MARTES', 
+        'WEDNESDAY': 'MIÉRCOLES', 'THURSDAY': 'JUEVES', 'FRIDAY': 'VIERNES', 'SATURDAY': 'SÁBADO',
+        'JANUARY': 'ENERO', 'FEBRUARY': 'FEBRERO', 'MARCH': 'MARZO', 'APRIL': 'ABRIL',
+        'MAY': 'MAYO', 'JUNE': 'JUNIO', 'JULY': 'JULIO', 'AUGUST': 'AGOSTO',
+        'SEPTEMBER': 'SEPTIEMBRE', 'OCTOBER': 'OCTUBRE', 'NOVEMBER': 'NOVIEMBRE', 'DECEMBER': 'DICIEMBRE'
+      };
+      Object.keys(replacements).forEach(key => {
+        str = str.replace(new RegExp('\\b' + key + '\\b', 'g'), replacements[key]);
+      });
+      return str;
+    }
+
+    function processFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+
+        const rawRows = XLSX.utils.sheet_to_json(sheet, { 
+          header: 1, 
+          defval: "", 
+          raw: false, 
+          dateNF: "yyyy-mm-dd" 
+        });
+
+        parseSpreadsheetData(rawRows);
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function parseSpreadsheetData(rows) {
+      const daysData = {};
+      let currentDay = "LUNES";
+
+      rows.forEach(row => {
+        if (!row || row.length === 0) return;
+
+        const cleanRow = row.map(cell => cell === null || cell === undefined ? "" : String(cell).trim());
+        const rowString = cleanRow.join(" ").trim();
+        if (!rowString) return;
+
+        // Omitir filas de encabezado repetidas
+        if (cleanRow.includes("Macro Indicator / Sub-Metric") || cleanRow.includes("Consensus") || /Time/i.test(cleanRow[1] || "")) {
+          return;
+        }
+
+        // --- 1. DETECCIÓN DUAL DE DÍA Y FECHA ---
+        let detectedDay = null;
+
+        const targetDateIdx = cleanRow.findIndex(c => c.includes("Calendar Target Date:"));
+        if (targetDateIdx !== -1) {
+          let rawDate = cleanRow[targetDateIdx + 1] || cleanRow[targetDateIdx].replace("Calendar Target Date:", "");
+          detectedDay = rawDate.replace(/Current Month/gi, "").replace(/\s{2,}/g, " ").trim().toUpperCase();
+        } 
+        else if (/^(SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|DOMINGO|LUNES|MARTES|MIÉRCOLES|MIERCOLES|JUEVES|VIERNES|SÁBADO|SABADO)/i.test(rowString)) {
+          detectedDay = rowString.toUpperCase();
+        } 
+        else {
+          for (let cell of cleanRow) {
+            if (/^\d{4}-\d{2}-\d{2}/.test(cell) || /^\d{1,2}\/\d{1,2}\/\d{2,4}/.test(cell) || /^\d{5}(\.\d+)?$/.test(cell)) {
+              let d;
+              if (/^\d{5}(\.\d+)?$/.test(cell)) {
+                const serial = parseFloat(cell);
+                if (serial > 40000 && serial < 60000) d = new Date(Math.round((serial - 25569) * 86400 * 1000));
+              } else {
+                let dateVal = cell.includes(' ') ? cell.split(' ')[0] : cell;
+                if (dateVal.includes('-')) {
+                  const parts = dateVal.split('-');
+                  d = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+                } else if (dateVal.includes('/')) {
+                  const parts = dateVal.split('/');
+                  let y = parseInt(parts[2]);
+                  if (y < 100) y += 2000;
+                  d = new Date(Date.UTC(y, parseInt(parts[0]) - 1, parseInt(parts[1])));
+                }
+              }
+
+              if (d && !isNaN(d.getTime())) {
+                const dayNames = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
+                detectedDay = `${dayNames[d.getUTCDay()]}, ${d.toLocaleDateString('es-ES', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).toUpperCase()}`;
+                break;
+              }
+            }
+          }
+        }
+
+        if (detectedDay) {
+          currentDay = detectedDay;
+          if (!daysData[currentDay]) daysData[currentDay] = [];
+          return;
+        }
+
+        // --- 2. EXTRACCIÓN DE DATOS DE LA FILA ---
+        let time = "-", country = "", indicator = "", consensus = "-", range = "-", prior = "-";
+
+        let mergedColIdx = cleanRow.findIndex(c => {
+          if (!c.includes(":")) return false;
+          const prefix = c.split(":")[0].trim().toUpperCase();
+          return isAllowedGeo(prefix);
+        });
+
+        if (mergedColIdx !== -1) {
+          country = cleanRow[mergedColIdx].split(":")[0].trim().toUpperCase();
+          indicator = cleanRow[mergedColIdx].substring(country.length + 1).trim();
+          consensus = cleanRow[mergedColIdx + 1] || "-";
+          range = cleanRow[mergedColIdx + 2] || "-";
+          prior = cleanRow[mergedColIdx + 3] || "-";
+        } 
+        else {
+          let foundGeoIdx = cleanRow.findIndex(c => isAllowedGeo(c));
+          if (foundGeoIdx !== -1) {
+            country = cleanRow[foundGeoIdx].toUpperCase();
+            
+            for (let i = 0; i < foundGeoIdx; i++) {
+              if (/^\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM)?$/i.test(cleanRow[i]) || /^\d{1,2}\.\d{2}/.test(cleanRow[i])) {
+                time = cleanRow[i];
+                break;
+              }
+            }
+
+            if (foundGeoIdx + 1 < cleanRow.length) indicator = cleanRow[foundGeoIdx + 1];
+
+            const postIndicator = cleanRow.slice(foundGeoIdx + 2);
+            if (postIndicator.length >= 4) {
+              consensus = postIndicator[1] || postIndicator[2];
+              range = postIndicator[3] || "-";
+              prior = postIndicator[4] || postIndicator[3] || "-";
+            } else if (postIndicator.length === 3) {
+              consensus = postIndicator[0];
+              range = postIndicator[1];
+              prior = postIndicator[2];
+            } else if (postIndicator.length === 2) {
+              consensus = postIndicator[0];
+              prior = postIndicator[1];
+            } else if (postIndicator.length === 1) {
+              consensus = postIndicator[0];
+            }
+          }
+        }
+
+        // Filtrar y conservar únicamente filas con país válido, texto de indicador y consenso actionable
+        if (country && indicator && isAllowedGeo(country) && isValidConsensus(consensus)) {
+          if (!daysData[currentDay]) daysData[currentDay] = [];
+          daysData[currentDay].push({ time, country, indicator, consensus, range, prior });
+        }
+      });
+
+      globalState.daysData = daysData;
+      saveToLocalStorage();
+      renderLiveConsensusApp();
+    }
+
+    function renderLiveConsensusApp() {
+      const container = document.getElementById('liveConsensusContainer');
+      const emptyState = document.getElementById('emptyState');
+      const summaryBar = document.getElementById('summaryBar');
+      const totalEventsBadge = document.getElementById('totalEventsBadge');
+
+      container.innerHTML = '';
+      let totalCount = 0;
+
+      const dayKeys = Object.keys(globalState.daysData);
+
+      if (dayKeys.length === 0) {
+        emptyState.classList.remove('hidden');
+        summaryBar.classList.add('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      summaryBar.classList.remove('hidden');
+
+      dayKeys.forEach(day => {
+        const events = globalState.daysData[day];
+        if (!events || events.length === 0) return;
+
+        totalCount += events.length;
+        const translatedDay = translateDateHeader(day);
+
+        let dayCard = document.createElement('div');
+        // MÓDULO CONTINUO CON BORDE UNIFICADO KAIROS
+        dayCard.className = "bg-[#07090e] border border-cyan-500/30 rounded-2xl shadow-xl shadow-cyan-950/20 space-y-4 overflow-hidden transition hover:border-cyan-500/50";
+
+        // CABECERA TIPO CÁPSULA / BADGE SIN CORTES
+        let dayHeader = `
+          <div class="bg-[#0b0f19] border-b border-cyan-500/30 px-5 py-3.5 flex justify-between items-center">
+            <div class="flex items-center gap-2 bg-cyan-500/15 border border-cyan-400/40 px-3 py-1.5 rounded-xl text-cyan-300 font-bold font-mono text-xs shadow-[0_0_12px_rgba(34,211,238,0.15)]">
+              <span>📅</span>
+              <span class="tracking-wider">${translatedDay}</span>
+            </div>
+            <span class="text-[10px] text-cyan-200/80 font-mono bg-cyan-950/70 px-2.5 py-1 rounded-lg border border-cyan-500/30 shadow-sm">${events.length} Expectativas</span>
+          </div>
+        `;
+
+        let tableHTML = `
+          <div class="px-4 pb-4 overflow-x-auto">
+            <table class="w-full text-left text-xs font-mono border-collapse">
+              <thead>
+                <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 uppercase tracking-wider">
+                  <th class="p-2.5">Hora</th>
+                  <th class="p-2.5">País</th>
+                  <th class="p-2.5">Indicador Macroeconómico</th>
+                  <th class="p-2.5 text-center">Consenso</th>
+                  <th class="p-2.5 text-center">Rango Expectativas</th>
+                  <th class="p-2.5 text-center">Previo</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+        events.forEach((item, idx) => {
+          const badgeClass = `badge-${item.country}`;
+          const rowBgClass = idx % 2 === 0 ? 'bg-transparent' : 'bg-zinc-900/20';
+
+          tableHTML += `
+            <tr class="${rowBgClass} border-b border-zinc-800/30 hover:bg-zinc-800/40 text-zinc-300 transition">
+              <td class="p-2.5 text-zinc-400 font-mono text-[11px]">${item.time}</td>
+              <td class="p-2.5"><span class="${badgeClass} px-2 py-0.5 rounded font-bold text-[9px] tracking-wide">${item.country}</span></td>
+              <td class="p-2.5 font-sans text-zinc-100 text-xs font-medium">${item.indicator}</td>
+              <td class="p-2.5 text-center font-bold text-cyan-400 font-mono text-xs">${item.consensus}</td>
+              <td class="p-2.5 text-center text-zinc-400 font-mono">${item.range}</td>
+              <td class="p-2.5 text-center text-zinc-500 font-mono">${item.prior}</td>
+            </tr>
+          `;
+        });
+
+        tableHTML += `
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        dayCard.innerHTML = dayHeader + tableHTML;
+        container.appendChild(dayCard);
+      });
+
+      totalEventsBadge.textContent = `${totalCount} Datos de Consenso Filtrados`;
+    }
+
+    function resetConsensusData() {
+      if (confirm('¿Deseas borrar la tabla de consenso guardada en pantalla?')) {
+        localStorage.removeItem('kairos_consensus_hub_state');
+        globalState = { daysData: {} };
+        renderLiveConsensusApp();
+      }
+    }
+
+    function triggerPrint() {
+      if (!globalState.daysData || Object.keys(globalState.daysData).length === 0) {
+        alert('No hay datos cargados para exportar a PDF.');
+        return;
+      }
+      renderPDFPrintPreview();
+      setTimeout(() => {
+        window.print();
+      }, 200);
+    }
+
+    function renderPDFPrintPreview() {
+      const outputContainer = document.getElementById('outputContainer');
+      const esHTML = renderReportTemplate(globalState.daysData);
+      outputContainer.innerHTML = esHTML;
+    }
+
+    function renderReportTemplate(data) {
+      const text = {
+        title: "REPORTE MACROECONÓMICO DE CONSENSO Y EXPECTATIVAS",
+        subtitle: "Calendario Filtrado Institucional · Exclusivamente Países Seleccionados con Consenso Válido",
+        time: "HORA",
+        country: "PAÍS / REGIÓN",
+        indicator: "INDICADOR MACROECONÓMICO",
+        consensus: "CONSENSO",
+        range: "RANGO EXPECTATIVAS",
+        prior: "PREVIO",
+        footer: "Inteligencia Institucional de Consenso Macro · Kairos Integrated Risk Engine"
+      };
+
+      let html = `
+        <div class="report-card bg-white p-8 rounded-xl shadow-lg border border-slate-200 font-sans mb-12">
+          <h1 style="font-size: 18px; font-weight: bold; color: #0F172A; margin: 0; border-bottom: 2px solid #0F172A; padding-bottom: 4px;">${text.title}</h1>
+          <h2 style="font-size: 11px; color: #475569; margin: 4px 0 16px 0; font-style: italic;">${text.subtitle}</h2>
+      `;
+
+      Object.keys(data).forEach(day => {
+        const events = data[day];
+        if (!events || events.length === 0) return;
+
+        const translatedDay = translateDateHeader(day);
+
+        html += `
+          <div style="background-color: #1F385C; color: white; padding: 6px 10px; font-weight: bold; font-size: 11px; margin-top: 16px; text-transform: uppercase;">
+            ${translatedDay}
+          </div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 12px; border: 1px solid #CBD5E1;">
+            <thead>
+              <tr style="background-color: #0F172A; color: white; text-align: left;">
+                <th style="padding: 6px; width: 8%; border: 1px solid #334155;">${text.time}</th>
+                <th style="padding: 6px; width: 14%; border: 1px solid #334155;">${text.country}</th>
+                <th style="padding: 6px; width: 42%; border: 1px solid #334155;">${text.indicator}</th>
+                <th style="padding: 6px; width: 12%; border: 1px solid #334155; text-align: center;">${text.consensus}</th>
+                <th style="padding: 6px; width: 12%; border: 1px solid #334155; text-align: center;">${text.range}</th>
+                <th style="padding: 6px; width: 12%; border: 1px solid #334155; text-align: center;">${text.prior}</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        events.forEach((item, idx) => {
+          const rowBg = idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC';
+          const badgeClass = `badge-${item.country}`;
+
+          html += `
+            <tr style="background-color: ${rowBg}; border-bottom: 1px solid #E2E8F0;">
+              <td style="padding: 5px; font-family: monospace; border: 1px solid #E2E8F0; text-align: center;">${item.time}</td>
+              <td style="padding: 5px; border: 1px solid #E2E8F0; text-align: center;"><span class="${badgeClass}" style="padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 9px;">${item.country}</span></td>
+              <td style="padding: 5px; font-weight: 500; border: 1px solid #E2E8F0;">${item.indicator}</td>
+              <td style="padding: 5px; font-weight: bold; color: #0369A1; border: 1px solid #E2E8F0; text-align: center;">${item.consensus}</td>
+              <td style="padding: 5px; color: #475569; border: 1px solid #E2E8F0; text-align: center;">${item.range}</td>
+              <td style="padding: 5px; color: #475569; border: 1px solid #E2E8F0; text-align: center;">${item.prior}</td>
+            </tr>
+          `;
+        });
+
+        html += `
+            </tbody>
+          </table>
+        `;
+      });
+
+      html += `
+        <div style="margin-top: 24px; border-top: 1px solid #CBD5E1; padding-top: 6px; text-align: center; font-size: 8px; color: #64748B;">
+          ${text.footer}
+        </div>
+      </div>`;
+
+      return html;
+    }
+  </script>
+</body>
+</html>
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
