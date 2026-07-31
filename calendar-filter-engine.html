@@ -1,6 +1,950 @@
 <!DOCTYPE html>
 <html lang="en">
+<head><!DOCTYPE html>
+<html lang="es">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kairos Macro Hub // Motor Unificado de Riesgo y Divergencias</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Motor SheetJS para lectura de Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body { background-color: #030305; color: #d4d4d8; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #030305; }
+    ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 3px; }
+
+    /* REGLAS PARA IMPRESIÓN Y EXPORTACIÓN A PDF */
+    @media screen {
+      #outputContainer { display: none !important; }
+    }
+    
+    @media print {
+      .no-print { display: none !important; }
+      body, html { background: white !important; color: #0f172a !important; padding: 0 !important; margin: 0 !important; }
+      #outputContainer { display: block !important; width: 100% !important; background: white !important; color: #0f172a !important; }
+      .page-break { page-break-before: always; }
+      .report-card { border: none !important; box-shadow: none !important; padding: 0 !important; background: white !important; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+
+    .badge-USD { background-color: #D9E1F2; color: #1E293B; }
+    .badge-EUR { background-color: #FFF2CC; color: #1E293B; }
+    .badge-GBP { background-color: #E2EFDA; color: #1E293B; }
+    .badge-JPY { background-color: #FCE4D6; color: #1E293B; }
+    .badge-CAD { background-color: #E1D5E7; color: #1E293B; }
+    .badge-AUD { background-color: #D5E8D4; color: #1E293B; }
+    .badge-NZD { background-color: #DAE8FC; color: #1E293B; }
+    .badge-CHF { background-color: #F8CECC; color: #1E293B; }
+    .badge-CNH, .badge-CNY { background-color: #FFE6CC; color: #1E293B; }
+    .badge-DEFAULT { background-color: #E2E8F0; color: #1E293B; }
+
+    /* Botones de Sentimiento Activos */
+    .score-btn-active-p2 { background-color: #059669 !important; color: white !important; border-color: #10b981 !important; font-weight: bold; }
+    .score-btn-active-p1 { background-color: #10b981 !important; color: white !important; border-color: #34d399 !important; font-weight: bold; }
+    .score-btn-active-0  { background-color: #3f3f46 !important; color: white !important; border-color: #71717a !important; font-weight: bold; }
+    .score-btn-active-m1 { background-color: #f43f5e !important; color: white !important; border-color: #fb7185 !important; font-weight: bold; }
+    .score-btn-active-m2 { background-color: #be123c !important; color: white !important; border-color: #e11d48 !important; font-weight: bold; }
+
+    /* Escala de Colores Matriz */
+    .score-scale-strong-bullish { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; border: 1px solid rgba(16, 185, 129, 0.4) !important; }
+    .score-scale-bullish { background-color: rgba(234, 179, 8, 0.15) !important; color: #facc15 !important; border: 1px solid rgba(234, 179, 8, 0.4) !important; }
+    .score-scale-neutral { background-color: rgba(63, 63, 70, 0.3) !important; color: #a1a1aa !important; border: 1px solid rgba(113, 113, 122, 0.3) !important; }
+    .score-scale-bearish { background-color: rgba(249, 115, 22, 0.15) !important; color: #fb923c !important; border: 1px solid rgba(249, 115, 22, 0.4) !important; }
+    .score-scale-strong-bearish { background-color: rgba(225, 29, 72, 0.15) !important; color: #fb7185 !important; border: 1px solid rgba(225, 29, 72, 0.4) !important; }
+  </style>
+</head>
+<body class="bg-[#030305] min-h-screen text-zinc-300 font-sans p-3 md:p-6 antialiased">
+
+  <!-- CONTENEDOR PRINCIPAL INTERACTIVO -->
+  <div class="max-w-6xl mx-auto space-y-6 no-print">
+    
+    <!-- Encabezado Principal -->
+    <div class="bg-[#090a10] p-5 md:p-6 rounded-2xl border border-zinc-800 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+          <span>⚡</span> Kairos Macro Hub
+        </h1>
+        <p class="text-zinc-400 text-xs mt-1">Filtro de calendario económico y motor de análisis de divergencias</p>
+      </div>
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <button onclick="alert('📌 Módulo de Bitácora e Histórico en desarrollo.')" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 border border-zinc-800 text-xs px-3 py-2 rounded-lg transition font-medium flex items-center gap-1.5">
+          <span>📁</span> Bitácora
+        </button>
+
+        <button onclick="resetAllScores()" class="bg-rose-950/20 hover:bg-rose-900/40 text-rose-300 border border-rose-900/40 text-xs px-3 py-2 rounded-lg transition">
+          🗑️ Reiniciar Todo
+        </button>
+        <button onclick="triggerPrint()" class="bg-cyan-500 hover:bg-cyan-400 text-black text-xs px-4 py-2 rounded-lg font-bold shadow-md transition">
+          Exportar PDF &rarr;
+        </button>
+      </div>
+    </div>
+
+    <!-- Carga de Archivos -->
+    <div id="dropZone" class="bg-[#07080d] border border-dashed border-zinc-800 hover:border-cyan-500/60 rounded-2xl p-6 text-center transition cursor-pointer group">
+      <input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event)" />
+      <div class="space-y-1.5">
+        <svg class="mx-auto h-8 w-8 text-zinc-500 group-hover:text-cyan-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <div class="text-xs font-medium text-zinc-300">
+          Arrastra tu archivo <span class="text-cyan-400 font-semibold">Excel (.xlsx) aquí</span> o haz clic para explorar
+        </div>
+      </div>
+    </div>
+
+    <!-- ESCÁNER DE DIVERGENCIAS MACRO -->
+    <div id="divergenceAlertBox" class="hidden bg-cyan-950/20 border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3">
+      <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2">
+        <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
+          <span>⚡</span> Escáner de Divergencias Macro Detectadas
+        </span>
+        <span id="divergenceCountBadge" class="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded font-bold">0 Pares Aprobados</span>
+      </div>
+      <div id="divergenceList" class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs"></div>
+    </div>
+
+    <!-- MATRIZ VIVA DE FUERZA GLOBAL E INTERMERCADO -->
+    <div id="liveMatrixContainer" class="hidden bg-[#07080d] border border-zinc-800 p-5 rounded-2xl space-y-4 shadow-lg">
+      <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+        <h3 class="text-xs font-bold text-white uppercase tracking-wider">Matriz de Fuerza Global en Tiempo Real</h3>
+        
+        <div class="flex items-center gap-1.5 text-[9px] font-mono">
+          <span class="px-1.5 py-0.5 rounded score-scale-strong-bullish font-bold">+4 a +10</span>
+          <span class="px-1.5 py-0.5 rounded score-scale-bullish font-bold">+1 a +3</span>
+          <span class="px-1.5 py-0.5 rounded score-scale-neutral font-bold">0</span>
+          <span class="px-1.5 py-0.5 rounded score-scale-bearish font-bold">-1 a -3</span>
+          <span class="px-1.5 py-0.5 rounded score-scale-strong-bearish font-bold">-4 a -10</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Divisas Forex -->
+        <div>
+          <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2 font-mono">Sección A: Divisas Forex Core</span>
+          <table class="w-full text-xs text-left">
+            <thead>
+              <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
+                <th class="p-2">Divisa</th>
+                <th class="p-2 text-center">Previo (Manual)</th>
+                <th class="p-2 text-center">Eventos (Auto)</th>
+                <th class="p-2 text-center">Total Combinado</th>
+              </tr>
+            </thead>
+            <tbody id="matrixForexBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Catalizadores Intermercado -->
+        <div>
+          <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2 font-mono">Sección B: Materias Primas y Riesgo</span>
+          <table class="w-full text-xs text-left">
+            <thead>
+              <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
+                <th class="p-2">Activo</th>
+                <th class="p-2 text-center">Previo (Manual)</th>
+                <th class="p-2 text-center">Evaluación</th>
+                <th class="p-2 text-center">Total Combinado</th>
+              </tr>
+            </thead>
+            <tbody id="matrixIntermarketBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDARIO INTERACTIVO POR DÍAS (MÓDULOS CORREGIDOS) -->
+    <div id="interactiveCalendarContainer" class="space-y-8"></div>
+
+  </div>
+
+  <!-- ÁREA DE IMPRESIÓN PDF -->
+  <div id="outputContainer"></div>
+
+  <script>
+    const WHITELIST = {
+      UNIVERSAL: ['interest rate decision', 'monetary policy statement', 'press conference', 'meeting minutes', 'speaks', 'speech', 'president speaks', 'summary of opinions'],
+      USD: ['nfp', 'nonfarm payrolls', 'adp', 'unemployment rate', 'average hourly earnings', 'jobless claims', 'cpi', 'pce', 'ppi', 'gdp', 'ism', 'pmi', 'industrial production', 'retail sales', 'consumer sentiment', 'building permits', 'home sales', 'trade balance'],
+      CAD: ['monetary policy report', 'cpi', 'ppi', 'ippi', 'gdp', 'employment change', 'unemployment rate', 'retail sales', 'trade balance', 'ivey pmi'],
+      EUR: ['cpi', 'ppi', 'gdp', 'pmi', 'zew', 'retail sales', 'industrial production', 'trade balance', 'ifo', 'business climate', 'unemployment', 'consumer climate'],
+      CHF: ['cpi', 'ppi', 'gdp', 'industrial production', 'pmi', 'retail sales', 'unemployment'],
+      GBP: ['cpi', 'rpi', 'ppi', 'gdp', 'unemployment rate', 'claimant count', 'average earnings', 'pmi', 'retail sales'],
+      JPY: ['ppi', 'cgpi', 'tankan', 'cpi', 'tokyo', 'national cpi', 'inflation', 'consumer price', 'gdp', 'trade balance', 'household spending', 'exports', 'imports', 'pmi', 'retail sales', 'industrial production', 'unemployment', 'jobless', 'boj', 'bank of japan', 'tertiary industry', 'current account'],
+      AUD: ['cpi', 'ppi', 'employment change', 'unemployment rate', 'gdp', 'retail sales', 'westpac', 'trade balance', 'pmi'],
+      NZD: ['cpi', 'ppi', 'gdt', 'gdp', 'employment change', 'unemployment rate', 'pmi', 'retail sales', 'trade balance'],
+      CNH: ['lpr', 'loan prime rate', 'cpi', 'ppi', 'gdp', 'pmi', 'industrial production', 'retail sales', 'trade balance']
+    };
+
+    const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH', 'CNY', 'DE', 'FR', 'UK', 'EU', 'CH', 'CA', 'US', 'JP', 'JPN', 'AU', 'AUS', 'NZ', 'NZL', 'GB', 'GBR', 'CN', 'CHN'];
+    const CURRENCY_HIERARCHY = ['EUR', 'GBP', 'AUD', 'NZD', 'USD', 'CAD', 'CHF', 'JPY'];
+
+    let globalState = {
+      daysData: {},
+      categoryScores: {},
+      matrixEvents: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
+      matrixTotals: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
+      matrixPrev: { USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 },
+      intermarketScores: { VIX: 0, Oil: 0, Gold: 0 },
+      dailyNotes: {}
+    };
+
+    const dropZone = document.getElementById('dropZone');
+    const excelInput = document.getElementById('excelInput');
+
+    dropZone.addEventListener('click', () => excelInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-cyan-500'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-cyan-500'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-cyan-500');
+      if (e.dataTransfer.files.length) processExcelFile(e.dataTransfer.files[0]);
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadFromLocalStorage();
+    });
+
+    function saveToLocalStorage() {
+      localStorage.setItem('kairos_macro_engine_state', JSON.stringify(globalState));
+    }
+
+    function loadFromLocalStorage() {
+      const saved = localStorage.getItem('kairos_macro_engine_state');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          globalState.daysData = parsed.daysData || {};
+          globalState.categoryScores = parsed.categoryScores || {};
+          globalState.matrixPrev = Object.assign({ USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 }, parsed.matrixPrev || {});
+          globalState.intermarketScores = Object.assign({ VIX: 0, Oil: 0, Gold: 0 }, parsed.intermarketScores || {});
+          globalState.dailyNotes = parsed.dailyNotes || {};
+          
+          if (Object.keys(globalState.daysData).length > 0) {
+            renderLiveInteractiveApp();
+          }
+        } catch (e) {
+          console.error("Error al cargar memoria local", e);
+        }
+      }
+    }
+
+    // TRADUCTOR AUTOMÁTICO DE NOMBRES DE DÍAS Y MESES AL ESPAÑOL
+    function translateDayToSpanish(dayStr) {
+      if (!dayStr) return dayStr;
+      let str = dayStr.toUpperCase();
+      const replacements = {
+        'MONDAY': 'LUNES',
+        'TUESDAY': 'MARTES',
+        'WEDNESDAY': 'MIÉRCOLES',
+        'THURSDAY': 'JUEVES',
+        'FRIDAY': 'VIERNES',
+        'SATURDAY': 'SÁBADO',
+        'SUNDAY': 'DOMINGO',
+        'JANUARY': 'ENERO',
+        'FEBRUARY': 'FEBRERO',
+        'MARCH': 'MARZO',
+        'APRIL': 'ABRIL',
+        'MAY': 'MAYO',
+        'JUNE': 'JUNIO',
+        'JULY': 'JULIO',
+        'AUGUST': 'AGOSTO',
+        'SEPTEMBER': 'SEPTIEMBRE',
+        'OCTOBER': 'OCTUBRE',
+        'NOVEMBER': 'NOVIEMBRE',
+        'DECEMBER': 'DICIEMBRE'
+      };
+      Object.keys(replacements).forEach(key => {
+        str = str.replace(new RegExp('\\b' + key + '\\b', 'g'), replacements[key]);
+      });
+      return str;
+    }
+
+    function handleFileSelect(e) {
+      if (e.target.files.length) processExcelFile(e.target.files[0]);
+    }
+
+    function isWhitelisted(ccy, eventName) {
+      if (!eventName) return false;
+      const lower = String(eventName).toLowerCase();
+      if (lower.includes('fed regional') || lower.includes('mpc member') || lower.includes('executive board member')) return false;
+      if (WHITELIST.UNIVERSAL.some(term => lower.includes(term))) return true;
+      const terms = WHITELIST[ccy] || [];
+      return terms.some(term => lower.includes(term));
+    }
+
+    function getCategorySentimentTitle(ccy, eventName) {
+      if (!eventName) return `SENTIMIENTO DE ${ccy}`;
+      const lower = eventName.toLowerCase();
+
+      if (lower.includes('cpi') || lower.includes('pce') || lower.includes('rpi') || lower.includes('inflation') || lower.includes('tokyo') || lower.includes('consumer price')) return `${ccy} - INFLACIÓN (IPC)`;
+      if (lower.includes('ppi') || lower.includes('ippi') || lower.includes('producer price') || lower.includes('cgpi')) return `${ccy} - PRECIOS DE PRODUCTOR (IPP)`;
+      if (lower.includes('unemployment') || lower.includes('employment') || lower.includes('jobless') || lower.includes('nfp') || lower.includes('adp') || lower.includes('claimant') || lower.includes('earnings') || lower.includes('household spending')) return `${ccy} - MERCADO LABORAL Y SALARIOS`;
+      if (lower.includes('pmi') || lower.includes('ism') || lower.includes('tankan')) return `${ccy} - ÍNDICES PMI / TANKAN`;
+      if (lower.includes('interest rate') || lower.includes('monetary policy') || lower.includes('ecb press') || lower.includes('fomc') || lower.includes('rate decision') || lower.includes('loan prime') || lower.includes('boj') || lower.includes('bank of japan')) return `${ccy} - POLÍTICA MONETARIA Y TASAS`;
+      if (lower.includes('retail sales')) return `${ccy} - VENTAS MINORISTAS`;
+      if (lower.includes('trade balance') || lower.includes('exports') || lower.includes('imports') || lower.includes('current account')) return `${ccy} - BALANZA COMERCIAL`;
+      if (lower.includes('gdp')) return `${ccy} - PRODUCTO INTERNO BRUTO (PIB)`;
+      if (lower.includes('zew')) return `${ccy} - SENTIMIENTO ECONÓMICO ZEW`;
+      if (lower.includes('gdt') || lower.includes('dairy')) return `${ccy} - ÍNDICE DE PRECIOS LÁCTEOS (GDT)`;
+      if (lower.includes('consumer climate') || lower.includes('consumer sentiment')) return `${ccy} - CLIMA Y CONFIANZA DEL CONSUMIDOR`;
+      if (lower.includes('building permit') || lower.includes('home sales')) return `${ccy} - MERCADO INMOBILIARIO`;
+
+      const firstWord = eventName.split(' ')[0].toUpperCase();
+      return `${ccy} - ${firstWord}`;
+    }
+
+    function processExcelFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+
+        const rawRows = XLSX.utils.sheet_to_json(sheet, { 
+          header: 1, 
+          defval: "", 
+          raw: false, 
+          dateNF: "yyyy-mm-dd" 
+        });
+        
+        parseSpreadsheetData(rawRows);
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function parseSpreadsheetData(rows) {
+      const daysData = {};
+      let currentDay = "LUNES";
+
+      rows.forEach(row => {
+        if (!row || row.length === 0) return;
+        const cleanRow = row.map(cell => cell === null || cell === undefined ? "" : String(cell).trim());
+        const rowString = cleanRow.join(" ").trim();
+        if (!rowString) return;
+
+        if (/Time/i.test(cleanRow[1] || "") && /Cur/i.test(cleanRow[2] || "") && /Event/i.test(cleanRow[3] || "")) return;
+
+        let detectedDay = null;
+        if (/^(SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|DOMINGO|LUNES|MARTES|MIÉRCOLES|MIERCOLES|JUEVES|VIERNES|SÁBADO|SABADO)/i.test(rowString)) {
+          detectedDay = rowString.toUpperCase();
+        } else {
+          for (let cell of cleanRow) {
+            if (/^\d{4}-\d{2}-\d{2}/.test(cell) || /^\d{1,2}\/\d{1,2}\/\d{2,4}/.test(cell) || /^\d{5}(\.\d+)?$/.test(cell)) {
+              let d;
+              if (/^\d{5}(\.\d+)?$/.test(cell)) {
+                const serial = parseFloat(cell);
+                if (serial > 40000 && serial < 60000) {
+                  d = new Date(Math.round((serial - 25569) * 86400 * 1000));
+                }
+              } else {
+                let dateVal = cell.includes(' ') ? cell.split(' ')[0] : cell;
+                if (dateVal.includes('-')) {
+                  const parts = dateVal.split('-');
+                  d = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+                } else if (dateVal.includes('/')) {
+                  const parts = dateVal.split('/');
+                  let y = parseInt(parts[2]);
+                  if (y < 100) y += 2000;
+                  d = new Date(Date.UTC(y, parseInt(parts[0]) - 1, parseInt(parts[1])));
+                }
+              }
+
+              if (d && !isNaN(d.getTime())) {
+                const dayNames = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
+                const dayName = dayNames[d.getUTCDay()];
+                const dateStr = d.toLocaleDateString('es-ES', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
+                detectedDay = `${dayName}, ${dateStr}`;
+                break; 
+              }
+            }
+          }
+        }
+
+        if (detectedDay) {
+          currentDay = detectedDay;
+          if (!daysData[currentDay]) daysData[currentDay] = [];
+          return;
+        }
+
+        let time = "", ccy = "", event = "", actual = "", forecast = "", previous = "";
+        let foundCcyIdx = -1;
+
+        for (let i = 0; i < cleanRow.length; i++) {
+          if (CURRENCIES.includes(cleanRow[i].toUpperCase())) {
+            foundCcyIdx = i;
+            ccy = cleanRow[i].toUpperCase();
+            break;
+          }
+        }
+
+        if (foundCcyIdx !== -1) {
+          for (let i = 0; i < foundCcyIdx; i++) {
+            if (/^\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM)?$/i.test(cleanRow[i]) || /^\d{1,2}\.\d{2}/.test(cleanRow[i])) {
+              time = cleanRow[i];
+              break;
+            }
+          }
+          if (foundCcyIdx + 1 < cleanRow.length) event = cleanRow[foundCcyIdx + 1];
+          const postEvent = cleanRow.slice(foundCcyIdx + 2);
+          if (postEvent.length >= 3) {
+            actual = postEvent[0] === "" ? postEvent[1] : postEvent[0];
+            forecast = postEvent[0] === "" ? postEvent[2] : postEvent[1];
+            previous = postEvent[0] === "" ? postEvent[3] || "" : postEvent[2] || "";
+          } else if (postEvent.length === 2) {
+            actual = postEvent[0]; forecast = postEvent[1];
+          } else if (postEvent.length === 1) {
+            actual = postEvent[0];
+          }
+        }
+
+        if (!ccy || !event) return;
+
+        let mappedCCY = ccy;
+        if (['DE', 'FR', 'EU'].includes(ccy)) mappedCCY = 'EUR';
+        if (['UK', 'GB', 'GBR'].includes(ccy)) mappedCCY = 'GBP';
+        if (['CH'].includes(ccy)) mappedCCY = 'CHF';
+        if (['CA', 'CAN'].includes(ccy)) mappedCCY = 'CAD';
+        if (['US', 'USA'].includes(ccy)) mappedCCY = 'USD';
+        if (['JP', 'JPN'].includes(ccy)) mappedCCY = 'JPY';
+        if (['AU', 'AUS'].includes(ccy)) mappedCCY = 'AUD';
+        if (['NZ', 'NZL'].includes(ccy)) mappedCCY = 'NZD';
+        if (['CN', 'CHN'].includes(ccy)) mappedCCY = 'CNH';
+
+        if (isWhitelisted(mappedCCY, event)) {
+          if (!daysData[currentDay]) daysData[currentDay] = [];
+          daysData[currentDay].push({ time, ccy: mappedCCY, event, actual, forecast, previous });
+        }
+      });
+
+      globalState.daysData = daysData;
+      globalState.categoryScores = {};
+      saveToLocalStorage();
+      renderLiveInteractiveApp();
+    }
+
+    function renderLiveInteractiveApp() {
+      document.getElementById('liveMatrixContainer').classList.remove('hidden');
+      renderMatrixTables();
+      renderInteractiveCalendar();
+      recalculateMatrixAndDivergences();
+    }
+
+    function getScoreScaleClass(score) {
+      if (score >= 4) return 'score-scale-strong-bullish font-black';
+      if (score >= 1) return 'score-scale-bullish font-bold';
+      if (score === 0) return 'score-scale-neutral font-medium';
+      if (score >= -3) return 'score-scale-bearish font-bold';
+      return 'score-scale-strong-bearish font-black';
+    }
+
+    function getPdfBadgeStyle(score) {
+      const num = parseInt(score) || 0;
+      if (num === 2) return 'background-color: #d1fae5; color: #065f46; border: 1px solid #34d399;';
+      if (num === 1) return 'background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;';
+      if (num === -1) return 'background-color: #fff1f2; color: #b91c1c; border: 1px solid #fecdd3;';
+      if (num === -2) return 'background-color: #ffe4e6; color: #9f1239; border: 1px solid #fda4af;';
+      return 'background-color: #f3f4f6; color: #374151; border: 1px solid #e5e7eb;';
+    }
+
+    function renderMatrixTables() {
+      const forexCurrencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'];
+      const intermarketAssets = ['VIX', 'Oil', 'Gold'];
+
+      const forexBody = document.getElementById('matrixForexBody');
+      const intermarketBody = document.getElementById('matrixIntermarketBody');
+
+      forexBody.innerHTML = forexCurrencies.map(asset => `
+        <tr class="border-b border-zinc-800/50 hover:bg-[#0a0a0f] transition">
+          <td class="p-2 font-bold text-white flex items-center gap-2">
+            <span id="matrix-badge-${asset}" class="badge-${asset === 'CNH' ? 'CNY' : asset} text-[9px] px-2 py-0.5 rounded font-mono">${asset}</span>
+          </td>
+          <td class="p-2 text-center text-zinc-500 font-mono">
+            <input type="number" value="${globalState.matrixPrev[asset] !== undefined ? globalState.matrixPrev[asset] : 0}" oninput="updatePrevMatrix('${asset}', this.value)" class="w-12 bg-[#020203] border border-zinc-700/60 rounded px-1 py-0.5 text-center text-xs text-white focus:outline-none focus:border-cyan-400 font-mono font-bold">
+          </td>
+          <td id="live-events-${asset}" class="p-2 text-center font-mono text-xs text-zinc-300 font-bold">0</td>
+          <td id="live-matrix-${asset}" class="p-2 text-center font-mono text-xs rounded transition-all">0</td>
+        </tr>
+      `).join('');
+
+      intermarketBody.innerHTML = intermarketAssets.map(asset => {
+        const curScore = globalState.intermarketScores[asset] || 0;
+        const assetNameEs = asset === 'Oil' ? 'Petróleo' : asset === 'Gold' ? 'Oro' : 'VIX';
+        return `
+        <tr class="border-b border-zinc-800/50 hover:bg-[#0a0a0f] transition">
+          <td class="p-2 font-bold text-white">${assetNameEs}</td>
+          <td class="p-2 text-center text-zinc-500 font-mono">
+            <input type="number" value="${globalState.matrixPrev[asset] !== undefined ? globalState.matrixPrev[asset] : 0}" oninput="updatePrevMatrix('${asset}', this.value)" class="w-12 bg-[#020203] border border-zinc-700/60 rounded px-1 py-0.5 text-center text-xs text-white focus:outline-none focus:border-cyan-400 font-mono font-bold">
+          </td>
+          <td class="p-2 text-center font-mono">
+            <div class="flex items-center justify-center gap-1">
+              <button onclick="setIntermarketScore('${asset}', 2)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-emerald-500 ${curScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
+              <button onclick="setIntermarketScore('${asset}', 1)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-emerald-400 ${curScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
+              <button onclick="setIntermarketScore('${asset}', 0)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-zinc-500 ${curScore === 0 ? 'score-btn-active-0' : ''}">0</button>
+              <button onclick="setIntermarketScore('${asset}', -1)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-rose-400 ${curScore === -1 ? 'score-btn-active-m1' : ''}">-1</button>
+              <button onclick="setIntermarketScore('${asset}', -2)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-rose-600 ${curScore === -2 ? 'score-btn-active-m2' : ''}">-2</button>
+            </div>
+          </td>
+          <td id="live-matrix-${asset}" class="p-2 text-center font-mono text-xs rounded transition-all">0</td>
+        </tr>
+      `}).join('');
+    }
+
+    function renderInteractiveCalendar() {
+      const container = document.getElementById('interactiveCalendarContainer');
+      container.innerHTML = '';
+
+      Object.keys(globalState.daysData).forEach(day => {
+        const events = globalState.daysData[day];
+        if (!events || events.length === 0) return;
+
+        let dayCard = document.createElement('div');
+        // MÓDULO CONTINUO CON BORDE UNIFICADO
+        dayCard.className = "bg-[#07090e] border border-cyan-500/30 rounded-2xl shadow-xl shadow-cyan-950/20 space-y-4 overflow-hidden transition hover:border-cyan-500/50";
+
+        // FECHA TRADUCIDA AL ESPAÑOL
+        const translatedDay = translateDayToSpanish(day);
+
+        // ENCABEZADO TIPO PILL/BADGE RESALTADO SIN CORTES TRUNCADOS
+        let dayHeader = `
+          <div class="bg-[#0b0f19] border-b border-cyan-500/30 px-5 py-3.5 flex justify-between items-center">
+            <div class="flex items-center gap-2 bg-cyan-500/15 border border-cyan-400/40 px-3 py-1.5 rounded-xl text-cyan-300 font-bold font-mono text-xs shadow-[0_0_12px_rgba(34,211,238,0.15)]">
+              <span>📅</span>
+              <span class="tracking-wider">${translatedDay}</span>
+            </div>
+            <span class="text-[10px] text-cyan-200/80 font-mono bg-cyan-950/70 px-2.5 py-1 rounded-lg border border-cyan-500/30 shadow-sm">${events.length} Eventos</span>
+          </div>
+        `;
+
+        let tableHTML = `
+          <div class="px-4 overflow-x-auto">
+            <table class="w-full text-left text-xs font-mono border-collapse">
+              <thead>
+                <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 uppercase tracking-wider">
+                  <th class="p-2.5">Hora</th>
+                  <th class="p-2.5">Divisa</th>
+                  <th class="p-2.5">Evento Económico</th>
+                  <th class="p-2.5">Actual</th>
+                  <th class="p-2.5">Pronóstico</th>
+                  <th class="p-2.5">Previo</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+        events.forEach((item, idx) => {
+          const badgeClass = `badge-${['USD','EUR','GBP','JPY','CAD','AUD','NZD','CHF','CNH','CNY'].includes(item.ccy) ? item.ccy : 'DEFAULT'}`;
+          const rowBgClass = idx % 2 === 0 ? 'bg-transparent' : 'bg-zinc-900/20';
+
+          tableHTML += `
+            <tr class="${rowBgClass} border-b border-zinc-800/30 hover:bg-zinc-800/40 text-zinc-300 transition">
+              <td class="p-2.5 text-zinc-400 font-mono text-[11px]">${item.time}</td>
+              <td class="p-2.5"><span class="${badgeClass} px-2 py-0.5 rounded font-bold text-[9px] tracking-wide">${item.ccy}</span></td>
+              <td class="p-2.5 font-sans text-zinc-200 text-xs font-medium">${item.event}</td>
+              <td class="p-2.5 font-bold text-white font-mono">${item.actual || '—'}</td>
+              <td class="p-2.5 text-zinc-400 font-mono">${item.forecast || '—'}</td>
+              <td class="p-2.5 text-zinc-500 font-mono">${item.previous || '—'}</td>
+            </tr>
+          `;
+
+          const nextItem = events[idx + 1];
+          if (!nextItem || nextItem.time !== item.time || nextItem.ccy !== item.ccy) {
+            const categoryTitle = getCategorySentimentTitle(item.ccy, item.event);
+            const categoryId = `${day}-${item.ccy}-${categoryTitle}`.replace(/[^a-zA-Z0-9]/g, '-');
+            const scoreObj = globalState.categoryScores[categoryId];
+            const currentScore = scoreObj ? scoreObj.score : 0;
+
+            tableHTML += `
+              <tr>
+                <td colspan="6" class="py-2.5 px-1">
+                  <div class="bg-gradient-to-r from-amber-950/20 via-zinc-900/40 to-zinc-900/20 border border-amber-500/30 rounded-xl p-2.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 my-1">
+                    <div class="flex items-center gap-2">
+                      <span class="text-amber-400 text-xs">📊</span>
+                      <span class="text-xs font-bold text-amber-200 tracking-wide">${categoryTitle}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 font-mono">
+                      <span class="text-[10px] text-zinc-400 mr-1 uppercase">Puntuación:</span>
+                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 2, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-500 transition ${currentScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
+                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 1, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-400 transition ${currentScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
+                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 0, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-zinc-500 transition ${currentScore === 0 ? 'score-btn-active-0' : ''}">0</button>
+                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', -1, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-400 transition ${currentScore === -1 ? 'score-btn-active-m1' : ''}">-1</button>
+                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', -2, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-600 transition ${currentScore === -2 ? 'score-btn-active-m2' : ''}">-2</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }
+        });
+
+        tableHTML += `
+              </tbody>
+            </table>
+          </div>
+          <div class="px-4 pb-4">
+            <textarea oninput="saveDailyNote('${day}', this.value)" class="w-full bg-[#030305] border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-300 focus:outline-none focus:border-cyan-500/60 font-mono transition placeholder-zinc-600" rows="1.5" placeholder="Notas de la jornada para ${translatedDay} (noticias inesperadas, eventos geopolíticos)...">${globalState.dailyNotes[day] || ''}</textarea>
+          </div>
+        `;
+
+        dayCard.innerHTML = dayHeader + tableHTML;
+        container.appendChild(dayCard);
+      });
+    }
+
+    function setCategoryScore(categoryId, ccy, scoreVal, btn) {
+      globalState.categoryScores[categoryId] = { ccy: ccy, score: parseInt(scoreVal) };
+
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.score-btn').forEach(b => {
+        b.className = "score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 transition";
+      });
+
+      if (scoreVal === 2) btn.classList.add('score-btn-active-p2');
+      if (scoreVal === 1) btn.classList.add('score-btn-active-p1');
+      if (scoreVal === 0) btn.classList.add('score-btn-active-0');
+      if (scoreVal === -1) btn.classList.add('score-btn-active-m1');
+      if (scoreVal === -2) btn.classList.add('score-btn-active-m2');
+
+      saveToLocalStorage();
+      recalculateMatrixAndDivergences();
+    }
+
+    function setIntermarketScore(asset, scoreVal) {
+      globalState.intermarketScores[asset] = parseInt(scoreVal);
+      saveToLocalStorage();
+      renderMatrixTables();
+      recalculateMatrixAndDivergences();
+    }
+
+    function saveDailyNote(day, noteText) {
+      globalState.dailyNotes[day] = noteText;
+      saveToLocalStorage();
+    }
+
+    function updatePrevMatrix(asset, val) {
+      globalState.matrixPrev[asset] = parseInt(val) || 0;
+      saveToLocalStorage();
+      recalculateMatrixAndDivergences();
+    }
+
+    function recalculateMatrixAndDivergences() {
+      const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'];
+      const intermarket = ['VIX', 'Oil', 'Gold'];
+
+      if (!globalState.matrixEvents) globalState.matrixEvents = {};
+      if (!globalState.matrixTotals) globalState.matrixTotals = {};
+      if (!globalState.matrixPrev) globalState.matrixPrev = {};
+
+      currencies.forEach(c => globalState.matrixEvents[c] = 0);
+      intermarket.forEach(i => globalState.matrixEvents[i] = globalState.intermarketScores[i] || 0);
+
+      if (globalState.categoryScores) {
+        Object.keys(globalState.categoryScores).forEach(catId => {
+          const item = globalState.categoryScores[catId];
+          if (item && item.ccy && typeof item.score === 'number') {
+            if (globalState.matrixEvents[item.ccy] !== undefined) {
+              globalState.matrixEvents[item.ccy] += item.score;
+            } else {
+              globalState.matrixEvents[item.ccy] = item.score;
+            }
+          }
+        });
+      }
+
+      [...currencies, ...intermarket].forEach(c => {
+        const prev = parseInt(globalState.matrixPrev[c]) || 0;
+        const ev = parseInt(globalState.matrixEvents[c]) || 0;
+        globalState.matrixTotals[c] = prev + ev;
+
+        const eventsEl = document.getElementById(`live-events-${c}`);
+        if (eventsEl) {
+          eventsEl.textContent = ev > 0 ? `+${ev}` : ev;
+        }
+
+        const totalEl = document.getElementById(`live-matrix-${c}`);
+        if (totalEl) {
+          const val = globalState.matrixTotals[c];
+          totalEl.textContent = val > 0 ? `+${val}` : val;
+          totalEl.className = `p-2 text-center font-mono text-xs rounded transition-all ${getScoreScaleClass(val)}`;
+        }
+      });
+
+      scanDivergences();
+    }
+
+    function formatStandardForexPair(curr1, curr2, score1, score2) {
+      const strong = score1 > score2 ? curr1 : curr2;
+      const weak = score1 > score2 ? curr2 : curr1;
+
+      const rank1 = CURRENCY_HIERARCHY.indexOf(curr1);
+      const rank2 = CURRENCY_HIERARCHY.indexOf(curr2);
+
+      let base, quote, actionText;
+
+      if (rank1 !== -1 && rank2 !== -1) {
+        if (rank1 < rank2) {
+          base = curr1; quote = curr2;
+          actionText = (strong === curr1) ? `COMPRA ${base}/${quote}` : `VENTA ${base}/${quote}`;
+        } else {
+          base = curr2; quote = curr1;
+          actionText = (strong === curr2) ? `COMPRA ${base}/${quote}` : `VENTA ${base}/${quote}`;
+        }
+      } else {
+        base = strong; quote = weak;
+        actionText = `COMPRA ${base}/${quote}`;
+      }
+
+      return {
+        pairName: `${base}/${quote}`,
+        actionBadge: actionText,
+        strong: strong,
+        weak: weak
+      };
+    }
+
+    function scanDivergences() {
+      const alertBox = document.getElementById('divergenceAlertBox');
+      const listContainer = document.getElementById('divergenceList');
+      const badge = document.getElementById('divergenceCountBadge');
+
+      const forexList = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF'];
+      let divergencesFound = [];
+
+      for (let i = 0; i < forexList.length; i++) {
+        for (let j = i + 1; j < forexList.length; j++) {
+          const cA = forexList[i];
+          const cB = forexList[j];
+          const scoreA = globalState.matrixTotals[cA] || 0;
+          const scoreB = globalState.matrixTotals[cB] || 0;
+          const diff = Math.abs(scoreA - scoreB);
+
+          if (diff >= 3) {
+            const formatted = formatStandardForexPair(cA, cB, scoreA, scoreB);
+            divergencesFound.push({
+              pair: formatted.pairName,
+              actionBadge: formatted.actionBadge,
+              strong: formatted.strong,
+              weak: formatted.weak,
+              strongScore: globalState.matrixTotals[formatted.strong] || 0,
+              weakScore: globalState.matrixTotals[formatted.weak] || 0,
+              diff: diff
+            });
+          }
+        }
+      }
+
+      if (divergencesFound.length > 0) {
+        alertBox.classList.remove('hidden');
+        badge.textContent = `${divergencesFound.length} Pares Aprobados`;
+        listContainer.innerHTML = divergencesFound.map(d => `
+          <div class="bg-[#030305] border border-cyan-500/30 p-2.5 rounded-xl flex items-center justify-between">
+            <div>
+              <span class="text-zinc-400 text-[10px]">Oportunidad:</span>
+              <span class="font-black text-cyan-400 text-sm block">${d.pair}</span>
+            </div>
+            <div class="text-right">
+              <span class="${d.actionBadge.includes('COMPRA') ? 'bg-emerald-950 text-emerald-400 border-emerald-500/30' : 'bg-rose-950 text-rose-400 border-rose-500/30'} border px-2 py-0.5 rounded text-[10px] font-bold block mb-0.5">${d.actionBadge}</span>
+              <span class="text-[9px] text-zinc-500">Diferencial: ${d.diff} pts (${d.strong}: ${d.strongScore > 0 ? '+' : ''}${d.strongScore} vs ${d.weak}: ${d.weakScore > 0 ? '+' : ''}${d.weakScore})</span>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        alertBox.classList.add('hidden');
+      }
+    }
+
+    function resetAllScores() {
+      if (confirm('¿Reiniciar todo el tablero? Esto borrará los datos cargados y puntuaciones.')) {
+        localStorage.removeItem('kairos_macro_engine_state');
+        globalState = {
+          daysData: {},
+          categoryScores: {},
+          matrixEvents: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
+          matrixTotals: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
+          matrixPrev: { USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 },
+          intermarketScores: { VIX: 0, Oil: 0, Gold: 0 },
+          dailyNotes: {}
+        };
+        document.getElementById('interactiveCalendarContainer').innerHTML = '';
+        document.getElementById('liveMatrixContainer').classList.add('hidden');
+        document.getElementById('divergenceAlertBox').classList.add('hidden');
+      }
+    }
+
+    function triggerPrint() {
+      renderPDFPrintPreview();
+      setTimeout(() => {
+        window.print();
+      }, 200);
+    }
+
+    function renderPDFPrintPreview() {
+      const outputContainer = document.getElementById('outputContainer');
+      const esHTML = renderReportTemplate(globalState.daysData);
+      outputContainer.innerHTML = esHTML;
+    }
+
+    function renderReportTemplate(data) {
+      const text = {
+        title: "CALENDARIO ECONÓMICO SEMANAL — REPORTE DE RIESGO",
+        subtitle: "Plantilla Semanal · Eventos Agrupados con Evaluación Cuantitativa de Sentimiento",
+        matrixTitle: "MATRIZ DE FUERZA GLOBAL E INTERMERCADO",
+        instructionsTitle: "Instrucciones de Operación:",
+        instructionsBody: "Matriz calculada automáticamente mediante el Motor Integrado de Riesgo Kairos.<br>• Impacto Alto: Muy Bueno (+2) | Bueno (+1) | En Línea (0) | Malo (-1) | Muy Malo (-2)<br>• Impacto Medio/Bajo o Geopolítica: Positivo (+1) | Neutral (0) | Negativo (-1)",
+        thAsset: "ACTIVO / DIVISA",
+        thPrev: "SEMANA PREVIA",
+        thCurr: "TOTAL COMBINADO",
+        secA: "SECCIÓN A: DIVISAS (FOREX CORE)",
+        secB: "SECCIÓN B: CATALIZADORES MACRO E INTERMERCADO",
+        vix: "VIX (Volatilidad S&P 500)",
+        oil: "Petróleo (Crudo WTI/Brent)",
+        gold: "Oro (XAU/USD)",
+        time: "HORA",
+        ccy: "DIVISA",
+        event: "EVENTO",
+        actual: "ACTUAL",
+        forecast: "PRONÓSTICO",
+        previous: "PREVIO",
+        sentiment: "EVALUACIÓN",
+        notes: "Notas Diarias (Noticias Inesperadas / Eventos Geopolíticos / Giros Intermercado):",
+        footer: "Inteligencia Institucional de Riesgo Forex · Kairos Integrated Risk Engine"
+      };
+
+      let html = `
+        <div class="report-card bg-white p-8 rounded-xl font-sans mb-12">
+          <h1 style="font-size: 18px; font-weight: bold; color: #0F172A; margin: 0; border-bottom: 2px solid #0F172A; padding-bottom: 4px;">${text.title}</h1>
+          <h2 style="font-size: 11px; color: #475569; margin: 4px 0 14px 0; font-style: italic;">${text.subtitle}</h2>
+
+          <div style="background-color: #F8FAFC; border: 1px solid #CBD5E1; padding: 10px; border-radius: 4px; margin-bottom: 16px;">
+            <div style="font-size: 11px; font-weight: bold; color: #0F172A; margin-bottom: 6px;">${text.matrixTitle}</div>
+            <p style="font-size: 9px; margin: 0 0 8px 0; color: #334155; line-height: 1.3;">
+              <strong>${text.instructionsTitle}</strong> ${text.instructionsBody}
+            </p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+              <thead>
+                <tr style="background-color: #0F172A; color: white;">
+                  <th style="padding: 5px; text-align: left; width: 40%;">${text.thAsset}</th>
+                  <th style="padding: 5px; text-align: center; width: 30%;">${text.thPrev}</th>
+                  <th style="padding: 5px; text-align: center; width: 30%;">${text.thCurr}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background-color: #CBD5E1; font-weight: bold;"><td colspan="3" style="padding: 3px 5px;">${text.secA}</td></tr>
+                ${['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'].map(asset => {
+                  const tot = globalState.matrixTotals[asset] || 0;
+                  const prev = globalState.matrixPrev[asset] || 0;
+                  return `
+                  <tr style="border-bottom: 1px solid #E2E8F0;">
+                    <td style="padding: 3px 5px; font-weight: bold;">${asset}</td>
+                    <td style="border-left: 1px solid #E2E8F0; text-align: center;">${prev > 0 ? '+' : ''}${prev}</td>
+                    <td style="border-left: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #0F172A;">${tot > 0 ? '+' : ''}${tot}</td>
+                  </tr>
+                `}).join('')}
+                <tr style="background-color: #CBD5E1; font-weight: bold;"><td colspan="3" style="padding: 3px 5px;">${text.secB}</td></tr>
+                ${[['VIX', text.vix], ['Oil', text.oil], ['Gold', text.gold]].map(asset => {
+                  const tot = globalState.matrixTotals[asset[0]] || 0;
+                  const prev = globalState.matrixPrev[asset[0]] || 0;
+                  return `
+                  <tr style="border-bottom: 1px solid #E2E8F0;">
+                    <td style="padding: 3px 5px; font-weight: bold;">${asset[1]}</td>
+                    <td style="border-left: 1px solid #E2E8F0; text-align: center;">${prev > 0 ? '+' : ''}${prev}</td>
+                    <td style="border-left: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #0F172A;">${tot > 0 ? '+' : ''}${tot}</td>
+                  </tr>
+                `}).join('')}
+              </tbody>
+            </table>
+          </div>
+      `;
+
+      Object.keys(data).forEach(day => {
+        const events = data[day];
+        if (!events || events.length === 0) return;
+        const translatedDay = translateDayToSpanish(day);
+
+        html += `
+          <div style="background-color: #1F385C; color: white; padding: 6px 10px; font-weight: bold; font-size: 11px; margin-top: 14px; text-transform: uppercase;">
+            ${translatedDay}
+          </div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 4px;">
+            <thead>
+              <tr style="border-bottom: 2px solid #1F385C; text-align: left; background-color: #F1F5F9;">
+                <th style="padding: 5px; width: 9%;">${text.time}</th>
+                <th style="padding: 5px; width: 8%;">${text.ccy}</th>
+                <th style="padding: 5px; width: 39%;">${text.event}</th>
+                <th style="padding: 5px; width: 11%;">${text.actual}</th>
+                <th style="padding: 5px; width: 11%;">${text.forecast}</th>
+                <th style="padding: 5px; width: 11%;">${text.previous}</th>
+                <th style="padding: 5px; width: 11%; text-align: center;">${text.sentiment}</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        events.forEach((item, idx) => {
+          const badgeClass = `badge-${['USD','EUR','GBP','JPY','CAD','AUD','NZD','CHF','CNH','CNY'].includes(item.ccy) ? item.ccy : 'DEFAULT'}`;
+
+          html += `
+            <tr style="border-bottom: 1px solid #E2E8F0;">
+              <td style="padding: 4px 5px; font-family: monospace;">${item.time}</td>
+              <td style="padding: 4px 5px;"><span class="${badgeClass}" style="padding: 1px 4px; border-radius: 3px; font-weight: bold; font-size: 9px;">${item.ccy}</span></td>
+              <td style="padding: 4px 5px;">${item.event}</td>
+              <td style="padding: 4px 5px;">${item.actual}</td>
+              <td style="padding: 4px 5px;">${item.forecast}</td>
+              <td style="padding: 4px 5px;">${item.previous}</td>
+              <td style="padding: 4px 5px; border-left: 1px solid #E2E8F0;"></td>
+            </tr>
+          `;
+
+          const nextItem = events[idx + 1];
+          if (!nextItem || nextItem.time !== item.time || nextItem.ccy !== item.ccy) {
+            const categoryTitle = getCategorySentimentTitle(item.ccy, item.event);
+            const categoryId = `${day}-${item.ccy}-${categoryTitle}`.replace(/[^a-zA-Z0-9]/g, '-');
+            const scoreItem = globalState.categoryScores[categoryId];
+            const scoreVal = scoreItem ? scoreItem.score : 0;
+            const formattedVal = scoreVal > 0 ? `+${scoreVal}` : scoreVal;
+            const pdfBadgeStyle = getPdfBadgeStyle(scoreVal);
+
+            html += `
+              <tr style="background-color: #FDF8E7; border-top: 1px solid #D9D9D9; border-bottom: 1px solid #D9D9D9;">
+                <td colspan="6" style="padding: 5px 8px; font-style: italic; font-weight: bold; color: #854D0E; font-size: 9px;">
+                  ${categoryTitle}
+                </td>
+                <td style="padding: 4px; text-align: center; border-left: 1px solid #CBD5E1;">
+                  <span style="display: inline-block; padding: 1px 6px; border-radius: 3px; font-weight: bold; font-size: 9px; font-family: monospace; ${pdfBadgeStyle}">
+                    ${formattedVal}
+                  </span>
+                </td>
+              </tr>
+            `;
+          }
+        });
+
+        html += `
+            </tbody>
+          </table>
+
+          <div style="border: 1px dashed #94A3B8; min-height: 45px; border-radius: 4px; padding: 6px; margin-bottom: 12px; background-color: #FAFAFA;">
+            <span style="font-size: 9px; font-weight: bold; color: #64748B;">
+              ${text.notes}
+            </span>
+            <p style="font-size: 10px; color: #334155; margin-top: 4px; font-family: monospace;">${globalState.dailyNotes[day] || '—'}</p>
+          </div>
+        `;
+      });
+
+      html += `
+        <div style="margin-top: 20px; border-top: 1px solid #CBD5E1; padding-top: 6px; text-align: center; font-size: 8px; color: #64748B;">
+          ${text.footer}
+        </div>
+      </div>`;
+
+      return html;
+    }
+  </script>
+</body>
+</html>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Excel Institutional Risk Report Generator</title>
