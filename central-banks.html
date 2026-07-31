@@ -43,7 +43,7 @@
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-  <!-- HEADER GLOBAL INYECTADO -->
+  <!-- HEADER GLOBAL INYECTADO VIA INJECT-ENGINE.JS -->
   <div id="global-header"></div>
 
   <!-- CONTENIDO PRINCIPAL -->
@@ -74,7 +74,7 @@
         </div>
       </div>
 
-      <!-- Resumen en Matriz -->
+      <!-- Resumen en Matriz de Vista Rápida -->
       <div class="bg-[#07080d] border border-zinc-800 p-5 rounded-2xl space-y-4 shadow-lg">
         <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
           <h3 class="text-xs font-bold text-white uppercase tracking-wider">Matriz de Tasas y Sesgo Monetario Actual</h3>
@@ -100,7 +100,7 @@
       <!-- Módulos Editables por Banco Central -->
       <div id="centralBanksContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
 
-      <!-- Sección de Definiciones -->
+      <!-- Sección de Definiciones y Guía -->
       <div class="bg-[#07090e] border border-zinc-800 p-6 rounded-2xl space-y-5 shadow-xl">
         <div class="border-b border-zinc-800 pb-3 flex items-center justify-between">
           <h3 class="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono flex items-center gap-2">
@@ -182,16 +182,125 @@
       'Dovish': { label: '🔴 Dovish (Flexible - Bajista)', class: 'stance-dovish' }
     };
 
+    /* DATOS MACROECONÓMICOS REALES Y ACTUALIZADOS */
     const DEFAULT_BANKS = [
-      { id: 'FED', ccy: 'USD', name: 'Reserva Federal', fullName: 'Federal Reserve (Fed)', rate: '5.25% - 5.50%', stance: 'Higher for Longer', nextMeeting: '2026-09-16', probCut: '15', probHold: '80', probHike: '5', notes: 'Enfocados en la persistencia de la inflación subyacente. Mercado descuenta pausa prolongada.' },
-      { id: 'ECB', ccy: 'EUR', name: 'Banco Central Europeo', fullName: 'European Central Bank (BCE)', rate: '4.25%', stance: 'Neutral', nextMeeting: '2026-09-10', probCut: '45', probHold: '50', probHike: '5', notes: 'Crecimiento débil en la Eurozona equilibra la presión salarial. Dependientes de los datos.' },
-      { id: 'BOE', ccy: 'GBP', name: 'Banco de Inglaterra', fullName: 'Bank of England (BoE)', rate: '5.00%', stance: 'Hawkish Pause', nextMeeting: '2026-09-17', probCut: '25', probHold: '70', probHike: '5', notes: 'Inflación de servicios aún elevada. Votación dividida en la última reunión.' },
-      { id: 'BOJ', ccy: 'JPY', name: 'Banco de Japón', fullName: 'Bank of Japan (BoJ)', rate: '0.25%', stance: 'Hawkish', nextMeeting: '2026-09-20', probCut: '0', probHold: '60', probHike: '40', notes: 'Proceso de normalización monetaria en marcha. Vigilando de cerca la volatilidad del yen.' },
-      { id: 'BOC', ccy: 'CAD', name: 'Banco de Canadá', fullName: 'Bank of Canada (BoC)', rate: '4.50%', stance: 'Dovish', nextMeeting: '2026-09-09', probCut: '70', probHold: '30', probHike: '0', notes: 'Enfriamiento del mercado laboral y consumo débil abren espacio a recortes continuos.' },
-      { id: 'RBA', ccy: 'AUD', name: 'Banco de Reserva de Australia', fullName: 'Reserve Bank of Australia (RBA)', rate: '4.35%', stance: 'Hawkish Pause', nextMeeting: '2026-09-29', probCut: '10', probHold: '80', probHike: '10', notes: 'Inflación trimestral obstinada frena expectativas de flexibilización temprana.' },
-      { id: 'RBNZ', ccy: 'NZD', name: 'Banco de Reserva de Nueva Zelanda', fullName: 'Reserve Bank of New Zealand (RBNZ)', rate: '5.25%', stance: 'Dovish Pause', nextMeeting: '2026-10-09', probCut: '65', probHold: '35', probHike: '0', notes: 'Giro flexible tras contracción del PIB y moderación rápida del IPC.' },
-      { id: 'SNB', ccy: 'CHF', name: 'Banco Nacional Suizo', fullName: 'Swiss National Bank (SNB)', rate: '1.25%', stance: 'Hawkish Cut', nextMeeting: '2026-09-24', probCut: '50', probHold: '50', probHike: '0', notes: 'Inflación bajo control dentro del rango meta (0-2%). Preocupación por la firmeza del CHF.' },
-      { id: 'PBOC', ccy: 'CNH', name: 'Banco Popular de China', fullName: 'People\'s Bank of China (PBoC)', rate: '3.35%', stance: 'Dovish', nextMeeting: '2026-08-20', probCut: '40', probHold: '60', probHike: '0', notes: 'Estímulos continuos para reactivar la demanda interna y el sector inmobiliario.' }
+      { 
+        id: 'FED', 
+        ccy: 'USD', 
+        name: 'Reserva Federal', 
+        fullName: 'Federal Reserve (Fed)', 
+        rate: '3.50% - 3.75%', 
+        stance: 'Hawkish Pause', 
+        nextMeeting: '2026-09-16', 
+        probCut: '5', 
+        probHold: '65', 
+        probHike: '30', 
+        notes: 'Tasa mantenida en 3.50%-3.75% el 29 de julio. Votación 9-3 con disidencia hawkish pidiendo alza de 25 pb debido a riesgos inflacionarios energéticos.' 
+      },
+      { 
+        id: 'ECB', 
+        ccy: 'EUR', 
+        name: 'Banco Central Europeo', 
+        fullName: 'European Central Bank (BCE)', 
+        rate: '2.25%', 
+        stance: 'Neutral', 
+        nextMeeting: '2026-09-10', 
+        probCut: '15', 
+        probHold: '80', 
+        probHike: '5', 
+        notes: 'Tasa de depósito mantenida en 2.25% en julio. Mantiene un enfoque dependiente de datos reunión a reunión sin compromiso previo de trayectoria.' 
+      },
+      { 
+        id: 'BOE', 
+        ccy: 'GBP', 
+        name: 'Banco de Inglaterra', 
+        fullName: 'Bank of England (BoE)', 
+        rate: '3.75%', 
+        stance: 'Hawkish Pause', 
+        nextMeeting: '2026-09-17', 
+        probCut: '10', 
+        probHold: '65', 
+        probHike: '25', 
+        notes: 'Mantuvo la tasa en 3.75% el 30 de julio en votación dividida 6-3. Tres miembros votaron por un alza a 4.00% ante presiones de precios.' 
+      },
+      { 
+        id: 'BOJ', 
+        ccy: 'JPY', 
+        name: 'Banco de Japón', 
+        fullName: 'Bank of Japan (BoJ)', 
+        rate: '1.00%', 
+        stance: 'Hawkish', 
+        nextMeeting: '2026-09-18', 
+        probCut: '0', 
+        probHold: '70', 
+        probHike: '30', 
+        notes: 'Tasa mantenida en 1.00% tras el alza previa. Votación 8-1 con disidencia pidiendo alza a 1.25%. IPC subyacente se mantiene firme.' 
+      },
+      { 
+        id: 'BOC', 
+        ccy: 'CAD', 
+        name: 'Banco de Canadá', 
+        fullName: 'Bank of Canada (BoC)', 
+        rate: '2.25%', 
+        stance: 'Neutral', 
+        nextMeeting: '2026-09-02', 
+        probCut: '20', 
+        probHold: '75', 
+        probHike: '5', 
+        notes: 'Tasa mantenida en 2.25% por sexta reunión consecutiva el 15 de julio. Monitorea la volatilidad del petróleo y el crecimiento moderado.' 
+      },
+      { 
+        id: 'RBA', 
+        ccy: 'AUD', 
+        name: 'Banco de Reserva de Australia', 
+        fullName: 'Reserve Bank of Australia (RBA)', 
+        rate: '4.35%', 
+        stance: 'Hawkish Pause', 
+        nextMeeting: '2026-08-11', 
+        probCut: '5', 
+        probHold: '85', 
+        probHike: '10', 
+        notes: 'Tasa clave en 4.35%. Próxima reunión el 11 de agosto. Enfriamiento en el mercado laboral reduce urgencia de alzas inmediatas.' 
+      },
+      { 
+        id: 'RBNZ', 
+        ccy: 'NZD', 
+        name: 'Banco de Reserva de Nueva Zelanda', 
+        fullName: 'Reserve Bank of New Zealand (RBNZ)', 
+        rate: '2.50%', 
+        stance: 'Hawkish', 
+        nextMeeting: '2026-09-02', 
+        probCut: '0', 
+        probHold: '60', 
+        probHike: '40', 
+        notes: 'Elevó la tasa clave 25 pb a 2.50% en su revisión de julio para contener expectativas de inflación. Abre la puerta a ajustes adicionales.' 
+      },
+      { 
+        id: 'SNB', 
+        ccy: 'CHF', 
+        name: 'Banco Nacional Suizo', 
+        fullName: 'Swiss National Bank (SNB)', 
+        rate: '0.00%', 
+        stance: 'Neutral', 
+        nextMeeting: '2026-09-24', 
+        probCut: '10', 
+        probHold: '80', 
+        probHike: '10', 
+        notes: 'Tasa mantenida en 0.00% con inflación en 0.6%. El SNB se mantiene alerta ante la firmeza del franco suizo y riesgos geopolíticos.' 
+      },
+      { 
+        id: 'PBOC', 
+        ccy: 'CNH', 
+        name: 'Banco Popular de China', 
+        fullName: 'People\'s Bank of China (PBoC)', 
+        rate: '3.00%', 
+        stance: 'Dovish', 
+        nextMeeting: '2026-08-20', 
+        probCut: '35', 
+        probHold: '65', 
+        probHike: '0', 
+        notes: 'LPR a 1 año mantenida en 3.00% y a 5 años en 3.50% en julio. Política acomodaticia activa para impulsar el consumo e inmobiliario.' 
+      }
     ];
 
     let banksData = [];
