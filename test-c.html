@@ -65,7 +65,13 @@
         <h1 class="text-2xl font-black tracking-tight text-white uppercase">Calendar Filter & Risk Engine</h1>
         <p class="text-zinc-400 text-xs mt-0.5">Edita manualmente la sesión previa y evalúa eventos en tiempo real.</p>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 flex-wrap">
+        <!-- NOTA / RESERVA DE ESPACIO PARA LA OPCIÓN 5 (BITÁCORA HISTÓRICA) -->
+        <button onclick="alert('📌 NOTA PENDIENTE (Opción 5):\n\nAquí se agregará el sistema de Bitácora e Histórico para Exportar e Importar semanas en archivos .JSON.\n\nServirá para guardar copias de seguridad de cada semana, hacer backtesting de tus análisis macro y comparar cómo evolucionó la fuerza de cada divisa con el tiempo.')" class="bg-zinc-900/80 hover:bg-zinc-800 text-zinc-400 border border-zinc-700/60 text-xs px-3.5 py-2.5 rounded-xl font-mono transition flex items-center gap-1.5 cursor-pointer opacity-80 hover:opacity-100">
+          <span>📁</span>
+          <span>Bitácora (Próximamente)</span>
+        </button>
+
         <button onclick="resetAllScores()" class="bg-rose-950/30 hover:bg-rose-900/50 text-rose-300 border border-rose-800/50 text-xs px-3.5 py-2.5 rounded-xl font-mono transition">
           🗑️ Reiniciar Todo
         </button>
@@ -594,7 +600,6 @@
       currencies.forEach(c => globalState.matrixEvents[c] = 0);
       intermarket.forEach(i => globalState.matrixEvents[i] = globalState.intermarketScores[i] || 0);
 
-      // Sumar puntuaciones del calendario
       if (globalState.categoryScores) {
         Object.keys(globalState.categoryScores).forEach(catId => {
           const item = globalState.categoryScores[catId];
@@ -608,7 +613,6 @@
         });
       }
 
-      // TOTAL COMBINADO = PREVIO (MANUAL) + EVENTOS (SEMANA ACTUAL)
       [...currencies, ...intermarket].forEach(c => {
         const prev = parseInt(globalState.matrixPrev[c]) || 0;
         const ev = parseInt(globalState.matrixEvents[c]) || 0;
