@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-<head><!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kairos Macro Hub // Motor Unificado de Riesgo y Divergencias</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Motor SheetJS para lectura de Excel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     body { background-color: #030305; color: #d4d4d8; }
@@ -15,11 +12,7 @@
     ::-webkit-scrollbar-track { background: #030305; }
     ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 3px; }
 
-    /* REGLAS PARA IMPRESIÓN Y EXPORTACIÓN A PDF */
-    @media screen {
-      #outputContainer { display: none !important; }
-    }
-    
+    @media screen { #outputContainer { display: none !important; } }
     @media print {
       .no-print { display: none !important; }
       body, html { background: white !important; color: #0f172a !important; padding: 0 !important; margin: 0 !important; }
@@ -40,14 +33,12 @@
     .badge-CNH, .badge-CNY { background-color: #FFE6CC; color: #1E293B; }
     .badge-DEFAULT { background-color: #E2E8F0; color: #1E293B; }
 
-    /* Botones de Sentimiento Activos */
     .score-btn-active-p2 { background-color: #059669 !important; color: white !important; border-color: #10b981 !important; font-weight: bold; }
     .score-btn-active-p1 { background-color: #10b981 !important; color: white !important; border-color: #34d399 !important; font-weight: bold; }
     .score-btn-active-0  { background-color: #3f3f46 !important; color: white !important; border-color: #71717a !important; font-weight: bold; }
     .score-btn-active-m1 { background-color: #f43f5e !important; color: white !important; border-color: #fb7185 !important; font-weight: bold; }
     .score-btn-active-m2 { background-color: #be123c !important; color: white !important; border-color: #e11d48 !important; font-weight: bold; }
 
-    /* Escala de Colores Matriz */
     .score-scale-strong-bullish { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; border: 1px solid rgba(16, 185, 129, 0.4) !important; }
     .score-scale-bullish { background-color: rgba(234, 179, 8, 0.15) !important; color: #facc15 !important; border: 1px solid rgba(234, 179, 8, 0.4) !important; }
     .score-scale-neutral { background-color: rgba(63, 63, 70, 0.3) !important; color: #a1a1aa !important; border: 1px solid rgba(113, 113, 122, 0.3) !important; }
@@ -55,115 +46,119 @@
     .score-scale-strong-bearish { background-color: rgba(225, 29, 72, 0.15) !important; color: #fb7185 !important; border: 1px solid rgba(225, 29, 72, 0.4) !important; }
   </style>
 </head>
-<body class="bg-[#030305] min-h-screen text-zinc-300 font-sans p-3 md:p-6 antialiased">
+<body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-  <!-- CONTENEDOR PRINCIPAL INTERACTIVO -->
-  <div class="max-w-6xl mx-auto space-y-6 no-print">
-    
-    <!-- Encabezado Principal -->
-    <div class="bg-[#090a10] p-5 md:p-6 rounded-2xl border border-zinc-800 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <div>
-        <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-          <span>⚡</span> Kairos Macro Hub
-        </h1>
-        <p class="text-zinc-400 text-xs mt-1">Filtro de calendario económico y motor de análisis de divergencias</p>
-      </div>
-      <div class="flex items-center gap-2.5 flex-wrap">
-        <button onclick="alert('📌 Módulo de Bitácora e Histórico en desarrollo.')" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 border border-zinc-800 text-xs px-3 py-2 rounded-lg transition font-medium flex items-center gap-1.5">
-          <span>📁</span> Bitácora
-        </button>
+  <!-- HEADER GLOBAL INYECTADO -->
+  <div id="global-header"></div>
 
-        <button onclick="resetAllScores()" class="bg-rose-950/20 hover:bg-rose-900/40 text-rose-300 border border-rose-900/40 text-xs px-3 py-2 rounded-lg transition">
-          🗑️ Reiniciar Todo
-        </button>
-        <button onclick="triggerPrint()" class="bg-cyan-500 hover:bg-cyan-400 text-black text-xs px-4 py-2 rounded-lg font-bold shadow-md transition">
-          Exportar PDF &rarr;
-        </button>
-      </div>
-    </div>
-
-    <!-- Carga de Archivos -->
-    <div id="dropZone" class="bg-[#07080d] border border-dashed border-zinc-800 hover:border-cyan-500/60 rounded-2xl p-6 text-center transition cursor-pointer group">
-      <input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event)" />
-      <div class="space-y-1.5">
-        <svg class="mx-auto h-8 w-8 text-zinc-500 group-hover:text-cyan-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        <div class="text-xs font-medium text-zinc-300">
-          Arrastra tu archivo <span class="text-cyan-400 font-semibold">Excel (.xlsx) aquí</span> o haz clic para explorar
-        </div>
-      </div>
-    </div>
-
-    <!-- ESCÁNER DE DIVERGENCIAS MACRO -->
-    <div id="divergenceAlertBox" class="hidden bg-cyan-950/20 border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3">
-      <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2">
-        <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
-          <span>⚡</span> Escáner de Divergencias Macro Detectadas
-        </span>
-        <span id="divergenceCountBadge" class="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded font-bold">0 Pares Aprobados</span>
-      </div>
-      <div id="divergenceList" class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs"></div>
-    </div>
-
-    <!-- MATRIZ VIVA DE FUERZA GLOBAL E INTERMERCADO -->
-    <div id="liveMatrixContainer" class="hidden bg-[#07080d] border border-zinc-800 p-5 rounded-2xl space-y-4 shadow-lg">
-      <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
-        <h3 class="text-xs font-bold text-white uppercase tracking-wider">Matriz de Fuerza Global en Tiempo Real</h3>
-        
-        <div class="flex items-center gap-1.5 text-[9px] font-mono">
-          <span class="px-1.5 py-0.5 rounded score-scale-strong-bullish font-bold">+4 a +10</span>
-          <span class="px-1.5 py-0.5 rounded score-scale-bullish font-bold">+1 a +3</span>
-          <span class="px-1.5 py-0.5 rounded score-scale-neutral font-bold">0</span>
-          <span class="px-1.5 py-0.5 rounded score-scale-bearish font-bold">-1 a -3</span>
-          <span class="px-1.5 py-0.5 rounded score-scale-strong-bearish font-bold">-4 a -10</span>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Divisas Forex -->
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-grow w-full max-w-6xl mx-auto px-3 md:px-6 py-6">
+    <div class="space-y-6 no-print">
+      
+      <!-- Encabezado Principal -->
+      <div class="bg-[#090a10] p-5 md:p-6 rounded-2xl border border-zinc-800 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2 font-mono">Sección A: Divisas Forex Core</span>
-          <table class="w-full text-xs text-left">
-            <thead>
-              <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
-                <th class="p-2">Divisa</th>
-                <th class="p-2 text-center">Previo (Manual)</th>
-                <th class="p-2 text-center">Eventos (Auto)</th>
-                <th class="p-2 text-center">Total Combinado</th>
-              </tr>
-            </thead>
-            <tbody id="matrixForexBody"></tbody>
-          </table>
+          <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            <span>⚡</span> Kairos Macro Hub
+          </h1>
+          <p class="text-zinc-400 text-xs mt-1">Filtro de calendario económico y motor de análisis de divergencias</p>
         </div>
-
-        <!-- Catalizadores Intermercado -->
-        <div>
-          <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2 font-mono">Sección B: Materias Primas y Riesgo</span>
-          <table class="w-full text-xs text-left">
-            <thead>
-              <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
-                <th class="p-2">Activo</th>
-                <th class="p-2 text-center">Previo (Manual)</th>
-                <th class="p-2 text-center">Evaluación</th>
-                <th class="p-2 text-center">Total Combinado</th>
-              </tr>
-            </thead>
-            <tbody id="matrixIntermarketBody"></tbody>
-          </table>
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <button onclick="resetAllScores()" class="bg-rose-950/20 hover:bg-rose-900/40 text-rose-300 border border-rose-900/40 text-xs px-3 py-2 rounded-lg transition">
+            🗑️ Reiniciar Todo
+          </button>
+          <button onclick="triggerPrint()" class="bg-cyan-500 hover:bg-cyan-400 text-black text-xs px-4 py-2 rounded-lg font-bold shadow-md transition">
+            Exportar PDF &rarr;
+          </button>
         </div>
       </div>
+
+      <!-- Carga de Archivos -->
+      <div id="dropZone" class="bg-[#07080d] border border-dashed border-zinc-800 hover:border-cyan-500/60 rounded-2xl p-6 text-center transition cursor-pointer group">
+        <input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event)" />
+        <div class="space-y-1.5">
+          <svg class="mx-auto h-8 w-8 text-zinc-500 group-hover:text-cyan-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <div class="text-xs font-medium text-zinc-300">
+            Arrastra tu archivo <span class="text-cyan-400 font-semibold">Excel (.xlsx) aquí</span> o haz clic para explorar
+          </div>
+        </div>
+      </div>
+
+      <!-- ESCÁNER DE DIVERGENCIAS MACRO -->
+      <div id="divergenceAlertBox" class="hidden bg-cyan-950/20 border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3">
+        <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2">
+          <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
+            <span>⚡</span> Escáner de Divergencias Macro Detectadas
+          </span>
+          <span id="divergenceCountBadge" class="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded font-bold">0 Pares Aprobados</span>
+        </div>
+        <div id="divergenceList" class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs"></div>
+      </div>
+
+      <!-- MATRIZ VIVA DE FUERZA GLOBAL E INTERMERCADO -->
+      <div id="liveMatrixContainer" class="hidden bg-[#07080d] border border-zinc-800 p-5 rounded-2xl space-y-4 shadow-lg">
+        <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+          <h3 class="text-xs font-bold text-white uppercase tracking-wider">Matriz de Fuerza Global en Tiempo Real</h3>
+          <div class="flex items-center gap-1.5 text-[9px] font-mono">
+            <span class="px-1.5 py-0.5 rounded score-scale-strong-bullish font-bold">+4 a +10</span>
+            <span class="px-1.5 py-0.5 rounded score-scale-bullish font-bold">+1 a +3</span>
+            <span class="px-1.5 py-0.5 rounded score-scale-neutral font-bold">0</span>
+            <span class="px-1.5 py-0.5 rounded score-scale-bearish font-bold">-1 a -3</span>
+            <span class="px-1.5 py-0.5 rounded score-scale-strong-bearish font-bold">-4 a -10</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2 font-mono">Sección A: Divisas Forex Core</span>
+            <table class="w-full text-xs text-left">
+              <thead>
+                <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
+                  <th class="p-2">Divisa</th>
+                  <th class="p-2 text-center">Previo (Manual)</th>
+                  <th class="p-2 text-center">Eventos (Auto)</th>
+                  <th class="p-2 text-center">Total Combinado</th>
+                </tr>
+              </thead>
+              <tbody id="matrixForexBody"></tbody>
+            </table>
+          </div>
+
+          <div>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2 font-mono">Sección B: Materias Primas y Riesgo</span>
+            <table class="w-full text-xs text-left">
+              <thead>
+                <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
+                  <th class="p-2">Activo</th>
+                  <th class="p-2 text-center">Previo (Manual)</th>
+                  <th class="p-2 text-center">Evaluación</th>
+                  <th class="p-2 text-center">Total Combinado</th>
+                </tr>
+              </thead>
+              <tbody id="matrixIntermarketBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CALENDARIO INTERACTIVO POR DÍAS -->
+      <div id="interactiveCalendarContainer" class="space-y-8"></div>
+
     </div>
 
-    <!-- CALENDARIO INTERACTIVO POR DÍAS (MÓDULOS CORREGIDOS) -->
-    <div id="interactiveCalendarContainer" class="space-y-8"></div>
+    <!-- ÁREA DE IMPRESIÓN PDF -->
+    <div id="outputContainer"></div>
+  </main>
 
-  </div>
+  <!-- FOOTER GLOBAL Y ENGINE DE NAVEGACIÓN -->
+  <div id="global-footer"></div>
+  <script src="inject-engine.js"></script>
 
-  <!-- ÁREA DE IMPRESIÓN PDF -->
-  <div id="outputContainer"></div>
-
+  <!-- LÓGICA DE JS INTERNO DEL MOTOR -->
   <script>
+    /* Toda la lógica JS que ya teníamos funcionando */
     const WHITELIST = {
       UNIVERSAL: ['interest rate decision', 'monetary policy statement', 'press conference', 'meeting minutes', 'speaks', 'speech', 'president speaks', 'summary of opinions'],
       USD: ['nfp', 'nonfarm payrolls', 'adp', 'unemployment rate', 'average hourly earnings', 'jobless claims', 'cpi', 'pce', 'ppi', 'gdp', 'ism', 'pmi', 'industrial production', 'retail sales', 'consumer sentiment', 'building permits', 'home sales', 'trade balance'],
@@ -230,30 +225,12 @@
       }
     }
 
-    // TRADUCTOR AUTOMÁTICO DE NOMBRES DE DÍAS Y MESES AL ESPAÑOL
     function translateDayToSpanish(dayStr) {
       if (!dayStr) return dayStr;
       let str = dayStr.toUpperCase();
       const replacements = {
-        'MONDAY': 'LUNES',
-        'TUESDAY': 'MARTES',
-        'WEDNESDAY': 'MIÉRCOLES',
-        'THURSDAY': 'JUEVES',
-        'FRIDAY': 'VIERNES',
-        'SATURDAY': 'SÁBADO',
-        'SUNDAY': 'DOMINGO',
-        'JANUARY': 'ENERO',
-        'FEBRUARY': 'FEBRERO',
-        'MARCH': 'MARZO',
-        'APRIL': 'ABRIL',
-        'MAY': 'MAYO',
-        'JUNE': 'JUNIO',
-        'JULY': 'JULIO',
-        'AUGUST': 'AGOSTO',
-        'SEPTEMBER': 'SEPTIEMBRE',
-        'OCTOBER': 'OCTUBRE',
-        'NOVEMBER': 'NOVIEMBRE',
-        'DECEMBER': 'DICIEMBRE'
+        'MONDAY': 'LUNES', 'TUESDAY': 'MARTES', 'WEDNESDAY': 'MIÉRCOLES', 'THURSDAY': 'JUEVES', 'FRIDAY': 'VIERNES', 'SATURDAY': 'SÁBADO', 'SUNDAY': 'DOMINGO',
+        'JANUARY': 'ENERO', 'FEBRUARY': 'FEBRERO', 'MARCH': 'MARZO', 'APRIL': 'ABRIL', 'MAY': 'MAYO', 'JUNE': 'JUNIO', 'JULY': 'JULIO', 'AUGUST': 'AGOSTO', 'SEPTEMBER': 'SEPTIEMBRE', 'OCTOBER': 'OCTUBRE', 'NOVEMBER': 'NOVIEMBRE', 'DECEMBER': 'DICIEMBRE'
       };
       Object.keys(replacements).forEach(key => {
         str = str.replace(new RegExp('\\b' + key + '\\b', 'g'), replacements[key]);
@@ -277,7 +254,6 @@
     function getCategorySentimentTitle(ccy, eventName) {
       if (!eventName) return `SENTIMIENTO DE ${ccy}`;
       const lower = eventName.toLowerCase();
-
       if (lower.includes('cpi') || lower.includes('pce') || lower.includes('rpi') || lower.includes('inflation') || lower.includes('tokyo') || lower.includes('consumer price')) return `${ccy} - INFLACIÓN (IPC)`;
       if (lower.includes('ppi') || lower.includes('ippi') || lower.includes('producer price') || lower.includes('cgpi')) return `${ccy} - PRECIOS DE PRODUCTOR (IPP)`;
       if (lower.includes('unemployment') || lower.includes('employment') || lower.includes('jobless') || lower.includes('nfp') || lower.includes('adp') || lower.includes('claimant') || lower.includes('earnings') || lower.includes('household spending')) return `${ccy} - MERCADO LABORAL Y SALARIOS`;
@@ -290,7 +266,6 @@
       if (lower.includes('gdt') || lower.includes('dairy')) return `${ccy} - ÍNDICE DE PRECIOS LÁCTEOS (GDT)`;
       if (lower.includes('consumer climate') || lower.includes('consumer sentiment')) return `${ccy} - CLIMA Y CONFIANZA DEL CONSUMIDOR`;
       if (lower.includes('building permit') || lower.includes('home sales')) return `${ccy} - MERCADO INMOBILIARIO`;
-
       const firstWord = eventName.split(' ')[0].toUpperCase();
       return `${ccy} - ${firstWord}`;
     }
@@ -302,14 +277,7 @@
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
-
-        const rawRows = XLSX.utils.sheet_to_json(sheet, { 
-          header: 1, 
-          defval: "", 
-          raw: false, 
-          dateNF: "yyyy-mm-dd" 
-        });
-        
+        const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: false, dateNF: "yyyy-mm-dd" });
         parseSpreadsheetData(rawRows);
       };
       reader.readAsArrayBuffer(file);
@@ -336,9 +304,7 @@
               let d;
               if (/^\d{5}(\.\d+)?$/.test(cell)) {
                 const serial = parseFloat(cell);
-                if (serial > 40000 && serial < 60000) {
-                  d = new Date(Math.round((serial - 25569) * 86400 * 1000));
-                }
+                if (serial > 40000 && serial < 60000) d = new Date(Math.round((serial - 25569) * 86400 * 1000));
               } else {
                 let dateVal = cell.includes(' ') ? cell.split(' ')[0] : cell;
                 if (dateVal.includes('-')) {
@@ -501,13 +467,10 @@
         if (!events || events.length === 0) return;
 
         let dayCard = document.createElement('div');
-        // MÓDULO CONTINUO CON BORDE UNIFICADO
         dayCard.className = "bg-[#07090e] border border-cyan-500/30 rounded-2xl shadow-xl shadow-cyan-950/20 space-y-4 overflow-hidden transition hover:border-cyan-500/50";
 
-        // FECHA TRADUCIDA AL ESPAÑOL
         const translatedDay = translateDayToSpanish(day);
 
-        // ENCABEZADO TIPO PILL/BADGE RESALTADO SIN CORTES TRUNCADOS
         let dayHeader = `
           <div class="bg-[#0b0f19] border-b border-cyan-500/30 px-5 py-3.5 flex justify-between items-center">
             <div class="flex items-center gap-2 bg-cyan-500/15 border border-cyan-400/40 px-3 py-1.5 rounded-xl text-cyan-300 font-bold font-mono text-xs shadow-[0_0_12px_rgba(34,211,238,0.15)]">
@@ -595,18 +558,15 @@
 
     function setCategoryScore(categoryId, ccy, scoreVal, btn) {
       globalState.categoryScores[categoryId] = { ccy: ccy, score: parseInt(scoreVal) };
-
       const parent = btn.parentElement;
       parent.querySelectorAll('.score-btn').forEach(b => {
         b.className = "score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 transition";
       });
-
       if (scoreVal === 2) btn.classList.add('score-btn-active-p2');
       if (scoreVal === 1) btn.classList.add('score-btn-active-p1');
       if (scoreVal === 0) btn.classList.add('score-btn-active-0');
       if (scoreVal === -1) btn.classList.add('score-btn-active-m1');
       if (scoreVal === -2) btn.classList.add('score-btn-active-m2');
-
       saveToLocalStorage();
       recalculateMatrixAndDivergences();
     }
@@ -659,9 +619,7 @@
         globalState.matrixTotals[c] = prev + ev;
 
         const eventsEl = document.getElementById(`live-events-${c}`);
-        if (eventsEl) {
-          eventsEl.textContent = ev > 0 ? `+${ev}` : ev;
-        }
+        if (eventsEl) eventsEl.textContent = ev > 0 ? `+${ev}` : ev;
 
         const totalEl = document.getElementById(`live-matrix-${c}`);
         if (totalEl) {
@@ -677,12 +635,10 @@
     function formatStandardForexPair(curr1, curr2, score1, score2) {
       const strong = score1 > score2 ? curr1 : curr2;
       const weak = score1 > score2 ? curr2 : curr1;
-
       const rank1 = CURRENCY_HIERARCHY.indexOf(curr1);
       const rank2 = CURRENCY_HIERARCHY.indexOf(curr2);
 
       let base, quote, actionText;
-
       if (rank1 !== -1 && rank2 !== -1) {
         if (rank1 < rank2) {
           base = curr1; quote = curr2;
@@ -696,12 +652,7 @@
         actionText = `COMPRA ${base}/${quote}`;
       }
 
-      return {
-        pairName: `${base}/${quote}`,
-        actionBadge: actionText,
-        strong: strong,
-        weak: weak
-      };
+      return { pairName: `${base}/${quote}`, actionBadge: actionText, strong: strong, weak: weak };
     }
 
     function scanDivergences() {
@@ -775,15 +726,12 @@
 
     function triggerPrint() {
       renderPDFPrintPreview();
-      setTimeout(() => {
-        window.print();
-      }, 200);
+      setTimeout(() => { window.print(); }, 200);
     }
 
     function renderPDFPrintPreview() {
       const outputContainer = document.getElementById('outputContainer');
-      const esHTML = renderReportTemplate(globalState.daysData);
-      outputContainer.innerHTML = esHTML;
+      outputContainer.innerHTML = renderReportTemplate(globalState.daysData);
     }
 
     function renderReportTemplate(data) {
@@ -801,13 +749,7 @@
         vix: "VIX (Volatilidad S&P 500)",
         oil: "Petróleo (Crudo WTI/Brent)",
         gold: "Oro (XAU/USD)",
-        time: "HORA",
-        ccy: "DIVISA",
-        event: "EVENTO",
-        actual: "ACTUAL",
-        forecast: "PRONÓSTICO",
-        previous: "PREVIO",
-        sentiment: "EVALUACIÓN",
+        time: "HORA", ccy: "DIVISA", event: "EVENTO", actual: "ACTUAL", forecast: "PRONÓSTICO", previous: "PREVIO", sentiment: "EVALUACIÓN",
         notes: "Notas Diarias (Noticias Inesperadas / Eventos Geopolíticos / Giros Intermercado):",
         footer: "Inteligencia Institucional de Riesgo Forex · Kairos Integrated Risk Engine"
       };
@@ -816,7 +758,6 @@
         <div class="report-card bg-white p-8 rounded-xl font-sans mb-12">
           <h1 style="font-size: 18px; font-weight: bold; color: #0F172A; margin: 0; border-bottom: 2px solid #0F172A; padding-bottom: 4px;">${text.title}</h1>
           <h2 style="font-size: 11px; color: #475569; margin: 4px 0 14px 0; font-style: italic;">${text.subtitle}</h2>
-
           <div style="background-color: #F8FAFC; border: 1px solid #CBD5E1; padding: 10px; border-radius: 4px; margin-bottom: 16px;">
             <div style="font-size: 11px; font-weight: bold; color: #0F172A; margin-bottom: 6px;">${text.matrixTitle}</div>
             <p style="font-size: 9px; margin: 0 0 8px 0; color: #334155; line-height: 1.3;">
@@ -884,7 +825,6 @@
 
         events.forEach((item, idx) => {
           const badgeClass = `badge-${['USD','EUR','GBP','JPY','CAD','AUD','NZD','CHF','CNH','CNY'].includes(item.ccy) ? item.ccy : 'DEFAULT'}`;
-
           html += `
             <tr style="border-bottom: 1px solid #E2E8F0;">
               <td style="padding: 4px 5px; font-family: monospace;">${item.time}</td>
