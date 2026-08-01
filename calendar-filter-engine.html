@@ -18,7 +18,7 @@
       body, html { background: white !important; color: #0f172a !important; padding: 0 !important; margin: 0 !important; }
       #outputContainer { display: block !important; width: 100% !important; background: white !important; color: #0f172a !important; }
       .page-break { page-break-before: always; }
-      .report-card { border: none !important; box-shadow: none !important; padding: 0 !important; background: white !important; }
+      table, tr, .report-card, .day-card { break-inside: avoid !important; page-break-inside: avoid !important; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     }
 
@@ -63,7 +63,15 @@
           </h1>
           <p class="text-zinc-400 text-xs mt-1">Filtro de calendario económico y motor de análisis de divergencias</p>
         </div>
-        <div class="flex items-center gap-2.5 flex-wrap">
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="exportStateJSON()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs px-3 py-2 rounded-lg transition">
+            📥 Exportar Backup
+          </button>
+          <button onclick="document.getElementById('jsonInput').click()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs px-3 py-2 rounded-lg transition">
+            📤 Cargar Backup
+          </button>
+          <input type="file" id="jsonInput" accept=".json" class="hidden" onchange="importStateJSON(event)" />
+          
           <button onclick="resetAllScores()" class="bg-rose-950/20 hover:bg-rose-900/40 text-rose-300 border border-rose-900/40 text-xs px-3 py-2 rounded-lg transition">
             🗑️ Reiniciar Todo
           </button>
@@ -86,7 +94,7 @@
         </div>
       </div>
 
-      <!-- ESCÁNER DE DIVERGENCIAS MACRO -->
+      <!-- ESCÁNER DE DIVERGENCIAS MACRO (ORDENADO POR MAYOR DIFERENCIAL) -->
       <div id="divergenceAlertBox" class="hidden bg-cyan-950/20 border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3">
         <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2">
           <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
@@ -98,48 +106,69 @@
       </div>
 
       <!-- MATRIZ VIVA DE FUERZA GLOBAL E INTERMERCADO -->
-      <div id="liveMatrixContainer" class="hidden bg-[#07080d] border border-zinc-800 p-5 rounded-2xl space-y-4 shadow-lg">
-        <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
-          <h3 class="text-xs font-bold text-white uppercase tracking-wider">Matriz de Fuerza Global en Tiempo Real</h3>
-          <div class="flex items-center gap-1.5 text-[9px] font-mono">
-            <span class="px-1.5 py-0.5 rounded score-scale-strong-bullish font-bold">+4 a +10</span>
-            <span class="px-1.5 py-0.5 rounded score-scale-bullish font-bold">+1 a +3</span>
-            <span class="px-1.5 py-0.5 rounded score-scale-neutral font-bold">0</span>
-            <span class="px-1.5 py-0.5 rounded score-scale-bearish font-bold">-1 a -3</span>
-            <span class="px-1.5 py-0.5 rounded score-scale-strong-bearish font-bold">-4 a -10</span>
+      <div id="liveMatrixContainer" class="hidden space-y-6">
+        <div class="bg-[#07080d] border border-zinc-800 p-5 rounded-2xl space-y-4 shadow-lg">
+          <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Matriz de Fuerza Global en Tiempo Real</h3>
+            <div class="flex items-center gap-1.5 text-[9px] font-mono">
+              <span class="px-1.5 py-0.5 rounded score-scale-strong-bullish font-bold">+4 a +10</span>
+              <span class="px-1.5 py-0.5 rounded score-scale-bullish font-bold">+1 a +3</span>
+              <span class="px-1.5 py-0.5 rounded score-scale-neutral font-bold">0</span>
+              <span class="px-1.5 py-0.5 rounded score-scale-bearish font-bold">-1 a -3</span>
+              <span class="px-1.5 py-0.5 rounded score-scale-strong-bearish font-bold">-4 a -10</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2 font-mono">Sección A: Divisas Forex Core</span>
+              <table class="w-full text-xs text-left">
+                <thead>
+                  <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
+                    <th class="p-2">Divisa</th>
+                    <th class="p-2 text-center">Previo (Manual)</th>
+                    <th class="p-2 text-center">Eventos (Auto)</th>
+                    <th class="p-2 text-center">Total Combinado</th>
+                  </tr>
+                </thead>
+                <tbody id="matrixForexBody"></tbody>
+              </table>
+            </div>
+
+            <div>
+              <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2 font-mono">Sección B: Materias Primas y Riesgo</span>
+              <table class="w-full text-xs text-left">
+                <thead>
+                  <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
+                    <th class="p-2">Activo</th>
+                    <th class="p-2 text-center">Previo (Manual)</th>
+                    <th class="p-2 text-center">Evaluación</th>
+                    <th class="p-2 text-center">Total Combinado</th>
+                  </tr>
+                </thead>
+                <tbody id="matrixIntermarketBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2 font-mono">Sección A: Divisas Forex Core</span>
-            <table class="w-full text-xs text-left">
-              <thead>
-                <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
-                  <th class="p-2">Divisa</th>
-                  <th class="p-2 text-center">Previo (Manual)</th>
-                  <th class="p-2 text-center">Eventos (Auto)</th>
-                  <th class="p-2 text-center">Total Combinado</th>
-                </tr>
-              </thead>
-              <tbody id="matrixForexBody"></tbody>
-            </table>
-          </div>
-
-          <div>
-            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2 font-mono">Sección B: Materias Primas y Riesgo</span>
-            <table class="w-full text-xs text-left">
-              <thead>
-                <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
-                  <th class="p-2">Activo</th>
-                  <th class="p-2 text-center">Previo (Manual)</th>
-                  <th class="p-2 text-center">Evaluación</th>
-                  <th class="p-2 text-center">Total Combinado</th>
-                </tr>
-              </thead>
-              <tbody id="matrixIntermarketBody"></tbody>
-            </table>
-          </div>
+      <!-- BARRA DE FILTROS DEL CALENDARIO -->
+      <div id="calendarFilterBar" class="hidden bg-[#07080d] border border-zinc-800 p-3 rounded-2xl flex flex-col md:flex-row gap-3 justify-between items-center text-xs">
+        <div class="flex items-center gap-1.5 flex-wrap" id="currencyFilterGroup">
+          <span class="text-zinc-500 text-[10px] font-bold uppercase mr-1">Filtrar:</span>
+          <button onclick="filterByCurrency('ALL')" class="currency-filter-btn px-2 py-1 rounded font-bold bg-cyan-500 text-black">TODAS</button>
+          <button onclick="filterByCurrency('USD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">USD</button>
+          <button onclick="filterByCurrency('EUR')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">EUR</button>
+          <button onclick="filterByCurrency('GBP')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">GBP</button>
+          <button onclick="filterByCurrency('JPY')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">JPY</button>
+          <button onclick="filterByCurrency('CAD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">CAD</button>
+          <button onclick="filterByCurrency('AUD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">AUD</button>
+          <button onclick="filterByCurrency('NZD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">NZD</button>
+          <button onclick="filterByCurrency('CHF')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">CHF</button>
+        </div>
+        <div class="w-full md:w-auto flex items-center gap-2">
+          <input type="text" id="eventSearchInput" oninput="applyCalendarFilters()" placeholder="🔍 Buscar evento..." class="w-full md:w-48 bg-[#030305] border border-zinc-700/60 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono" />
         </div>
       </div>
 
@@ -158,7 +187,17 @@
 
   <!-- LÓGICA DE JS INTERNO DEL MOTOR -->
   <script>
-    /* Toda la lógica JS que ya teníamos funcionando */
+    // --- HELPER PARA ESCAPAR CARACTERES Y EVITAR ERRORES DE XSS / MARKUP ---
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     const WHITELIST = {
       UNIVERSAL: ['interest rate decision', 'monetary policy statement', 'press conference', 'meeting minutes', 'speaks', 'speech', 'president speaks', 'summary of opinions'],
       USD: ['nfp', 'nonfarm payrolls', 'adp', 'unemployment rate', 'average hourly earnings', 'jobless claims', 'cpi', 'pce', 'ppi', 'gdp', 'ism', 'pmi', 'industrial production', 'retail sales', 'consumer sentiment', 'building permits', 'home sales', 'trade balance'],
@@ -175,6 +214,8 @@
     const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH', 'CNY', 'DE', 'FR', 'UK', 'EU', 'CH', 'CA', 'US', 'JP', 'JPN', 'AU', 'AUS', 'NZ', 'NZL', 'GB', 'GBR', 'CN', 'CHN'];
     const CURRENCY_HIERARCHY = ['EUR', 'GBP', 'AUD', 'NZD', 'USD', 'CAD', 'CHF', 'JPY'];
 
+    let activeCurrencyFilter = 'ALL';
+
     let globalState = {
       daysData: {},
       categoryScores: {},
@@ -189,8 +230,13 @@
     const excelInput = document.getElementById('excelInput');
 
     dropZone.addEventListener('click', () => excelInput.click());
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-cyan-500'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-cyan-500'));
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); });
+    dropZone.addEventListener('dragenter', (e) => { e.preventDefault(); dropZone.classList.add('border-cyan-500'); });
+    dropZone.addEventListener('dragleave', (e) => {
+      if (!dropZone.contains(e.relatedTarget)) {
+        dropZone.classList.remove('border-cyan-500');
+      }
+    });
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('border-cyan-500');
@@ -223,6 +269,38 @@
           console.error("Error al cargar memoria local", e);
         }
       }
+    }
+
+    // Exportar Backup JSON
+    function exportStateJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalState, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `kairos_macro_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    // Cargar Backup JSON
+    function importStateJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (parsed && typeof parsed === 'object') {
+            globalState = parsed;
+            saveToLocalStorage();
+            renderLiveInteractiveApp();
+            alert('¡Respaldo cargado correctamente!');
+          }
+        } catch(err) {
+          alert('Error al leer el archivo de respaldo JSON.');
+        }
+      };
+      reader.readAsText(file);
     }
 
     function translateDayToSpanish(dayStr) {
@@ -338,10 +416,12 @@
         let time = "", ccy = "", event = "", actual = "", forecast = "", previous = "";
         let foundCcyIdx = -1;
 
-        for (let i = 0; i < cleanRow.length; i++) {
-          if (CURRENCIES.includes(cleanRow[i].toUpperCase())) {
+        // Búsqueda estricta de divisa en las primeras 5 columnas y solo de max 3 letras
+        for (let i = 0; i < Math.min(cleanRow.length, 5); i++) {
+          const cellVal = cleanRow[i].toUpperCase();
+          if (cellVal.length <= 3 && CURRENCIES.includes(cellVal)) {
             foundCcyIdx = i;
-            ccy = cleanRow[i].toUpperCase();
+            ccy = cellVal;
             break;
           }
         }
@@ -393,6 +473,7 @@
 
     function renderLiveInteractiveApp() {
       document.getElementById('liveMatrixContainer').classList.remove('hidden');
+      document.getElementById('calendarFilterBar').classList.remove('hidden');
       renderMatrixTables();
       renderInteractiveCalendar();
       recalculateMatrixAndDivergences();
@@ -404,15 +485,6 @@
       if (score === 0) return 'score-scale-neutral font-medium';
       if (score >= -3) return 'score-scale-bearish font-bold';
       return 'score-scale-strong-bearish font-black';
-    }
-
-    function getPdfBadgeStyle(score) {
-      const num = parseInt(score) || 0;
-      if (num === 2) return 'background-color: #d1fae5; color: #065f46; border: 1px solid #34d399;';
-      if (num === 1) return 'background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;';
-      if (num === -1) return 'background-color: #fff1f2; color: #b91c1c; border: 1px solid #fecdd3;';
-      if (num === -2) return 'background-color: #ffe4e6; color: #9f1239; border: 1px solid #fda4af;';
-      return 'background-color: #f3f4f6; color: #374151; border: 1px solid #e5e7eb;';
     }
 
     function renderMatrixTables() {
@@ -462,12 +534,24 @@
       const container = document.getElementById('interactiveCalendarContainer');
       container.innerHTML = '';
 
+      const searchQuery = (document.getElementById('eventSearchInput')?.value || '').toLowerCase();
+
       Object.keys(globalState.daysData).forEach(day => {
-        const events = globalState.daysData[day];
+        let events = globalState.daysData[day] || [];
         if (!events || events.length === 0) return;
 
+        // Filtrado dinámico por divisa y texto
+        if (activeCurrencyFilter !== 'ALL') {
+          events = events.filter(e => e.ccy === activeCurrencyFilter);
+        }
+        if (searchQuery) {
+          events = events.filter(e => (e.event || '').toLowerCase().includes(searchQuery) || (e.ccy || '').toLowerCase().includes(searchQuery));
+        }
+
+        if (events.length === 0) return;
+
         let dayCard = document.createElement('div');
-        dayCard.className = "bg-[#07090e] border border-cyan-500/30 rounded-2xl shadow-xl shadow-cyan-950/20 space-y-4 overflow-hidden transition hover:border-cyan-500/50";
+        dayCard.className = "day-card bg-[#07090e] border border-cyan-500/30 rounded-2xl shadow-xl shadow-cyan-950/20 space-y-4 overflow-hidden transition hover:border-cyan-500/50";
 
         const translatedDay = translateDayToSpanish(day);
 
@@ -475,7 +559,7 @@
           <div class="bg-[#0b0f19] border-b border-cyan-500/30 px-5 py-3.5 flex justify-between items-center">
             <div class="flex items-center gap-2 bg-cyan-500/15 border border-cyan-400/40 px-3 py-1.5 rounded-xl text-cyan-300 font-bold font-mono text-xs shadow-[0_0_12px_rgba(34,211,238,0.15)]">
               <span>📅</span>
-              <span class="tracking-wider">${translatedDay}</span>
+              <span class="tracking-wider">${escapeHtml(translatedDay)}</span>
             </div>
             <span class="text-[10px] text-cyan-200/80 font-mono bg-cyan-950/70 px-2.5 py-1 rounded-lg border border-cyan-500/30 shadow-sm">${events.length} Eventos</span>
           </div>
@@ -503,12 +587,12 @@
 
           tableHTML += `
             <tr class="${rowBgClass} border-b border-zinc-800/30 hover:bg-zinc-800/40 text-zinc-300 transition">
-              <td class="p-2.5 text-zinc-400 font-mono text-[11px]">${item.time}</td>
-              <td class="p-2.5"><span class="${badgeClass} px-2 py-0.5 rounded font-bold text-[9px] tracking-wide">${item.ccy}</span></td>
-              <td class="p-2.5 font-sans text-zinc-200 text-xs font-medium">${item.event}</td>
-              <td class="p-2.5 font-bold text-white font-mono">${item.actual || '—'}</td>
-              <td class="p-2.5 text-zinc-400 font-mono">${item.forecast || '—'}</td>
-              <td class="p-2.5 text-zinc-500 font-mono">${item.previous || '—'}</td>
+              <td class="p-2.5 text-zinc-400 font-mono text-[11px]">${escapeHtml(item.time)}</td>
+              <td class="p-2.5"><span class="${badgeClass} px-2 py-0.5 rounded font-bold text-[9px] tracking-wide">${escapeHtml(item.ccy)}</span></td>
+              <td class="p-2.5 font-sans text-zinc-200 text-xs font-medium">${escapeHtml(item.event)}</td>
+              <td class="p-2.5 font-bold text-white font-mono">${escapeHtml(item.actual) || '—'}</td>
+              <td class="p-2.5 text-zinc-400 font-mono">${escapeHtml(item.forecast) || '—'}</td>
+              <td class="p-2.5 text-zinc-500 font-mono">${escapeHtml(item.previous) || '—'}</td>
             </tr>
           `;
 
@@ -525,7 +609,7 @@
                   <div class="bg-gradient-to-r from-amber-950/20 via-zinc-900/40 to-zinc-900/20 border border-amber-500/30 rounded-xl p-2.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 my-1">
                     <div class="flex items-center gap-2">
                       <span class="text-amber-400 text-xs">📊</span>
-                      <span class="text-xs font-bold text-amber-200 tracking-wide">${categoryTitle}</span>
+                      <span class="text-xs font-bold text-amber-200 tracking-wide">${escapeHtml(categoryTitle)}</span>
                     </div>
                     <div class="flex items-center gap-1.5 font-mono">
                       <span class="text-[10px] text-zinc-400 mr-1 uppercase">Puntuación:</span>
@@ -547,13 +631,30 @@
             </table>
           </div>
           <div class="px-4 pb-4">
-            <textarea oninput="saveDailyNote('${day}', this.value)" class="w-full bg-[#030305] border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-300 focus:outline-none focus:border-cyan-500/60 font-mono transition placeholder-zinc-600" rows="1.5" placeholder="Notas de la jornada para ${translatedDay} (noticias inesperadas, eventos geopolíticos)...">${globalState.dailyNotes[day] || ''}</textarea>
+            <textarea data-day="${escapeHtml(day)}" oninput="saveDailyNote(this.getAttribute('data-day'), this.value)" class="w-full bg-[#030305] border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-300 focus:outline-none focus:border-cyan-500/60 font-mono transition placeholder-zinc-600" rows="1.5" placeholder="Notas de la jornada para ${escapeHtml(translatedDay)} (noticias inesperadas, eventos geopolíticos)...">${escapeHtml(globalState.dailyNotes[day] || '')}</textarea>
           </div>
         `;
 
         dayCard.innerHTML = dayHeader + tableHTML;
         container.appendChild(dayCard);
       });
+    }
+
+    function filterByCurrency(ccy) {
+      activeCurrencyFilter = ccy;
+      const btns = document.querySelectorAll('.currency-filter-btn');
+      btns.forEach(btn => {
+        if (btn.textContent === ccy || (ccy === 'ALL' && btn.textContent === 'TODAS')) {
+          btn.className = "currency-filter-btn px-2 py-1 rounded font-bold bg-cyan-500 text-black";
+        } else {
+          btn.className = "currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300";
+        }
+      });
+      renderInteractiveCalendar();
+    }
+
+    function applyCalendarFilters() {
+      renderInteractiveCalendar();
     }
 
     function setCategoryScore(categoryId, ccy, scoreVal, btn) {
@@ -686,6 +787,9 @@
         }
       }
 
+      // ORDENAR POR DIFERENCIAL DE MAYOR A MENOR
+      divergencesFound.sort((a, b) => b.diff - a.diff);
+
       if (divergencesFound.length > 0) {
         alertBox.classList.remove('hidden');
         badge.textContent = `${divergencesFound.length} Pares Aprobados`;
@@ -693,11 +797,11 @@
           <div class="bg-[#030305] border border-cyan-500/30 p-2.5 rounded-xl flex items-center justify-between">
             <div>
               <span class="text-zinc-400 text-[10px]">Oportunidad:</span>
-              <span class="font-black text-cyan-400 text-sm block">${d.pair}</span>
+              <span class="font-black text-cyan-400 text-sm block">${escapeHtml(d.pair)}</span>
             </div>
             <div class="text-right">
-              <span class="${d.actionBadge.includes('COMPRA') ? 'bg-emerald-950 text-emerald-400 border-emerald-500/30' : 'bg-rose-950 text-rose-400 border-rose-500/30'} border px-2 py-0.5 rounded text-[10px] font-bold block mb-0.5">${d.actionBadge}</span>
-              <span class="text-[9px] text-zinc-500">Diferencial: ${d.diff} pts (${d.strong}: ${d.strongScore > 0 ? '+' : ''}${d.strongScore} vs ${d.weak}: ${d.weakScore > 0 ? '+' : ''}${d.weakScore})</span>
+              <span class="${d.actionBadge.includes('COMPRA') ? 'bg-emerald-950 text-emerald-400 border-emerald-500/30' : 'bg-rose-950 text-rose-400 border-rose-500/30'} border px-2 py-0.5 rounded text-[10px] font-bold block mb-0.5">${escapeHtml(d.actionBadge)}</span>
+              <span class="text-[9px] text-zinc-500">Diferencial: ${d.diff} pts (${escapeHtml(d.strong)}: ${d.strongScore > 0 ? '+' : ''}${d.strongScore} vs ${escapeHtml(d.weak)}: ${d.weakScore > 0 ? '+' : ''}${d.weakScore})</span>
             </div>
           </div>
         `).join('');
@@ -720,6 +824,7 @@
         };
         document.getElementById('interactiveCalendarContainer').innerHTML = '';
         document.getElementById('liveMatrixContainer').classList.add('hidden');
+        document.getElementById('calendarFilterBar').classList.add('hidden');
         document.getElementById('divergenceAlertBox').classList.add('hidden');
       }
     }
@@ -740,7 +845,7 @@
         subtitle: "Plantilla Semanal · Eventos Agrupados con Evaluación Cuantitativa de Sentimiento",
         matrixTitle: "MATRIZ DE FUERZA GLOBAL E INTERMERCADO",
         instructionsTitle: "Instrucciones de Operación:",
-        instructionsBody: "Matriz calculada automáticamente mediante el Motor Integrado de Riesgo Kairos.<br>• Impacto Alto: Muy Bueno (+2) | Bueno (+1) | En Línea (0) | Malo (-1) | Muy Malo (-2)<br>• Impacto Medio/Bajo o Geopolítica: Positivo (+1) | Neutral (0) | Negativo (-1)",
+        instructionsBody: "Matriz calculada automáticamente mediante el Motor Integrado de Riesgo Kairos.<br>• Impacto Alto: Muy Bueno (+2) | Bueno (+1) | En Línea (0) | Malo (-1) | Muy Malo (-2)",
         thAsset: "ACTIVO / DIVISA",
         thPrev: "SEMANA PREVIA",
         thCurr: "TOTAL COMBINADO",
@@ -806,7 +911,7 @@
 
         html += `
           <div style="background-color: #1F385C; color: white; padding: 6px 10px; font-weight: bold; font-size: 11px; margin-top: 14px; text-transform: uppercase;">
-            ${translatedDay}
+            ${escapeHtml(translatedDay)}
           </div>
           <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 4px;">
             <thead>
@@ -827,12 +932,12 @@
           const badgeClass = `badge-${['USD','EUR','GBP','JPY','CAD','AUD','NZD','CHF','CNH','CNY'].includes(item.ccy) ? item.ccy : 'DEFAULT'}`;
           html += `
             <tr style="border-bottom: 1px solid #E2E8F0;">
-              <td style="padding: 4px 5px; font-family: monospace;">${item.time}</td>
-              <td style="padding: 4px 5px;"><span class="${badgeClass}" style="padding: 1px 4px; border-radius: 3px; font-weight: bold; font-size: 9px;">${item.ccy}</span></td>
-              <td style="padding: 4px 5px;">${item.event}</td>
-              <td style="padding: 4px 5px;">${item.actual}</td>
-              <td style="padding: 4px 5px;">${item.forecast}</td>
-              <td style="padding: 4px 5px;">${item.previous}</td>
+              <td style="padding: 4px 5px; font-family: monospace;">${escapeHtml(item.time)}</td>
+              <td style="padding: 4px 5px;"><span class="${badgeClass}" style="padding: 1px 4px; border-radius: 3px; font-weight: bold; font-size: 9px;">${escapeHtml(item.ccy)}</span></td>
+              <td style="padding: 4px 5px;">${escapeHtml(item.event)}</td>
+              <td style="padding: 4px 5px;">${escapeHtml(item.actual)}</td>
+              <td style="padding: 4px 5px;">${escapeHtml(item.forecast)}</td>
+              <td style="padding: 4px 5px;">${escapeHtml(item.previous)}</td>
               <td style="padding: 4px 5px; border-left: 1px solid #E2E8F0;"></td>
             </tr>
           `;
@@ -844,15 +949,14 @@
             const scoreItem = globalState.categoryScores[categoryId];
             const scoreVal = scoreItem ? scoreItem.score : 0;
             const formattedVal = scoreVal > 0 ? `+${scoreVal}` : scoreVal;
-            const pdfBadgeStyle = getPdfBadgeStyle(scoreVal);
 
             html += `
               <tr style="background-color: #FDF8E7; border-top: 1px solid #D9D9D9; border-bottom: 1px solid #D9D9D9;">
                 <td colspan="6" style="padding: 5px 8px; font-style: italic; font-weight: bold; color: #854D0E; font-size: 9px;">
-                  ${categoryTitle}
+                  ${escapeHtml(categoryTitle)}
                 </td>
                 <td style="padding: 4px; text-align: center; border-left: 1px solid #CBD5E1;">
-                  <span style="display: inline-block; padding: 1px 6px; border-radius: 3px; font-weight: bold; font-size: 9px; font-family: monospace; ${pdfBadgeStyle}">
+                  <span style="display: inline-block; padding: 1px 6px; border-radius: 3px; font-weight: bold; font-size: 9px; font-family: monospace;">
                     ${formattedVal}
                   </span>
                 </td>
@@ -869,7 +973,7 @@
             <span style="font-size: 9px; font-weight: bold; color: #64748B;">
               ${text.notes}
             </span>
-            <p style="font-size: 10px; color: #334155; margin-top: 4px; font-family: monospace;">${globalState.dailyNotes[day] || '—'}</p>
+            <p style="font-size: 10px; color: #334155; margin-top: 4px; font-family: monospace;">${escapeHtml(globalState.dailyNotes[day] || '—')}</p>
           </div>
         `;
       });
