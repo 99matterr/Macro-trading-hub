@@ -18,7 +18,7 @@
       body, html { background: white !important; color: #0f172a !important; padding: 0 !important; margin: 0 !important; }
       #outputContainer { display: block !important; width: 100% !important; background: white !important; margin: 0 !important; }
       .page-break { page-break-before: always; }
-      .report-card { border: none !important; box-shadow: none !important; padding: 0 !important; background: white !important; }
+      table, tr, .report-card, .day-card { break-inside: avoid !important; page-break-inside: avoid !important; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     }
 
@@ -51,7 +51,15 @@
           </h1>
           <p class="text-zinc-400 text-xs mt-1">Visor y filtro de expectativas y rangos de consenso macroeconómico</p>
         </div>
-        <div class="flex items-center gap-2.5 flex-wrap">
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="exportStateJSON()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs px-3 py-2 rounded-lg transition">
+            📥 Exportar Backup
+          </button>
+          <button onclick="document.getElementById('jsonInput').click()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs px-3 py-2 rounded-lg transition">
+            📤 Cargar Backup
+          </button>
+          <input type="file" id="jsonInput" accept=".json" class="hidden" onchange="importStateJSON(event)" />
+
           <button onclick="resetConsensusData()" class="bg-rose-950/20 hover:bg-rose-900/40 text-rose-300 border border-rose-900/40 text-xs px-3 py-2 rounded-lg transition">
             🗑️ Borrar Memoria
           </button>
@@ -61,17 +69,17 @@
         </div>
       </div>
 
-      <!-- Zona Clicable / Dropzone -->
+      <!-- Zona Clicable / Dropzone Multi-Archivo -->
       <div id="dropZone" class="bg-[#07080d] border border-dashed border-zinc-800 hover:border-cyan-500/60 rounded-2xl p-6 text-center transition cursor-pointer group">
-        <input type="file" id="excelInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleFileSelect(event)" />
+        <input type="file" id="excelInput" accept=".xlsx, .xls, .csv" multiple class="hidden" onchange="handleFileSelect(event)" />
         <div class="space-y-1.5">
           <svg class="mx-auto h-8 w-8 text-zinc-500 group-hover:text-cyan-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <div class="text-xs font-medium text-zinc-300">
-            Arrastra tu archivo <span class="text-cyan-400 font-semibold">Excel (.xlsx) o CSV aquí</span> o haz clic para explorar
+            Arrastra uno o <span class="text-cyan-400 font-semibold">múltiples archivos Excel (.xlsx) o CSV aquí</span> o haz clic para explorar
           </div>
-          <p class="text-xs text-zinc-600 font-mono">Los datos filtrados quedarán guardados en pantalla automáticamente</p>
+          <p class="text-xs text-zinc-600 font-mono">Los datos se consolidarán y ordenarán cronológicamente (Lunes a Viernes) automáticamente.</p>
         </div>
       </div>
 
@@ -79,7 +87,7 @@
       <div id="emptyState" class="bg-[#07080d] border border-zinc-800/80 rounded-2xl p-12 text-center text-zinc-500 space-y-2">
         <span class="text-3xl block mb-2">📋</span>
         <h3 class="text-sm font-semibold text-zinc-300">No hay tabla de consenso publicada</h3>
-        <p class="text-xs max-w-md mx-auto">Sube una tabla de expectativas en la zona superior. Una vez filtrada, tus datos se mantendrán publicados en esta página permanentemente.</p>
+        <p class="text-xs max-w-md mx-auto">Sube una o varias tablas de expectativas en la zona superior. Tus datos se mantendrán agregados y publicados en esta página.</p>
       </div>
 
       <!-- Resumen de Cobertura -->
@@ -90,6 +98,26 @@
         </div>
         <div id="totalEventsBadge" class="bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 px-3 py-1 rounded-lg text-[11px] font-bold">
           0 Datos de Consenso Filtrados
+        </div>
+      </div>
+
+      <!-- BARRA DE FILTROS Y BÚSQUEDA -->
+      <div id="consensusFilterBar" class="hidden bg-[#07080d] border border-zinc-800 p-3 rounded-2xl flex flex-col md:flex-row gap-3 justify-between items-center text-xs">
+        <div class="flex items-center gap-1.5 flex-wrap" id="geoFilterGroup">
+          <span class="text-zinc-500 text-[10px] font-bold uppercase mr-1">Filtrar Región:</span>
+          <button onclick="filterByGeo('ALL')" class="geo-filter-btn px-2 py-1 rounded font-bold bg-cyan-500 text-black">TODAS</button>
+          <button onclick="filterByGeo('US')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">EE.UU. (US)</button>
+          <button onclick="filterByGeo('EUR')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">EUROZONA (EUR)</button>
+          <button onclick="filterByGeo('GB')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">REINO UNIDO (GBP)</button>
+          <button onclick="filterByGeo('JP')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">JAPÓN (JPY)</button>
+          <button onclick="filterByGeo('CA')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">CANADÁ (CAD)</button>
+          <button onclick="filterByGeo('AU')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">AUSTRALIA (AUD)</button>
+          <button onclick="filterByGeo('NZ')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">N. ZELANDA (NZD)</button>
+          <button onclick="filterByGeo('CH')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">SUIZA (CHF)</button>
+          <button onclick="filterByGeo('CN')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">CHINA (CNH)</button>
+        </div>
+        <div class="w-full md:w-auto flex items-center gap-2">
+          <input type="text" id="indicatorSearchInput" oninput="applyConsensusFilters()" placeholder="🔍 Buscar indicador..." class="w-full md:w-48 bg-[#030305] border border-zinc-700/60 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono" />
         </div>
       </div>
 
@@ -106,24 +134,42 @@
   <script src="inject-engine.js"></script>
 
   <script>
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     const ALLOWED_GEOS = [
       'US', 'USA', 'USD', 'AU', 'AUS', 'AUD', 'CH', 'CHE', 'CHF',
       'NZ', 'NZL', 'NZD', 'CN', 'CHN', 'CNH', 'CNY', 'JP', 'JPN', 'JPY',
       'GB', 'UK', 'GBP', 'EMU', 'EU', 'EUR', 'DE', 'DEU', 'FR', 'FRA', 'CA', 'CAN', 'CAD'
     ];
 
+    let activeGeoFilter = 'ALL';
     let globalState = { daysData: {} };
 
     const dropZone = document.getElementById('dropZone');
     const excelInput = document.getElementById('excelInput');
 
     dropZone.addEventListener('click', () => excelInput.click());
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-cyan-500'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-cyan-500'));
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); });
+    dropZone.addEventListener('dragenter', (e) => { e.preventDefault(); dropZone.classList.add('border-cyan-500'); });
+    dropZone.addEventListener('dragleave', (e) => {
+      if (!dropZone.contains(e.relatedTarget)) {
+        dropZone.classList.remove('border-cyan-500');
+      }
+    });
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('border-cyan-500');
-      if (e.dataTransfer.files.length) processFile(e.dataTransfer.files[0]);
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+        processFiles(e.dataTransfer.files);
+      }
     });
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -139,7 +185,7 @@
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          globalState.daysData = parsed.daysData || {};
+          globalState = normalizeState(parsed);
           if (Object.keys(globalState.daysData).length > 0) {
             renderLiveConsensusApp();
           }
@@ -149,8 +195,59 @@
       }
     }
 
+    function normalizeState(state) {
+      if (!state || !state.daysData) return { daysData: {} };
+      const newDaysData = {};
+      for (const [key, val] of Object.entries(state.daysData)) {
+        if (val && Array.isArray(val.events)) {
+          newDaysData[key] = val;
+        } else if (Array.isArray(val)) {
+          const info = parseHeaderToIsoAndFormatted(key);
+          const isoKey = info.iso !== "9999-99-99" ? info.iso : key;
+          newDaysData[isoKey] = {
+            isoDate: isoKey,
+            formattedDay: info.formatted || key,
+            events: val
+          };
+        }
+      }
+      return { daysData: newDaysData };
+    }
+
+    function exportStateJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalState, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `kairos_consensus_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importStateJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (parsed && typeof parsed === 'object') {
+            globalState = normalizeState(parsed);
+            saveToLocalStorage();
+            renderLiveConsensusApp();
+            alert('¡Respaldo de consenso cargado correctamente!');
+          }
+        } catch(err) {
+          alert('Error al leer el archivo JSON de respaldo.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
     function handleFileSelect(e) {
-      if (e.target.files.length) processFile(e.target.files[0]);
+      if (e.target.files && e.target.files.length) {
+        processFiles(e.target.files);
+      }
     }
 
     function isAllowedGeo(geoCode) {
@@ -165,38 +262,143 @@
       return true;
     }
 
-    function translateDateHeader(headerStr) {
-      if (!headerStr) return headerStr;
-      let str = headerStr.toUpperCase();
-      const replacements = {
-        'SUNDAY': 'DOMINGO', 'MONDAY': 'LUNES', 'TUESDAY': 'MARTES', 
-        'WEDNESDAY': 'MIÉRCOLES', 'THURSDAY': 'JUEVES', 'FRIDAY': 'VIERNES', 'SATURDAY': 'SÁBADO',
-        'JANUARY': 'ENERO', 'FEBRUARY': 'FEBRERO', 'MARCH': 'MARZO', 'APRIL': 'ABRIL',
-        'MAY': 'MAYO', 'JUNE': 'JUNIO', 'JULY': 'JULIO', 'AUGUST': 'AGOSTO',
-        'SEPTEMBER': 'SEPTIEMBRE', 'OCTOBER': 'OCTUBRE', 'NOVEMBER': 'NOVIEMBRE', 'DECEMBER': 'DICIEMBRE'
+    // RESOLUCIÓN PRECISA DE FECHA DE ENCABEZADO A ISO (YYYY-MM-DD) Y ETIQUETA FORMATEADA
+    function parseHeaderToIsoAndFormatted(rawHeaderStr) {
+      if (!rawHeaderStr) return { iso: "9999-99-99", formatted: "FECHA DESCONOCIDA" };
+      const str = String(rawHeaderStr).trim();
+      if (!str) return { iso: "9999-99-99", formatted: "FECHA DESCONOCIDA" };
+
+      const refDate = new Date();
+      const currentYear = refDate.getFullYear() || 2026;
+
+      const dayNamesEs = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
+      const monthNamesEs = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+      const monthNamesEn = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+
+      const dayMap = {
+        'SUNDAY': 0, 'DOMINGO': 0, 'MONDAY': 1, 'LUNES': 1,
+        'TUESDAY': 2, 'MARTES': 2, 'WEDNESDAY': 3, 'MIÉRCOLES': 3, 'MIERCOLES': 3,
+        'THURSDAY': 4, 'JUEVES': 4, 'FRIDAY': 5, 'VIERNES': 5,
+        'SATURDAY': 6, 'SÁBADO': 6, 'SABADO': 6
       };
-      Object.keys(replacements).forEach(key => {
-        str = str.replace(new RegExp('\\b' + key + '\\b', 'g'), replacements[key]);
-      });
-      return str;
+
+      // 1. Caso "Current Month <day_num>"
+      if (/Current Month/i.test(str)) {
+        let targetDow = null;
+        for (const [key, dow] of Object.entries(dayMap)) {
+          if (new RegExp('\\b' + key + '\\b', 'i').test(str)) {
+            targetDow = dow;
+            break;
+          }
+        }
+
+        const dayMatch = str.match(/Current Month\s+(\d{1,2})/i);
+        if (dayMatch && targetDow !== null) {
+          const dayNum = parseInt(dayMatch[1], 10);
+          let candidates = [];
+
+          for (let m = 0; m < 12; m++) {
+            const d = new Date(Date.UTC(currentYear, m, dayNum));
+            if (d.getUTCMonth() === m && d.getUTCDay() === targetDow) {
+              candidates.push(d);
+            }
+          }
+
+          if (candidates.length > 0) {
+            candidates.sort((a, b) => Math.abs(a - refDate) - Math.abs(b - refDate));
+            const best = candidates[0];
+            
+            const yyyy = best.getUTCFullYear();
+            const mm = String(best.getUTCMonth() + 1).padStart(2, '0');
+            const dd = String(best.getUTCDate()).padStart(2, '0');
+            const iso = `${yyyy}-${mm}-${dd}`;
+
+            const formatted = `${dayNamesEs[targetDow]}, ${best.getUTCDate()} DE ${monthNamesEs[best.getUTCMonth()]} DE ${yyyy}`;
+            return { iso, formatted };
+          }
+        }
+      }
+
+      // 2. Mes Explícito (Español o Inglés)
+      for (let m = 0; m < 12; m++) {
+        const enM = monthNamesEn[m];
+        const esM = monthNamesEs[m];
+        if (new RegExp('\\b' + enM + '\\b', 'i').test(str) || new RegExp('\\b' + esM + '\\b', 'i').test(str)) {
+          const cleanStrForDay = str.replace(/\b20\d{2}\b/g, '');
+          const dayMatch = cleanStrForDay.match(/\b(\d{1,2})\b/);
+          if (dayMatch) {
+            const dayNum = parseInt(dayMatch[1], 10);
+            const d = new Date(Date.UTC(currentYear, m, dayNum));
+            if (d.getUTCMonth() === m) {
+              const yyyy = d.getUTCFullYear();
+              const mm = String(m + 1).padStart(2, '0');
+              const dd = String(dayNum).padStart(2, '0');
+              const iso = `${yyyy}-${mm}-${dd}`;
+              const formatted = `${dayNamesEs[d.getUTCDay()]}, ${dayNum} DE ${monthNamesEs[m]} DE ${yyyy}`;
+              return { iso, formatted };
+            }
+          }
+        }
+      }
+
+      // 3. Fecha Numérica ISO / Estándar (ej: YYYY-MM-DD o DD/MM/YYYY)
+      const numMatch = str.match(/(\d{1,4})[-/.](\d{1,2})[-/.](\d{1,4})/);
+      if (numMatch) {
+        let p1 = parseInt(numMatch[1], 10), p2 = parseInt(numMatch[2], 10), p3 = parseInt(numMatch[3], 10);
+        let y, m, d;
+        if (p1 > 1000) { y = p1; m = p2 - 1; d = p3; }
+        else if (p3 > 1000) { y = p3; m = p2 - 1; d = p1; }
+        if (y && m >= 0 && m < 12 && d >= 1 && d <= 31) {
+          const dt = new Date(Date.UTC(y, m, d));
+          const yyyy = dt.getUTCFullYear();
+          const mm = String(dt.getUTCMonth() + 1).padStart(2, '0');
+          const dd = String(dt.getUTCDate()).padStart(2, '0');
+          const iso = `${yyyy}-${mm}-${dd}`;
+          const formatted = `${dayNamesEs[dt.getUTCDay()]}, ${dt.getUTCDate()} DE ${monthNamesEs[dt.getUTCMonth()]} DE ${yyyy}`;
+          return { iso, formatted };
+        }
+      }
+
+      return { iso: "9999-99-99", formatted: str.toUpperCase() };
     }
 
-    function processFile(file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: false, dateNF: "yyyy-mm-dd" });
-        parseSpreadsheetData(rawRows);
-      };
-      reader.readAsArrayBuffer(file);
+    async function processFiles(fileList) {
+      const files = Array.from(fileList);
+      if (!files.length) return;
+
+      for (const file of files) {
+        await processSingleFile(file);
+      }
+
+      saveToLocalStorage();
+      renderLiveConsensusApp();
+      excelInput.value = "";
+    }
+
+    function processSingleFile(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: false });
+            parseSpreadsheetData(rawRows);
+          } catch (err) {
+            console.error("Error al procesar el archivo:", file.name, err);
+          }
+          resolve();
+        };
+        reader.onerror = () => resolve();
+        reader.readAsArrayBuffer(file);
+      });
     }
 
     function parseSpreadsheetData(rows) {
-      const daysData = {};
-      let currentDay = "LUNES";
+      let currentIsoKey = "9999-99-99";
+      let currentFormattedDay = "FECHA DESCONOCIDA";
 
       rows.forEach(row => {
         if (!row || row.length === 0) return;
@@ -204,50 +406,34 @@
         const rowString = cleanRow.join(" ").trim();
         if (!rowString) return;
 
-        if (cleanRow.includes("Macro Indicator / Sub-Metric") || cleanRow.includes("Consensus") || /Time/i.test(cleanRow[1] || "")) return;
+        if (cleanRow.includes("Macro Indicator / Sub-Metric") || cleanRow.includes("Consensus") || /Expectation Range/i.test(rowString)) return;
 
-        let detectedDay = null;
-        const targetDateIdx = cleanRow.findIndex(c => c.includes("Calendar Target Date:"));
+        // A) DETECTAR ENCABEZADO DE FECHA
+        let headerRaw = null;
+
+        const targetDateIdx = cleanRow.findIndex(c => String(c).includes("Calendar Target Date:"));
         if (targetDateIdx !== -1) {
-          let rawDate = cleanRow[targetDateIdx + 1] || cleanRow[targetDateIdx].replace("Calendar Target Date:", "");
-          detectedDay = rawDate.replace(/Current Month/gi, "").replace(/\s{2,}/g, " ").trim().toUpperCase();
-        } else if (/^(SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|DOMINGO|LUNES|MARTES|MIÉRCOLES|MIERCOLES|JUEVES|VIERNES|SÁBADO|SABADO)/i.test(rowString)) {
-          detectedDay = rowString.toUpperCase();
-        } else {
-          for (let cell of cleanRow) {
-            if (/^\d{4}-\d{2}-\d{2}/.test(cell) || /^\d{1,2}\/\d{1,2}\/\d{2,4}/.test(cell) || /^\d{5}(\.\d+)?$/.test(cell)) {
-              let d;
-              if (/^\d{5}(\.\d+)?$/.test(cell)) {
-                const serial = parseFloat(cell);
-                if (serial > 40000 && serial < 60000) d = new Date(Math.round((serial - 25569) * 86400 * 1000));
-              } else {
-                let dateVal = cell.includes(' ') ? cell.split(' ')[0] : cell;
-                if (dateVal.includes('-')) {
-                  const parts = dateVal.split('-');
-                  d = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
-                } else if (dateVal.includes('/')) {
-                  const parts = dateVal.split('/');
-                  let y = parseInt(parts[2]);
-                  if (y < 100) y += 2000;
-                  d = new Date(Date.UTC(y, parseInt(parts[0]) - 1, parseInt(parts[1])));
-                }
-              }
-
-              if (d && !isNaN(d.getTime())) {
-                const dayNames = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
-                detectedDay = `${dayNames[d.getUTCDay()]}, ${d.toLocaleDateString('es-ES', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).toUpperCase()}`;
-                break;
-              }
-            }
-          }
+          headerRaw = cleanRow[targetDateIdx + 1] || cleanRow[targetDateIdx].replace("Calendar Target Date:", "");
+        } else if (/^(SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|DOMINGO|LUNES|MARTES|MIÉRCOLES|MIERCOLES|JUEVES|VIERNES|SÁBADO|SABADO)/i.test(rowString) && !cleanRow.some(c => isAllowedGeo(c))) {
+          headerRaw = rowString;
         }
 
-        if (detectedDay) {
-          currentDay = detectedDay;
-          if (!daysData[currentDay]) daysData[currentDay] = [];
+        if (headerRaw) {
+          const dateInfo = parseHeaderToIsoAndFormatted(headerRaw);
+          currentIsoKey = dateInfo.iso;
+          currentFormattedDay = dateInfo.formatted;
+
+          if (!globalState.daysData[currentIsoKey]) {
+            globalState.daysData[currentIsoKey] = {
+              isoDate: currentIsoKey,
+              formattedDay: currentFormattedDay,
+              events: []
+            };
+          }
           return;
         }
 
+        // B) EXTRAER DATOS DEL INDICADOR
         let time = "-", country = "", indicator = "", consensus = "-", range = "-", prior = "-";
 
         let mergedColIdx = cleanRow.findIndex(c => {
@@ -274,11 +460,7 @@
             }
             if (foundGeoIdx + 1 < cleanRow.length) indicator = cleanRow[foundGeoIdx + 1];
             const postIndicator = cleanRow.slice(foundGeoIdx + 2);
-            if (postIndicator.length >= 4) {
-              consensus = postIndicator[1] || postIndicator[2];
-              range = postIndicator[3] || "-";
-              prior = postIndicator[4] || postIndicator[3] || "-";
-            } else if (postIndicator.length === 3) {
+            if (postIndicator.length >= 3) {
               consensus = postIndicator[0]; range = postIndicator[1]; prior = postIndicator[2];
             } else if (postIndicator.length === 2) {
               consensus = postIndicator[0]; prior = postIndicator[1];
@@ -289,51 +471,91 @@
         }
 
         if (country && indicator && isAllowedGeo(country) && isValidConsensus(consensus)) {
-          if (!daysData[currentDay]) daysData[currentDay] = [];
-          daysData[currentDay].push({ time, country, indicator, consensus, range, prior });
+          if (!globalState.daysData[currentIsoKey]) {
+            globalState.daysData[currentIsoKey] = {
+              isoDate: currentIsoKey,
+              formattedDay: currentFormattedDay,
+              events: []
+            };
+          }
+
+          const dayObj = globalState.daysData[currentIsoKey];
+          const existingIdx = dayObj.events.findIndex(e => e.country === country && e.indicator === indicator);
+          const newItem = { time, country, indicator, consensus, range, prior };
+
+          if (existingIdx !== -1) {
+            dayObj.events[existingIdx] = newItem;
+          } else {
+            dayObj.events.push(newItem);
+          }
         }
       });
-
-      globalState.daysData = daysData;
-      saveToLocalStorage();
-      renderLiveConsensusApp();
     }
 
     function renderLiveConsensusApp() {
       const container = document.getElementById('liveConsensusContainer');
       const emptyState = document.getElementById('emptyState');
       const summaryBar = document.getElementById('summaryBar');
+      const filterBar = document.getElementById('consensusFilterBar');
       const totalEventsBadge = document.getElementById('totalEventsBadge');
 
       container.innerHTML = '';
       let totalCount = 0;
 
-      const dayKeys = Object.keys(globalState.daysData);
+      // ORDENAMIENTO CRONOLÓGICO POR CLAVE ISO YYYY-MM-DD
+      const sortedIsoKeys = Object.keys(globalState.daysData).sort();
 
-      if (dayKeys.length === 0) {
+      if (sortedIsoKeys.length === 0) {
         emptyState.classList.remove('hidden');
         summaryBar.classList.add('hidden');
+        filterBar.classList.add('hidden');
         return;
       }
 
       emptyState.classList.add('hidden');
       summaryBar.classList.remove('hidden');
+      filterBar.classList.remove('hidden');
 
-      dayKeys.forEach(day => {
-        const events = globalState.daysData[day];
+      const searchQuery = (document.getElementById('indicatorSearchInput')?.value || '').toLowerCase();
+
+      sortedIsoKeys.forEach(isoKey => {
+        const dayObj = globalState.daysData[isoKey];
+        let events = dayObj.events || [];
         if (!events || events.length === 0) return;
 
+        if (activeGeoFilter !== 'ALL') {
+          events = events.filter(e => {
+            const c = e.country.toUpperCase();
+            if (activeGeoFilter === 'US') return ['US', 'USA', 'USD'].includes(c);
+            if (activeGeoFilter === 'EUR') return ['EMU', 'EU', 'EUR', 'DE', 'DEU', 'FR', 'FRA'].includes(c);
+            if (activeGeoFilter === 'GB') return ['GB', 'UK', 'GBP'].includes(c);
+            if (activeGeoFilter === 'JP') return ['JP', 'JPN', 'JPY'].includes(c);
+            if (activeGeoFilter === 'CA') return ['CA', 'CAN', 'CAD'].includes(c);
+            if (activeGeoFilter === 'AU') return ['AU', 'AUS', 'AUD'].includes(c);
+            if (activeGeoFilter === 'NZ') return ['NZ', 'NZL', 'NZD'].includes(c);
+            if (activeGeoFilter === 'CH') return ['CH', 'CHE', 'CHF'].includes(c);
+            if (activeGeoFilter === 'CN') return ['CN', 'CHN', 'CNH', 'CNY'].includes(c);
+            return c === activeGeoFilter;
+          });
+        }
+
+        if (searchQuery) {
+          events = events.filter(e => (e.indicator || '').toLowerCase().includes(searchQuery) || (e.country || '').toLowerCase().includes(searchQuery));
+        }
+
+        if (events.length === 0) return;
+
         totalCount += events.length;
-        const translatedDay = translateDateHeader(day);
+        const displayDay = dayObj.formattedDay || isoKey;
 
         let dayCard = document.createElement('div');
-        dayCard.className = "bg-[#07090e] border border-cyan-500/30 rounded-2xl shadow-xl shadow-cyan-950/20 space-y-4 overflow-hidden transition hover:border-cyan-500/50";
+        dayCard.className = "day-card bg-[#07090e] border border-cyan-500/30 rounded-2xl shadow-xl shadow-cyan-950/20 space-y-4 overflow-hidden transition hover:border-cyan-500/50";
 
         let dayHeader = `
           <div class="bg-[#0b0f19] border-b border-cyan-500/30 px-5 py-3.5 flex justify-between items-center">
             <div class="flex items-center gap-2 bg-cyan-500/15 border border-cyan-400/40 px-3 py-1.5 rounded-xl text-cyan-300 font-bold font-mono text-xs shadow-[0_0_12px_rgba(34,211,238,0.15)]">
               <span>📅</span>
-              <span class="tracking-wider">${translatedDay}</span>
+              <span class="tracking-wider">${escapeHtml(displayDay)}</span>
             </div>
             <span class="text-[10px] text-cyan-200/80 font-mono bg-cyan-950/70 px-2.5 py-1 rounded-lg border border-cyan-500/30 shadow-sm">${events.length} Expectativas</span>
           </div>
@@ -361,12 +583,12 @@
 
           tableHTML += `
             <tr class="${rowBgClass} border-b border-zinc-800/30 hover:bg-zinc-800/40 text-zinc-300 transition">
-              <td class="p-2.5 text-zinc-400 font-mono text-[11px]">${item.time}</td>
-              <td class="p-2.5"><span class="${badgeClass} px-2 py-0.5 rounded font-bold text-[9px] tracking-wide">${item.country}</span></td>
-              <td class="p-2.5 font-sans text-zinc-100 text-xs font-medium">${item.indicator}</td>
-              <td class="p-2.5 text-center font-bold text-cyan-400 font-mono text-xs">${item.consensus}</td>
-              <td class="p-2.5 text-center text-zinc-400 font-mono">${item.range}</td>
-              <td class="p-2.5 text-center text-zinc-500 font-mono">${item.prior}</td>
+              <td class="p-2.5 text-zinc-400 font-mono text-[11px]">${escapeHtml(item.time)}</td>
+              <td class="p-2.5"><span class="${badgeClass} px-2 py-0.5 rounded font-bold text-[9px] tracking-wide">${escapeHtml(item.country)}</span></td>
+              <td class="p-2.5 font-sans text-zinc-100 text-xs font-medium">${escapeHtml(item.indicator)}</td>
+              <td class="p-2.5 text-center font-bold text-cyan-400 font-mono text-xs">${escapeHtml(item.consensus)}</td>
+              <td class="p-2.5 text-center text-zinc-400 font-mono">${escapeHtml(item.range)}</td>
+              <td class="p-2.5 text-center text-zinc-500 font-mono">${escapeHtml(item.prior)}</td>
             </tr>
           `;
         });
@@ -382,6 +604,23 @@
       });
 
       totalEventsBadge.textContent = `${totalCount} Datos de Consenso Filtrados`;
+    }
+
+    function filterByGeo(geo) {
+      activeGeoFilter = geo;
+      const btns = document.querySelectorAll('.geo-filter-btn');
+      btns.forEach(btn => {
+        if (btn.getAttribute('onclick').includes(`'${geo}'`)) {
+          btn.className = "geo-filter-btn px-2 py-1 rounded font-bold bg-cyan-500 text-black";
+        } else {
+          btn.className = "geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300";
+        }
+      });
+      renderLiveConsensusApp();
+    }
+
+    function applyConsensusFilters() {
+      renderLiveConsensusApp();
     }
 
     function resetConsensusData() {
@@ -421,14 +660,17 @@
           <h2 style="font-size: 11px; color: #475569; margin: 4px 0 16px 0; font-style: italic;">${text.subtitle}</h2>
       `;
 
-      Object.keys(data).forEach(day => {
-        const events = data[day];
+      const sortedIsoKeys = Object.keys(data).sort();
+
+      sortedIsoKeys.forEach(isoKey => {
+        const dayObj = data[isoKey];
+        const events = dayObj.events || [];
         if (!events || events.length === 0) return;
-        const translatedDay = translateDateHeader(day);
+        const displayDay = dayObj.formattedDay || isoKey;
 
         html += `
           <div style="background-color: #1F385C; color: white; padding: 6px 10px; font-weight: bold; font-size: 11px; margin-top: 16px; text-transform: uppercase;">
-            ${translatedDay}
+            ${escapeHtml(displayDay)}
           </div>
           <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 12px; border: 1px solid #CBD5E1;">
             <thead>
@@ -450,12 +692,12 @@
 
           html += `
             <tr style="background-color: ${rowBg}; border-bottom: 1px solid #E2E8F0;">
-              <td style="padding: 5px; font-family: monospace; border: 1px solid #E2E8F0; text-align: center;">${item.time}</td>
-              <td style="padding: 5px; border: 1px solid #E2E8F0; text-align: center;"><span class="${badgeClass}" style="padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 9px;">${item.country}</span></td>
-              <td style="padding: 5px; font-weight: 500; border: 1px solid #E2E8F0;">${item.indicator}</td>
-              <td style="padding: 5px; font-weight: bold; color: #0369A1; border: 1px solid #E2E8F0; text-align: center;">${item.consensus}</td>
-              <td style="padding: 5px; color: #475569; border: 1px solid #E2E8F0; text-align: center;">${item.range}</td>
-              <td style="padding: 5px; color: #475569; border: 1px solid #E2E8F0; text-align: center;">${item.prior}</td>
+              <td style="padding: 5px; font-family: monospace; border: 1px solid #E2E8F0; text-align: center;">${escapeHtml(item.time)}</td>
+              <td style="padding: 5px; border: 1px solid #E2E8F0; text-align: center;"><span class="${badgeClass}" style="padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 9px;">${escapeHtml(item.country)}</span></td>
+              <td style="padding: 5px; font-weight: 500; border: 1px solid #E2E8F0;">${escapeHtml(item.indicator)}</td>
+              <td style="padding: 5px; font-weight: bold; color: #0369A1; border: 1px solid #E2E8F0; text-align: center;">${escapeHtml(item.consensus)}</td>
+              <td style="padding: 5px; color: #475569; border: 1px solid #E2E8F0; text-align: center;">${escapeHtml(item.range)}</td>
+              <td style="padding: 5px; color: #475569; border: 1px solid #E2E8F0; text-align: center;">${escapeHtml(item.prior)}</td>
             </tr>
           `;
         });
