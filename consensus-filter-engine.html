@@ -20,6 +20,8 @@
       .page-break { page-break-before: always; }
       table, tr, .report-card, .day-card { break-inside: avoid !important; page-break-inside: avoid !important; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      .print-highlight-green { background-color: #dcfce7 !important; color: #166534 !important; }
+      .print-highlight-red { background-color: #fee2e2 !important; color: #991b1b !important; }
     }
 
     .badge-US, .badge-USA, .badge-USD { background-color: #D9E1F2; color: #1E293B; }
@@ -32,6 +34,16 @@
     .badge-CH, .badge-CHF { background-color: #F8CECC; color: #1E293B; }
     .badge-CN, .badge-CNH, .badge-CNY { background-color: #FFE6CC; color: #1E293B; }
     .badge-DEFAULT { background-color: #E2E8F0; color: #1E293B; }
+
+    /* Clases de Resaltado para la vista web */
+    .row-highlight-green {
+      background-color: rgba(16, 185, 129, 0.12) !important;
+      border-left: 4px solid #10b981 !important;
+    }
+    .row-highlight-red {
+      background-color: rgba(239, 68, 68, 0.12) !important;
+      border-left: 4px solid #ef4444 !important;
+    }
   </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
@@ -207,7 +219,7 @@
           newDaysData[isoKey] = {
             isoDate: isoKey,
             formattedDay: info.formatted || key,
-            events: val
+            events: val.map(e => ({ ...e, status: e.status || 'none' }))
           };
         }
       }
@@ -262,7 +274,7 @@
       return true;
     }
 
-    // RESOLUCIÓN PRECISA DE FECHA DE ENCABEZADO A ISO (YYYY-MM-DD) Y ETIQUETA FORMATEADA
+    // RESOLUCIÓN DE FECHA DE ENCABEZADO A CLAVE ISO Y DÍA FORMATEADO
     function parseHeaderToIsoAndFormatted(rawHeaderStr) {
       if (!rawHeaderStr) return { iso: "9999-99-99", formatted: "FECHA DESCONOCIDA" };
       const str = String(rawHeaderStr).trim();
@@ -481,15 +493,33 @@
 
           const dayObj = globalState.daysData[currentIsoKey];
           const existingIdx = dayObj.events.findIndex(e => e.country === country && e.indicator === indicator);
-          const newItem = { time, country, indicator, consensus, range, prior };
+          const newItem = { time, country, indicator, consensus, range, prior, status: 'none' };
 
           if (existingIdx !== -1) {
+            // Preservar el status previo si ya existía
+            newItem.status = dayObj.events[existingIdx].status || 'none';
             dayObj.events[existingIdx] = newItem;
           } else {
             dayObj.events.push(newItem);
           }
         }
       });
+    }
+
+    // TOGGLE DE ESTADO DEL EVENTO (NEUTRO -> GREEN -> RED -> NEUTRO)
+    function toggleEventStatus(isoKey, itemIndex) {
+      if (!globalState.daysData[isoKey] || !globalState.daysData[isoKey].events[itemIndex]) return;
+      
+      const currentStatus = globalState.daysData[isoKey].events[itemIndex].status || 'none';
+      let nextStatus = 'none';
+
+      if (currentStatus === 'none') nextStatus = 'green';
+      else if (currentStatus === 'green') nextStatus = 'red';
+      else if (currentStatus === 'red') nextStatus = 'none';
+
+      globalState.daysData[isoKey].events[itemIndex].status = nextStatus;
+      saveToLocalStorage();
+      renderLiveConsensusApp();
     }
 
     function renderLiveConsensusApp() {
@@ -502,7 +532,6 @@
       container.innerHTML = '';
       let totalCount = 0;
 
-      // ORDENAMIENTO CRONOLÓGICO POR CLAVE ISO YYYY-MM-DD
       const sortedIsoKeys = Object.keys(globalState.daysData).sort();
 
       if (sortedIsoKeys.length === 0) {
@@ -569,7 +598,7 @@
                   <th class="p-2.5">Hora</th>
                   <th class="p-2.5">País</th>
                   <th class="p-2.5">Indicador Macroeconómico</th>
-                  <th class="p-2.5 text-center">Consenso</th>
+                  <th class="p-2.5 text-center">Consenso / Evaluación</th>
                   <th class="p-2.5 text-center">Rango Expectativas</th>
                   <th class="p-2.5 text-center">Previo</th>
                 </tr>
@@ -577,16 +606,36 @@
               <tbody>
         `;
 
-        events.forEach((item, idx) => {
-          const badgeClass = `badge-${item.country}`;
-          const rowBgClass = idx % 2 === 0 ? 'bg-transparent' : 'bg-zinc-900/20';
+        events.forEach((item) => {
+          // Obtener el índice real en la lista completa del día
+          const originalIndex = dayObj.events.findIndex(e => e.country === item.country && e.indicator === item.indicator);
+          const status = item.status || 'none';
+
+          let rowBgClass = 'bg-transparent';
+          let consensusTextColor = 'text-cyan-400';
+          let statusBtnHtml = '';
+
+          if (status === 'green') {
+            rowBgClass = 'row-highlight-green text-emerald-100';
+            consensusTextColor = 'text-emerald-400 font-extrabold';
+            statusBtnHtml = `<button onclick="toggleEventStatus('${isoKey}', ${originalIndex})" title="Resultado: Positivo / Superó Consenso" class="ml-2 px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 transition">🟢 Beat</button>`;
+          } else if (status === 'red') {
+            rowBgClass = 'row-highlight-red text-rose-100';
+            consensusTextColor = 'text-rose-400 font-extrabold';
+            statusBtnHtml = `<button onclick="toggleEventStatus('${isoKey}', ${originalIndex})" title="Resultado: Negativo / Decepcionó Consenso" class="ml-2 px-2 py-0.5 text-[10px] font-bold rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 transition">🔴 Miss</button>`;
+          } else {
+            statusBtnHtml = `<button onclick="toggleEventStatus('${isoKey}', ${originalIndex})" title="Hacer clic para evaluar resultado" class="ml-2 px-2 py-0.5 text-[10px] font-bold rounded bg-zinc-800 text-zinc-400 border border-zinc-700 hover:bg-zinc-700 hover:text-white transition">⚪ Evaluador</button>`;
+          }
 
           tableHTML += `
             <tr class="${rowBgClass} border-b border-zinc-800/30 hover:bg-zinc-800/40 text-zinc-300 transition">
               <td class="p-2.5 text-zinc-400 font-mono text-[11px]">${escapeHtml(item.time)}</td>
-              <td class="p-2.5"><span class="${badgeClass} px-2 py-0.5 rounded font-bold text-[9px] tracking-wide">${escapeHtml(item.country)}</span></td>
+              <td class="p-2.5"><span class="badge-${escapeHtml(item.country)} px-2 py-0.5 rounded font-bold text-[9px] tracking-wide">${escapeHtml(item.country)}</span></td>
               <td class="p-2.5 font-sans text-zinc-100 text-xs font-medium">${escapeHtml(item.indicator)}</td>
-              <td class="p-2.5 text-center font-bold text-cyan-400 font-mono text-xs">${escapeHtml(item.consensus)}</td>
+              <td class="p-2.5 text-center font-mono text-xs">
+                <span class="${consensusTextColor}">${escapeHtml(item.consensus)}</span>
+                ${statusBtnHtml}
+              </td>
               <td class="p-2.5 text-center text-zinc-400 font-mono">${escapeHtml(item.range)}</td>
               <td class="p-2.5 text-center text-zinc-500 font-mono">${escapeHtml(item.prior)}</td>
             </tr>
@@ -687,15 +736,23 @@
         `;
 
         events.forEach((item, idx) => {
-          const rowBg = idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC';
-          const badgeClass = `badge-${item.country}`;
+          let rowStyle = idx % 2 === 0 ? 'background-color: #FFFFFF;' : 'background-color: #F8FAFC;';
+          let consensusStyle = 'font-weight: bold; color: #0369A1;';
+
+          if (item.status === 'green') {
+            rowStyle = 'background-color: #dcfce7; color: #166534; font-weight: 600;';
+            consensusStyle = 'font-weight: bold; color: #15803d;';
+          } else if (item.status === 'red') {
+            rowStyle = 'background-color: #fee2e2; color: #991b1b; font-weight: 600;';
+            consensusStyle = 'font-weight: bold; color: #b91c1c;';
+          }
 
           html += `
-            <tr style="background-color: ${rowBg}; border-bottom: 1px solid #E2E8F0;">
+            <tr style="${rowStyle} border-bottom: 1px solid #E2E8F0;">
               <td style="padding: 5px; font-family: monospace; border: 1px solid #E2E8F0; text-align: center;">${escapeHtml(item.time)}</td>
-              <td style="padding: 5px; border: 1px solid #E2E8F0; text-align: center;"><span class="${badgeClass}" style="padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 9px;">${escapeHtml(item.country)}</span></td>
+              <td style="padding: 5px; border: 1px solid #E2E8F0; text-align: center;"><span class="badge-${escapeHtml(item.country)}" style="padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 9px;">${escapeHtml(item.country)}</span></td>
               <td style="padding: 5px; font-weight: 500; border: 1px solid #E2E8F0;">${escapeHtml(item.indicator)}</td>
-              <td style="padding: 5px; font-weight: bold; color: #0369A1; border: 1px solid #E2E8F0; text-align: center;">${escapeHtml(item.consensus)}</td>
+              <td style="padding: 5px; ${consensusStyle} border: 1px solid #E2E8F0; text-align: center;">${escapeHtml(item.consensus)}</td>
               <td style="padding: 5px; color: #475569; border: 1px solid #E2E8F0; text-align: center;">${escapeHtml(item.range)}</td>
               <td style="padding: 5px; color: #475569; border: 1px solid #E2E8F0; text-align: center;">${escapeHtml(item.prior)}</td>
             </tr>
