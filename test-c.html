@@ -76,7 +76,7 @@
             <button onclick="switchTab('CHF')" id="tab-CHF" class="tab-btn px-3 py-2 rounded-t font-semibold text-sm transition text-gray-400 hover:text-white bg-card cursor-pointer">CHF</button>
         </div>
 
-        <!-- TAB CONTENT: Dashboard (Sentiment Chart & Divergence Controls) -->
+        <!-- TAB CONTENT: Dashboard (Sentiment Chart & Controls) -->
         <div id="view-dashboard" class="tab-view space-y-4">
             <div class="bg-card rounded-lg border border-dark p-4">
                 
@@ -115,7 +115,7 @@
 
                 <!-- Sentiment Bars Container -->
                 <div id="sentimentBarsContainer" class="space-y-3">
-                    <!-- Dynamic non-overlapping cards rendered here -->
+                    <!-- Dynamic rows -->
                 </div>
             </div>
         </div>
@@ -242,7 +242,6 @@
             ]
         };
 
-        // All 28 Standard Forex Currency Pairs
         const pairsList = [
             "EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDCAD", "USDCHF", "USDJPY",
             "EURGBP", "EURAUD", "EURNZD", "EURCAD", "EURCHF", "EURJPY",
@@ -257,6 +256,33 @@
         let currentSort = 'divergence';
         let currentFilter = 'all';
         let barChartInstance = null;
+
+        // SMART NORMALIZER: Safely converts manual text inputs or API values to raw formula decimals
+        function parseInputValue(input, type) {
+            if (input === null || input === undefined || input === '') return 0.0;
+            
+            let strVal = input.toString().trim().toUpperCase();
+            if (strVal.includes('K')) strVal = strVal.replace('K', '');
+            
+            const isExplicitPercent = strVal.includes('%');
+            const cleanStr = strVal.replace('%', '');
+            let num = parseFloat(cleanStr);
+            
+            if (isNaN(num)) return 0.0;
+
+            const percentTypes = ["CPI", "UNEMP_RATE", "PCT_GROWTH", "EUR_UNEMP_FIXED", "CARD_TRANS"];
+            
+            if (percentTypes.includes(type)) {
+                if (isExplicitPercent) {
+                    return num / 100.0;
+                }
+                // Convert whole percentage inputs (e.g., 0.5 for 0.5%, 4.3 for 4.3%) into underlying formula decimals
+                if (Math.abs(num) >= 0.08) {
+                    return num / 100.0;
+                }
+            }
+            return num;
+        }
 
         function evaluateIndicator(ind) {
             let netChange = 0;
@@ -548,7 +574,6 @@
                 return;
             }
 
-            // Render 2-row cards (prevents percentage text overlap)
             pairsData.forEach(p => {
                 const diffFormatted = p.diff > 0 ? '+' + p.diff : p.diff;
 
@@ -591,22 +616,45 @@
 
             appData[curr].forEach((ind, idx) => {
                 const scoreColor = ind.score > 0 ? 'text-green-400 font-bold' : ind.score < 0 ? 'text-red-400 font-bold' : 'text-gray-400';
+                const isPercentType = ["CPI", "UNEMP_RATE", "PCT_GROWTH", "EUR_UNEMP_FIXED", "CARD_TRANS"].includes(ind.type);
+
+                // Format values with Excel-style percentage symbols
+                const formatDisplayVal = (val) => {
+                    if (val === null || val === undefined) return '';
+                    if (isPercentType) {
+                        return (val * 100).toFixed(2) + '%';
+                    }
+                    return val;
+                };
+
+                const formatNetChange = (val) => {
+                    if (val === null || val === undefined) return '-';
+                    if (isPercentType) {
+                        const pct = (val * 100).toFixed(2);
+                        return (val > 0 ? '+' + pct : pct) + '%';
+                    }
+                    return val > 0 ? '+' + val : val;
+                };
+
                 tbody.innerHTML += `
                     <tr class="hover:bg-gray-800/50">
                         <td class="p-3 font-medium text-white">${ind.name}</td>
                         <td class="p-3">
-                            <input type="number" step="any" value="${ind.previous}" onchange="updateValue('${curr}', ${idx}, 'previous', this.value)"
-                            class="w-full bg-gray-900 border border-dark rounded px-2 py-1 text-xs text-white focus:border-blue-500 outline-none">
+                            <input type="text" value="${formatDisplayVal(ind.previous)}" 
+                            onchange="updateValue('${curr}', ${idx}, 'previous', this.value)"
+                            class="w-full bg-gray-900 border border-dark rounded px-2 py-1 text-xs text-white focus:border-blue-500 outline-none font-mono">
                         </td>
                         <td class="p-3">
-                            <input type="number" step="any" value="${ind.forecast}" onchange="updateValue('${curr}', ${idx}, 'forecast', this.value)"
-                            class="w-full bg-gray-900 border border-dark rounded px-2 py-1 text-xs text-white focus:border-blue-500 outline-none">
+                            <input type="text" value="${formatDisplayVal(ind.forecast)}" 
+                            onchange="updateValue('${curr}', ${idx}, 'forecast', this.value)"
+                            class="w-full bg-gray-900 border border-dark rounded px-2 py-1 text-xs text-white focus:border-blue-500 outline-none font-mono">
                         </td>
                         <td class="p-3">
-                            <input type="number" step="any" value="${ind.actual}" onchange="updateValue('${curr}', ${idx}, 'actual', this.value)"
-                            class="w-full bg-gray-900 border border-dark rounded px-2 py-1 text-xs text-white focus:border-blue-500 outline-none">
+                            <input type="text" value="${formatDisplayVal(ind.actual)}" 
+                            onchange="updateValue('${curr}', ${idx}, 'actual', this.value)"
+                            class="w-full bg-gray-900 border border-dark rounded px-2 py-1 text-xs text-white focus:border-blue-500 outline-none font-mono">
                         </td>
-                        <td class="p-3 text-right font-mono text-gray-300">${ind.netChange}</td>
+                        <td class="p-3 text-right font-mono text-gray-300">${formatNetChange(ind.netChange)}</td>
                         <td class="p-3 text-center font-mono ${scoreColor}">${ind.score > 0 ? '+' + ind.score : ind.score}</td>
                         <td class="p-3 text-right text-gray-400">${ind.weight}</td>
                     </tr>
@@ -615,17 +663,18 @@
         }
 
         function updateValue(curr, index, field, val) {
-            appData[curr][index][field] = parseFloat(val) || 0;
+            const ind = appData[curr][index];
+            const normalizedVal = parseInputValue(val, ind.type);
+            appData[curr][index][field] = normalizedVal;
             refreshApp();
         }
 
-        // AUTOMATED FINNHUB API DATA FETCHING
+        // AUTOMATED FINNHUB API DATA FETCHING WITH NORMALIZATION
         async function autoUpdateData() {
             const btn = document.getElementById('fetchBtn');
             const icon = document.getElementById('fetchIcon');
             
-            // UPDATE YOUR FINNHUB API KEY HERE
-            const apiKey = 'd9nr6n9r01qqbd5rpli0d9nr6n9r01qqbd5rplig'; 
+            const apiKey = 'YOUR_FINNHUB_API_KEY_HERE'; 
             
             const today = new Date().toISOString().split('T')[0];
             const url = `https://finnhub.io/api/v1/calendar/economic?from=${today}&to=${today}&token=${apiKey}`;
@@ -639,16 +688,19 @@
                 const data = await res.json();
                 
                 if (data && data.economicCalendar) {
-                    console.log("Fetched Live Economic Releases:", data.economicCalendar);
-
                     data.economicCalendar.forEach(release => {
                         for (const currency in appData) {
                             appData[currency].forEach(ind => {
-                                // Match live events to local indicators by string comparison
                                 if (release.event && ind.name.toLowerCase().includes(release.event.toLowerCase())) {
-                                    if (release.actual !== null && release.actual !== undefined) ind.actual = parseFloat(release.actual);
-                                    if (release.prev !== null && release.prev !== undefined) ind.previous = parseFloat(release.prev);
-                                    if (release.estimate !== null && release.estimate !== undefined) ind.forecast = parseFloat(release.estimate);
+                                    if (release.actual !== null && release.actual !== undefined) {
+                                        ind.actual = parseInputValue(release.actual, ind.type);
+                                    }
+                                    if (release.prev !== null && release.prev !== undefined) {
+                                        ind.previous = parseInputValue(release.prev, ind.type);
+                                    }
+                                    if (release.estimate !== null && release.estimate !== undefined) {
+                                        ind.forecast = parseInputValue(release.estimate, ind.type);
+                                    }
                                 }
                             });
                         }
