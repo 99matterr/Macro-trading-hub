@@ -94,7 +94,7 @@
         </div>
       </div>
 
-      <!-- ESCÁNER DE DIVERGENCIAS MACRO (ORDENADO POR MAYOR DIFERENCIAL) -->
+      <!-- ESCÁNER DE DIVERGENCIAS MACRO -->
       <div id="divergenceAlertBox" class="hidden bg-cyan-950/20 border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3">
         <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2">
           <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
@@ -187,7 +187,7 @@
 
   <!-- LÓGICA DE JS INTERNO DEL MOTOR -->
   <script>
-    // --- HELPER PARA ESCAPAR CARACTERES Y EVITAR ERRORES DE XSS / MARKUP ---
+    // Helper para escapar HTML
     function escapeHtml(str) {
       if (!str) return '';
       return String(str)
@@ -271,7 +271,6 @@
       }
     }
 
-    // Exportar Backup JSON
     function exportStateJSON() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalState, null, 2));
       const downloadAnchor = document.createElement('a');
@@ -282,7 +281,6 @@
       downloadAnchor.remove();
     }
 
-    // Cargar Backup JSON
     function importStateJSON(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -329,22 +327,28 @@
       return terms.some(term => lower.includes(term));
     }
 
+    // CATEGORIZACIÓN EXTENDIDA MEJORADA (EVITA TÍTULOS GENÉRICOS DE FALLBACK)
     function getCategorySentimentTitle(ccy, eventName) {
       if (!eventName) return `SENTIMIENTO DE ${ccy}`;
       const lower = eventName.toLowerCase();
+      
       if (lower.includes('cpi') || lower.includes('pce') || lower.includes('rpi') || lower.includes('inflation') || lower.includes('tokyo') || lower.includes('consumer price')) return `${ccy} - INFLACIÓN (IPC)`;
       if (lower.includes('ppi') || lower.includes('ippi') || lower.includes('producer price') || lower.includes('cgpi')) return `${ccy} - PRECIOS DE PRODUCTOR (IPP)`;
       if (lower.includes('unemployment') || lower.includes('employment') || lower.includes('jobless') || lower.includes('nfp') || lower.includes('adp') || lower.includes('claimant') || lower.includes('earnings') || lower.includes('household spending')) return `${ccy} - MERCADO LABORAL Y SALARIOS`;
       if (lower.includes('pmi') || lower.includes('ism') || lower.includes('tankan')) return `${ccy} - ÍNDICES PMI / TANKAN`;
-      if (lower.includes('interest rate') || lower.includes('monetary policy') || lower.includes('ecb press') || lower.includes('fomc') || lower.includes('rate decision') || lower.includes('loan prime') || lower.includes('boj') || lower.includes('bank of japan')) return `${ccy} - POLÍTICA MONETARIA Y TASAS`;
+      if (lower.includes('interest rate') || lower.includes('monetary policy') || lower.includes('ecb press') || lower.includes('fomc') || lower.includes('rate decision') || lower.includes('loan prime') || lower.includes('boj') || lower.includes('bank of japan') || lower.includes('meeting minutes') || lower.includes('speaks') || lower.includes('speech')) return `${ccy} - POLÍTICA MONETARIA Y TASAS`;
       if (lower.includes('retail sales')) return `${ccy} - VENTAS MINORISTAS`;
       if (lower.includes('trade balance') || lower.includes('exports') || lower.includes('imports') || lower.includes('current account')) return `${ccy} - BALANZA COMERCIAL`;
       if (lower.includes('gdp')) return `${ccy} - PRODUCTO INTERNO BRUTO (PIB)`;
-      if (lower.includes('zew')) return `${ccy} - SENTIMIENTO ECONÓMICO ZEW`;
+      if (lower.includes('zew') || lower.includes('ifo') || lower.includes('business climate') || lower.includes('confidence') || lower.includes('ratingdog')) return `${ccy} - SENTIMIENTO Y CLIMA DE NEGOCIOS`;
+      if (lower.includes('industrial production') || lower.includes('factory orders') || lower.includes('manufacturing production')) return `${ccy} - PRODUCCIÓN INDUSTRIAL`;
       if (lower.includes('gdt') || lower.includes('dairy')) return `${ccy} - ÍNDICE DE PRECIOS LÁCTEOS (GDT)`;
       if (lower.includes('consumer climate') || lower.includes('consumer sentiment')) return `${ccy} - CLIMA Y CONFIANZA DEL CONSUMIDOR`;
       if (lower.includes('building permit') || lower.includes('home sales')) return `${ccy} - MERCADO INMOBILIARIO`;
-      const firstWord = eventName.split(' ')[0].toUpperCase();
+
+      // Fallback limpio que remueve prefijos de países
+      const cleanName = eventName.replace(/^(French|German|Italian|Spanish|Eurozone|US|UK|Japanese|Australian|Canadian|Swiss|Chinese)\s+/i, '');
+      const firstWord = cleanName.split(' ')[0].toUpperCase();
       return `${ccy} - ${firstWord}`;
     }
 
@@ -416,7 +420,6 @@
         let time = "", ccy = "", event = "", actual = "", forecast = "", previous = "";
         let foundCcyIdx = -1;
 
-        // Búsqueda estricta de divisa en las primeras 5 columnas y solo de max 3 letras
         for (let i = 0; i < Math.min(cleanRow.length, 5); i++) {
           const cellVal = cleanRow[i].toUpperCase();
           if (cellVal.length <= 3 && CURRENCIES.includes(cellVal)) {
@@ -597,8 +600,12 @@
           `;
 
           const nextItem = events[idx + 1];
-          if (!nextItem || nextItem.time !== item.time || nextItem.ccy !== item.ccy) {
-            const categoryTitle = getCategorySentimentTitle(item.ccy, item.event);
+          const currentCategory = getCategorySentimentTitle(item.ccy, item.event);
+          const nextCategory = nextItem ? getCategorySentimentTitle(nextItem.ccy, nextItem.event) : null;
+
+          // CORRECCIÓN: SE EVALÚA POR CAMBIO DE CATEGORÍA / DIVISA EN LUGAR DE CAMBIO DE HORA
+          if (!nextItem || nextItem.ccy !== item.ccy || nextCategory !== currentCategory) {
+            const categoryTitle = currentCategory;
             const categoryId = `${day}-${item.ccy}-${categoryTitle}`.replace(/[^a-zA-Z0-9]/g, '-');
             const scoreObj = globalState.categoryScores[categoryId];
             const currentScore = scoreObj ? scoreObj.score : 0;
@@ -787,7 +794,6 @@
         }
       }
 
-      // ORDENAR POR DIFERENCIAL DE MAYOR A MENOR
       divergencesFound.sort((a, b) => b.diff - a.diff);
 
       if (divergencesFound.length > 0) {
@@ -943,8 +949,12 @@
           `;
 
           const nextItem = events[idx + 1];
-          if (!nextItem || nextItem.time !== item.time || nextItem.ccy !== item.ccy) {
-            const categoryTitle = getCategorySentimentTitle(item.ccy, item.event);
+          const currentCategory = getCategorySentimentTitle(item.ccy, item.event);
+          const nextCategory = nextItem ? getCategorySentimentTitle(nextItem.ccy, nextItem.event) : null;
+
+          // CORRECCIÓN PDF: EVALUACIÓN POR CAMBIO DE CATEGORÍA
+          if (!nextItem || nextItem.ccy !== item.ccy || nextCategory !== currentCategory) {
+            const categoryTitle = currentCategory;
             const categoryId = `${day}-${item.ccy}-${categoryTitle}`.replace(/[^a-zA-Z0-9]/g, '-');
             const scoreItem = globalState.categoryScores[categoryId];
             const scoreVal = scoreItem ? scoreItem.score : 0;
