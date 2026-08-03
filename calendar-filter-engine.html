@@ -271,31 +271,58 @@
       }
     }
 
+    // CORRECCIÓN: EXPORTACIÓN ROBUSTA VÍA BLOB
     function exportStateJSON() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalState, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `kairos_macro_backup_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      try {
+        const dataStr = JSON.stringify(globalState, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.href = url;
+        downloadAnchor.download = `kairos_macro_backup_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        
+        document.body.removeChild(downloadAnchor);
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error("Export error:", err);
+        alert("Error al exportar el archivo JSON.");
+      }
     }
 
+    // CORRECCIÓN: IMPORTACIÓN SEGURA CON REINICIO DE INPUT
     function importStateJSON(e) {
       const file = e.target.files[0];
       if (!file) return;
+
       const reader = new FileReader();
       reader.onload = function(evt) {
         try {
           const parsed = JSON.parse(evt.target.result);
           if (parsed && typeof parsed === 'object') {
-            globalState = parsed;
+            globalState = {
+              daysData: parsed.daysData || {},
+              categoryScores: parsed.categoryScores || {},
+              matrixEvents: parsed.matrixEvents || { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
+              matrixTotals: parsed.matrixTotals || { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
+              matrixPrev: Object.assign({ USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 }, parsed.matrixPrev || {}),
+              intermarketScores: Object.assign({ VIX: 0, Oil: 0, Gold: 0 }, parsed.intermarketScores || {}),
+              dailyNotes: parsed.dailyNotes || {}
+            };
+
             saveToLocalStorage();
             renderLiveInteractiveApp();
             alert('¡Respaldo cargado correctamente!');
+          } else {
+            throw new Error("Formato JSON no válido");
           }
         } catch(err) {
+          console.error("Import error:", err);
           alert('Error al leer el archivo de respaldo JSON.');
+        } finally {
+          e.target.value = '';
         }
       };
       reader.readAsText(file);
@@ -327,7 +354,6 @@
       return terms.some(term => lower.includes(term));
     }
 
-    // CATEGORIZACIÓN EXTENDIDA MEJORADA (EVITA TÍTULOS GENÉRICOS DE FALLBACK)
     function getCategorySentimentTitle(ccy, eventName) {
       if (!eventName) return `SENTIMIENTO DE ${ccy}`;
       const lower = eventName.toLowerCase();
@@ -346,7 +372,6 @@
       if (lower.includes('consumer climate') || lower.includes('consumer sentiment')) return `${ccy} - CLIMA Y CONFIANZA DEL CONSUMIDOR`;
       if (lower.includes('building permit') || lower.includes('home sales')) return `${ccy} - MERCADO INMOBILIARIO`;
 
-      // Fallback limpio que remueve prefijos de países
       const cleanName = eventName.replace(/^(French|German|Italian|Spanish|Eurozone|US|UK|Japanese|Australian|Canadian|Swiss|Chinese)\s+/i, '');
       const firstWord = cleanName.split(' ')[0].toUpperCase();
       return `${ccy} - ${firstWord}`;
@@ -543,7 +568,6 @@
         let events = globalState.daysData[day] || [];
         if (!events || events.length === 0) return;
 
-        // Filtrado dinámico por divisa y texto
         if (activeCurrencyFilter !== 'ALL') {
           events = events.filter(e => e.ccy === activeCurrencyFilter);
         }
@@ -603,7 +627,6 @@
           const currentCategory = getCategorySentimentTitle(item.ccy, item.event);
           const nextCategory = nextItem ? getCategorySentimentTitle(nextItem.ccy, nextItem.event) : null;
 
-          // CORRECCIÓN: SE EVALÚA POR CAMBIO DE CATEGORÍA / DIVISA EN LUGAR DE CAMBIO DE HORA
           if (!nextItem || nextItem.ccy !== item.ccy || nextCategory !== currentCategory) {
             const categoryTitle = currentCategory;
             const categoryId = `${day}-${item.ccy}-${categoryTitle}`.replace(/[^a-zA-Z0-9]/g, '-');
@@ -952,7 +975,6 @@
           const currentCategory = getCategorySentimentTitle(item.ccy, item.event);
           const nextCategory = nextItem ? getCategorySentimentTitle(nextItem.ccy, nextItem.event) : null;
 
-          // CORRECCIÓN PDF: EVALUACIÓN POR CAMBIO DE CATEGORÍA
           if (!nextItem || nextItem.ccy !== item.ccy || nextCategory !== currentCategory) {
             const categoryTitle = currentCategory;
             const categoryId = `${day}-${item.ccy}-${categoryTitle}`.replace(/[^a-zA-Z0-9]/g, '-');
