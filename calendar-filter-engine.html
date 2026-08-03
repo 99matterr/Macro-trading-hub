@@ -271,28 +271,33 @@
       }
     }
 
-    // CORRECCIÓN: EXPORTACIÓN ROBUSTA VÍA BLOB
+    // EXPORTACIÓN COMPATIBLE CON SAFARI (IPADOS / IOS)
     function exportStateJSON() {
       try {
         const dataStr = JSON.stringify(globalState, null, 2);
-        const blob = new Blob([dataStr], { type: "application/json" });
+        const blob = new Blob([dataStr], { type: "application/octet-stream" });
         const url = URL.createObjectURL(blob);
         
         const downloadAnchor = document.createElement('a');
         downloadAnchor.href = url;
         downloadAnchor.download = `kairos_macro_backup_${new Date().toISOString().slice(0,10)}.json`;
+        
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         
-        document.body.removeChild(downloadAnchor);
-        URL.revokeObjectURL(url);
+        setTimeout(() => {
+          if (document.body.contains(downloadAnchor)) {
+            document.body.removeChild(downloadAnchor);
+          }
+          URL.revokeObjectURL(url);
+        }, 2000);
       } catch (err) {
         console.error("Export error:", err);
         alert("Error al exportar el archivo JSON.");
       }
     }
 
-    // CORRECCIÓN: IMPORTACIÓN SEGURA CON REINICIO DE INPUT
+    // IMPORTACIÓN SEGURA CON REINICIO DE INPUT
     function importStateJSON(e) {
       const file = e.target.files[0];
       if (!file) return;
