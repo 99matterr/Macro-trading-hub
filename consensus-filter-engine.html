@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kairos Macro Hub // Motor Unificado de Riesgo y Divergencias</title>
+  <title>Kairos Macro Hub // Motor de Expectativas y Consenso</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
@@ -16,34 +16,34 @@
     @media print {
       .no-print { display: none !important; }
       body, html { background: white !important; color: #0f172a !important; padding: 0 !important; margin: 0 !important; }
-      #outputContainer { display: block !important; width: 100% !important; background: white !important; color: #0f172a !important; }
+      #outputContainer { display: block !important; width: 100% !important; background: white !important; margin: 0 !important; }
       .page-break { page-break-before: always; }
       table, tr, .report-card, .day-card { break-inside: avoid !important; page-break-inside: avoid !important; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      .print-highlight-green { background-color: #dcfce7 !important; color: #166534 !important; }
+      .print-highlight-red { background-color: #fee2e2 !important; color: #991b1b !important; }
     }
 
-    .badge-USD { background-color: #D9E1F2; color: #1E293B; }
-    .badge-EUR { background-color: #FFF2CC; color: #1E293B; }
-    .badge-GBP { background-color: #E2EFDA; color: #1E293B; }
-    .badge-JPY { background-color: #FCE4D6; color: #1E293B; }
-    .badge-CAD { background-color: #E1D5E7; color: #1E293B; }
-    .badge-AUD { background-color: #D5E8D4; color: #1E293B; }
-    .badge-NZD { background-color: #DAE8FC; color: #1E293B; }
-    .badge-CHF { background-color: #F8CECC; color: #1E293B; }
-    .badge-CNH, .badge-CNY { background-color: #FFE6CC; color: #1E293B; }
+    .badge-US, .badge-USA, .badge-USD { background-color: #D9E1F2; color: #1E293B; }
+    .badge-EMU, .badge-EU, .badge-EUR, .badge-DE, .badge-FR { background-color: #FFF2CC; color: #1E293B; }
+    .badge-GB, .badge-UK, .badge-GBP { background-color: #E2EFDA; color: #1E293B; }
+    .badge-JP, .badge-JPY { background-color: #FCE4D6; color: #1E293B; }
+    .badge-CA, .badge-CAD { background-color: #E1D5E7; color: #1E293B; }
+    .badge-AU, .badge-AUD { background-color: #D5E8D4; color: #1E293B; }
+    .badge-NZ, .badge-NZD { background-color: #DAE8FC; color: #1E293B; }
+    .badge-CH, .badge-CHF { background-color: #F8CECC; color: #1E293B; }
+    .badge-CN, .badge-CNH, .badge-CNY { background-color: #FFE6CC; color: #1E293B; }
     .badge-DEFAULT { background-color: #E2E8F0; color: #1E293B; }
 
-    .score-btn-active-p2 { background-color: #059669 !important; color: white !important; border-color: #10b981 !important; font-weight: bold; }
-    .score-btn-active-p1 { background-color: #10b981 !important; color: white !important; border-color: #34d399 !important; font-weight: bold; }
-    .score-btn-active-0  { background-color: #3f3f46 !important; color: white !important; border-color: #71717a !important; font-weight: bold; }
-    .score-btn-active-m1 { background-color: #f43f5e !important; color: white !important; border-color: #fb7185 !important; font-weight: bold; }
-    .score-btn-active-m2 { background-color: #be123c !important; color: white !important; border-color: #e11d48 !important; font-weight: bold; }
-
-    .score-scale-strong-bullish { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; border: 1px solid rgba(16, 185, 129, 0.4) !important; }
-    .score-scale-bullish { background-color: rgba(234, 179, 8, 0.15) !important; color: #facc15 !important; border: 1px solid rgba(234, 179, 8, 0.4) !important; }
-    .score-scale-neutral { background-color: rgba(63, 63, 70, 0.3) !important; color: #a1a1aa !important; border: 1px solid rgba(113, 113, 122, 0.3) !important; }
-    .score-scale-bearish { background-color: rgba(249, 115, 22, 0.15) !important; color: #fb923c !important; border: 1px solid rgba(249, 115, 22, 0.4) !important; }
-    .score-scale-strong-bearish { background-color: rgba(225, 29, 72, 0.15) !important; color: #fb7185 !important; border: 1px solid rgba(225, 29, 72, 0.4) !important; }
+    /* Clases de Resaltado para la vista web */
+    .row-highlight-green {
+      background-color: rgba(16, 185, 129, 0.12) !important;
+      border-left: 4px solid #10b981 !important;
+    }
+    .row-highlight-red {
+      background-color: rgba(239, 68, 68, 0.12) !important;
+      border-left: 4px solid #ef4444 !important;
+    }
   </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
@@ -51,17 +51,17 @@
   <!-- HEADER GLOBAL INYECTADO -->
   <div id="global-header"></div>
 
-  <!-- CONTENIDO PRINCIPAL -->
+  <!-- CONTENIDO PRINCIPAL INTERACTIVO -->
   <main class="flex-grow w-full max-w-6xl mx-auto px-3 md:px-6 py-6">
     <div class="space-y-6 no-print">
       
-      <!-- Encabezado Principal -->
+      <!-- Encabezado Principal Kairos Style -->
       <div class="bg-[#090a10] p-5 md:p-6 rounded-2xl border border-zinc-800 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            <span>⚡</span> Kairos Macro Hub
+            <span>🎯</span> Kairos Consensus Hub
           </h1>
-          <p class="text-zinc-400 text-xs mt-1">Filtro de calendario económico y motor de análisis de divergencias</p>
+          <p class="text-zinc-400 text-xs mt-1">Visor y filtro de expectativas y rangos de consenso macroeconómico</p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
           <button onclick="exportStateJSON()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs px-3 py-2 rounded-lg transition">
@@ -71,9 +71,9 @@
             📤 Cargar Backup
           </button>
           <input type="file" id="jsonInput" accept=".json" class="hidden" onchange="importStateJSON(event)" />
-          
-          <button onclick="resetAllScores()" class="bg-rose-950/20 hover:bg-rose-900/40 text-rose-300 border border-rose-900/40 text-xs px-3 py-2 rounded-lg transition">
-            🗑️ Reiniciar Todo
+
+          <button onclick="resetConsensusData()" class="bg-rose-950/20 hover:bg-rose-900/40 text-rose-300 border border-rose-900/40 text-xs px-3 py-2 rounded-lg transition">
+            🗑️ Borrar Memoria
           </button>
           <button onclick="triggerPrint()" class="bg-cyan-500 hover:bg-cyan-400 text-black text-xs px-4 py-2 rounded-lg font-bold shadow-md transition">
             Exportar PDF &rarr;
@@ -81,103 +81,63 @@
         </div>
       </div>
 
-      <!-- Carga de Archivos -->
+      <!-- Zona Clicable / Dropzone Multi-Archivo -->
       <div id="dropZone" class="bg-[#07080d] border border-dashed border-zinc-800 hover:border-cyan-500/60 rounded-2xl p-6 text-center transition cursor-pointer group">
-        <input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event)" />
+        <input type="file" id="excelInput" accept=".xlsx, .xls, .csv" multiple class="hidden" onchange="handleFileSelect(event)" />
         <div class="space-y-1.5">
           <svg class="mx-auto h-8 w-8 text-zinc-500 group-hover:text-cyan-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <div class="text-xs font-medium text-zinc-300">
-            Arrastra tu archivo <span class="text-cyan-400 font-semibold">Excel (.xlsx) aquí</span> o haz clic para explorar
+            Arrastra uno o <span class="text-cyan-400 font-semibold">múltiples archivos Excel (.xlsx) o CSV aquí</span> o haz clic para explorar
           </div>
+          <p class="text-xs text-zinc-600 font-mono">Los datos se consolidarán y ordenarán cronológicamente (Lunes a Viernes) automáticamente.</p>
         </div>
       </div>
 
-      <!-- ESCÁNER DE DIVERGENCIAS MACRO -->
-      <div id="divergenceAlertBox" class="hidden bg-cyan-950/20 border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3">
-        <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2">
-          <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
-            <span>⚡</span> Escáner de Divergencias Macro Detectadas
-          </span>
-          <span id="divergenceCountBadge" class="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded font-bold">0 Pares Aprobados</span>
-        </div>
-        <div id="divergenceList" class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs"></div>
+      <!-- Estado Vacío -->
+      <div id="emptyState" class="bg-[#07080d] border border-zinc-800/80 rounded-2xl p-12 text-center text-zinc-500 space-y-2">
+        <span class="text-3xl block mb-2">📋</span>
+        <h3 class="text-sm font-semibold text-zinc-300">No hay tabla de consenso publicada</h3>
+        <p class="text-xs max-w-md mx-auto">Sube una o varias tablas de expectativas en la zona superior. Tus datos se mantendrán agregados y publicados en esta página.</p>
       </div>
 
-      <!-- MATRIZ VIVA DE FUERZA GLOBAL E INTERMERCADO -->
-      <div id="liveMatrixContainer" class="hidden space-y-6">
-        <div class="bg-[#07080d] border border-zinc-800 p-5 rounded-2xl space-y-4 shadow-lg">
-          <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
-            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Matriz de Fuerza Global en Tiempo Real</h3>
-            <div class="flex items-center gap-1.5 text-[9px] font-mono">
-              <span class="px-1.5 py-0.5 rounded score-scale-strong-bullish font-bold">+4 a +10</span>
-              <span class="px-1.5 py-0.5 rounded score-scale-bullish font-bold">+1 a +3</span>
-              <span class="px-1.5 py-0.5 rounded score-scale-neutral font-bold">0</span>
-              <span class="px-1.5 py-0.5 rounded score-scale-bearish font-bold">-1 a -3</span>
-              <span class="px-1.5 py-0.5 rounded score-scale-strong-bearish font-bold">-4 a -10</span>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
-              <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2 font-mono">Sección A: Divisas Forex Core</span>
-              <table class="w-full text-xs text-left">
-                <thead>
-                  <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
-                    <th class="p-2">Divisa</th>
-                    <th class="p-2 text-center">Previo (Manual)</th>
-                    <th class="p-2 text-center">Eventos (Auto)</th>
-                    <th class="p-2 text-center">Total Combinado</th>
-                  </tr>
-                </thead>
-                <tbody id="matrixForexBody"></tbody>
-              </table>
-            </div>
-
-            <div>
-              <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2 font-mono">Sección B: Materias Primas y Riesgo</span>
-              <table class="w-full text-xs text-left">
-                <thead>
-                  <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
-                    <th class="p-2">Activo</th>
-                    <th class="p-2 text-center">Previo (Manual)</th>
-                    <th class="p-2 text-center">Evaluación</th>
-                    <th class="p-2 text-center">Total Combinado</th>
-                  </tr>
-                </thead>
-                <tbody id="matrixIntermarketBody"></tbody>
-              </table>
-            </div>
-          </div>
+      <!-- Resumen de Cobertura -->
+      <div id="summaryBar" class="hidden bg-[#07080d] border border-zinc-800/80 p-4 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-3 text-xs font-mono">
+        <div class="flex items-center gap-2 text-zinc-400">
+          <span class="text-cyan-400">🌐 Regiones Filtradas:</span>
+          <span class="text-zinc-200 font-bold">EE.UU., Eurozona, Reino Unido, Japón, Canadá, Australia, Nueva Zelanda, Suiza, China</span>
+        </div>
+        <div id="totalEventsBadge" class="bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 px-3 py-1 rounded-lg text-[11px] font-bold">
+          0 Datos de Consenso Filtrados
         </div>
       </div>
 
-      <!-- BARRA DE FILTROS DEL CALENDARIO -->
-      <div id="calendarFilterBar" class="hidden bg-[#07080d] border border-zinc-800 p-3 rounded-2xl flex flex-col md:flex-row gap-3 justify-between items-center text-xs">
-        <div class="flex items-center gap-1.5 flex-wrap" id="currencyFilterGroup">
-          <span class="text-zinc-500 text-[10px] font-bold uppercase mr-1">Filtrar:</span>
-          <button onclick="filterByCurrency('ALL')" class="currency-filter-btn px-2 py-1 rounded font-bold bg-cyan-500 text-black">TODAS</button>
-          <button onclick="filterByCurrency('USD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">USD</button>
-          <button onclick="filterByCurrency('EUR')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">EUR</button>
-          <button onclick="filterByCurrency('GBP')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">GBP</button>
-          <button onclick="filterByCurrency('JPY')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">JPY</button>
-          <button onclick="filterByCurrency('CAD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">CAD</button>
-          <button onclick="filterByCurrency('AUD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">AUD</button>
-          <button onclick="filterByCurrency('NZD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">NZD</button>
-          <button onclick="filterByCurrency('CHF')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">CHF</button>
+      <!-- BARRA DE FILTROS Y BÚSQUEDA -->
+      <div id="consensusFilterBar" class="hidden bg-[#07080d] border border-zinc-800 p-3 rounded-2xl flex flex-col md:flex-row gap-3 justify-between items-center text-xs">
+        <div class="flex items-center gap-1.5 flex-wrap" id="geoFilterGroup">
+          <span class="text-zinc-500 text-[10px] font-bold uppercase mr-1">Filtrar Región:</span>
+          <button onclick="filterByGeo('ALL')" class="geo-filter-btn px-2 py-1 rounded font-bold bg-cyan-500 text-black">TODAS</button>
+          <button onclick="filterByGeo('US')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">EE.UU. (US)</button>
+          <button onclick="filterByGeo('EUR')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">EUROZONA (EUR)</button>
+          <button onclick="filterByGeo('GB')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">REINO UNIDO (GBP)</button>
+          <button onclick="filterByGeo('JP')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">JAPÓN (JPY)</button>
+          <button onclick="filterByGeo('CA')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">CANADÁ (CAD)</button>
+          <button onclick="filterByGeo('AU')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">AUSTRALIA (AUD)</button>
+          <button onclick="filterByGeo('NZ')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">N. ZELANDA (NZD)</button>
+          <button onclick="filterByGeo('CH')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">SUIZA (CHF)</button>
+          <button onclick="filterByGeo('CN')" class="geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">CHINA (CNH)</button>
         </div>
         <div class="w-full md:w-auto flex items-center gap-2">
-          <input type="text" id="eventSearchInput" oninput="applyCalendarFilters()" placeholder="🔍 Buscar evento..." class="w-full md:w-48 bg-[#030305] border border-zinc-700/60 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono" />
+          <input type="text" id="indicatorSearchInput" oninput="applyConsensusFilters()" placeholder="🔍 Buscar indicador..." class="w-full md:w-48 bg-[#030305] border border-zinc-700/60 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono" />
         </div>
       </div>
 
-      <!-- CALENDARIO INTERACTIVO POR DÍAS -->
-      <div id="interactiveCalendarContainer" class="space-y-8"></div>
+      <div id="liveConsensusContainer" class="space-y-8"></div>
 
     </div>
 
-    <!-- ÁREA DE IMPRESIÓN PDF -->
+    <!-- ÁREA DE IMPRESIÓN / PDF EN ESPAÑOL -->
     <div id="outputContainer"></div>
   </main>
 
@@ -185,7 +145,6 @@
   <div id="global-footer"></div>
   <script src="inject-engine.js"></script>
 
-  <!-- LÓGICA DE JS INTERNO DEL MOTOR -->
   <script>
     function escapeHtml(str) {
       if (!str) return '';
@@ -197,33 +156,14 @@
         .replace(/'/g, '&#039;');
     }
 
-    const WHITELIST = {
-      UNIVERSAL: ['interest rate decision', 'monetary policy statement', 'press conference', 'meeting minutes', 'speaks', 'speech', 'president speaks', 'summary of opinions'],
-      USD: ['nfp', 'nonfarm payrolls', 'adp', 'unemployment rate', 'average hourly earnings', 'jobless claims', 'cpi', 'pce', 'ppi', 'gdp', 'ism', 'pmi', 'industrial production', 'retail sales', 'consumer sentiment', 'building permits', 'home sales', 'trade balance'],
-      CAD: ['monetary policy report', 'cpi', 'ppi', 'ippi', 'gdp', 'employment change', 'unemployment rate', 'retail sales', 'trade balance', 'ivey pmi'],
-      EUR: ['cpi', 'ppi', 'gdp', 'pmi', 'zew', 'retail sales', 'industrial production', 'trade balance', 'ifo', 'business climate', 'unemployment', 'consumer climate'],
-      CHF: ['cpi', 'ppi', 'gdp', 'industrial production', 'pmi', 'retail sales', 'unemployment'],
-      GBP: ['cpi', 'rpi', 'ppi', 'gdp', 'unemployment rate', 'claimant count', 'average earnings', 'pmi', 'retail sales'],
-      JPY: ['ppi', 'cgpi', 'tankan', 'cpi', 'tokyo', 'national cpi', 'inflation', 'consumer price', 'gdp', 'trade balance', 'household spending', 'exports', 'imports', 'pmi', 'retail sales', 'industrial production', 'unemployment', 'jobless', 'boj', 'bank of japan', 'tertiary industry', 'current account'],
-      AUD: ['cpi', 'ppi', 'employment change', 'unemployment rate', 'gdp', 'retail sales', 'westpac', 'trade balance', 'pmi'],
-      NZD: ['cpi', 'ppi', 'gdt', 'gdp', 'employment change', 'unemployment rate', 'pmi', 'retail sales', 'trade balance'],
-      CNH: ['lpr', 'loan prime rate', 'cpi', 'ppi', 'gdp', 'pmi', 'industrial production', 'retail sales', 'trade balance']
-    };
+    const ALLOWED_GEOS = [
+      'US', 'USA', 'USD', 'AU', 'AUS', 'AUD', 'CH', 'CHE', 'CHF',
+      'NZ', 'NZL', 'NZD', 'CN', 'CHN', 'CNH', 'CNY', 'JP', 'JPN', 'JPY',
+      'GB', 'UK', 'GBP', 'EMU', 'EU', 'EUR', 'DE', 'DEU', 'FR', 'FRA', 'CA', 'CAN', 'CAD'
+    ];
 
-    const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH', 'CNY', 'DE', 'FR', 'UK', 'EU', 'CH', 'CA', 'US', 'JP', 'JPN', 'AU', 'AUS', 'NZ', 'NZL', 'GB', 'GBR', 'CN', 'CHN'];
-    const CURRENCY_HIERARCHY = ['EUR', 'GBP', 'AUD', 'NZD', 'USD', 'CAD', 'CHF', 'JPY'];
-
-    let activeCurrencyFilter = 'ALL';
-
-    let globalState = {
-      daysData: {},
-      categoryScores: {},
-      matrixEvents: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
-      matrixTotals: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
-      matrixPrev: { USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 },
-      intermarketScores: { VIX: 0, Oil: 0, Gold: 0 },
-      dailyNotes: {}
-    };
+    let activeGeoFilter = 'ALL';
+    let globalState = { daysData: {} };
 
     const dropZone = document.getElementById('dropZone');
     const excelInput = document.getElementById('excelInput');
@@ -239,7 +179,9 @@
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('border-cyan-500');
-      if (e.dataTransfer.files.length) processExcelFile(e.dataTransfer.files[0]);
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+        processFiles(e.dataTransfer.files);
+      }
     });
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -247,156 +189,228 @@
     });
 
     function saveToLocalStorage() {
-      localStorage.setItem('kairos_macro_engine_state', JSON.stringify(globalState));
+      localStorage.setItem('kairos_consensus_hub_state', JSON.stringify(globalState));
     }
 
     function loadFromLocalStorage() {
-      const saved = localStorage.getItem('kairos_macro_engine_state');
+      const saved = localStorage.getItem('kairos_consensus_hub_state');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          globalState.daysData = parsed.daysData || {};
-          globalState.categoryScores = parsed.categoryScores || {};
-          globalState.matrixPrev = Object.assign({ USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 }, parsed.matrixPrev || {});
-          globalState.intermarketScores = Object.assign({ VIX: 0, Oil: 0, Gold: 0 }, parsed.intermarketScores || {});
-          globalState.dailyNotes = parsed.dailyNotes || {};
-          
+          globalState = normalizeState(parsed);
           if (Object.keys(globalState.daysData).length > 0) {
-            renderLiveInteractiveApp();
+            renderLiveConsensusApp();
           }
         } catch (e) {
-          console.error("Error al cargar memoria local", e);
+          console.error("Error al cargar datos desde memoria local", e);
         }
       }
     }
 
-    // EXPORTACIÓN COMPATIBLE CON SAFARI (IPADOS / IOS)
-    function exportStateJSON() {
-      try {
-        const dataStr = JSON.stringify(globalState, null, 2);
-        const blob = new Blob([dataStr], { type: "application/octet-stream" });
-        const url = URL.createObjectURL(blob);
-        
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.href = url;
-        downloadAnchor.download = `kairos_macro_backup_${new Date().toISOString().slice(0,10)}.json`;
-        
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        
-        setTimeout(() => {
-          if (document.body.contains(downloadAnchor)) {
-            document.body.removeChild(downloadAnchor);
-          }
-          URL.revokeObjectURL(url);
-        }, 2000);
-      } catch (err) {
-        console.error("Export error:", err);
-        alert("Error al exportar el archivo JSON.");
+    function normalizeState(state) {
+      if (!state || !state.daysData) return { daysData: {} };
+      const newDaysData = {};
+      for (const [key, val] of Object.entries(state.daysData)) {
+        if (val && Array.isArray(val.events)) {
+          newDaysData[key] = val;
+        } else if (Array.isArray(val)) {
+          const info = parseHeaderToIsoAndFormatted(key);
+          const isoKey = info.iso !== "9999-99-99" ? info.iso : key;
+          newDaysData[isoKey] = {
+            isoDate: isoKey,
+            formattedDay: info.formatted || key,
+            events: val.map(e => ({ ...e, status: e.status || 'none' }))
+          };
+        }
       }
+      return { daysData: newDaysData };
     }
 
-    // IMPORTACIÓN SEGURA CON REINICIO DE INPUT
+    function exportStateJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalState, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `kairos_consensus_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
     function importStateJSON(e) {
       const file = e.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function(evt) {
         try {
           const parsed = JSON.parse(evt.target.result);
           if (parsed && typeof parsed === 'object') {
-            globalState = {
-              daysData: parsed.daysData || {},
-              categoryScores: parsed.categoryScores || {},
-              matrixEvents: parsed.matrixEvents || { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
-              matrixTotals: parsed.matrixTotals || { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
-              matrixPrev: Object.assign({ USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 }, parsed.matrixPrev || {}),
-              intermarketScores: Object.assign({ VIX: 0, Oil: 0, Gold: 0 }, parsed.intermarketScores || {}),
-              dailyNotes: parsed.dailyNotes || {}
-            };
-
+            globalState = normalizeState(parsed);
             saveToLocalStorage();
-            renderLiveInteractiveApp();
-            alert('¡Respaldo cargado correctamente!');
-          } else {
-            throw new Error("Formato JSON no válido");
+            renderLiveConsensusApp();
+            alert('¡Respaldo de consenso cargado correctamente!');
           }
         } catch(err) {
-          console.error("Import error:", err);
-          alert('Error al leer el archivo de respaldo JSON.');
-        } finally {
-          e.target.value = '';
+          alert('Error al leer el archivo JSON de respaldo.');
         }
       };
       reader.readAsText(file);
     }
 
-    function translateDayToSpanish(dayStr) {
-      if (!dayStr) return dayStr;
-      let str = dayStr.toUpperCase();
-      const replacements = {
-        'MONDAY': 'LUNES', 'TUESDAY': 'MARTES', 'WEDNESDAY': 'MIÉRCOLES', 'THURSDAY': 'JUEVES', 'FRIDAY': 'VIERNES', 'SATURDAY': 'SÁBADO', 'SUNDAY': 'DOMINGO',
-        'JANUARY': 'ENERO', 'FEBRUARY': 'FEBRERO', 'MARCH': 'MARZO', 'APRIL': 'ABRIL', 'MAY': 'MAYO', 'JUNE': 'JUNIO', 'JULY': 'JULIO', 'AUGUST': 'AGOSTO', 'SEPTEMBER': 'SEPTIEMBRE', 'OCTOBER': 'OCTUBRE', 'NOVEMBER': 'NOVIEMBRE', 'DECEMBER': 'DICIEMBRE'
-      };
-      Object.keys(replacements).forEach(key => {
-        str = str.replace(new RegExp('\\b' + key + '\\b', 'g'), replacements[key]);
-      });
-      return str;
-    }
-
     function handleFileSelect(e) {
-      if (e.target.files.length) processExcelFile(e.target.files[0]);
+      if (e.target.files && e.target.files.length) {
+        processFiles(e.target.files);
+      }
     }
 
-    function isWhitelisted(ccy, eventName) {
-      if (!eventName) return false;
-      const lower = String(eventName).toLowerCase();
-      if (lower.includes('fed regional') || lower.includes('mpc member') || lower.includes('executive board member')) return false;
-      if (WHITELIST.UNIVERSAL.some(term => lower.includes(term))) return true;
-      const terms = WHITELIST[ccy] || [];
-      return terms.some(term => lower.includes(term));
+    function isAllowedGeo(geoCode) {
+      if (!geoCode) return false;
+      return ALLOWED_GEOS.includes(String(geoCode).trim().toUpperCase());
     }
 
-    function getCategorySentimentTitle(ccy, eventName) {
-      if (!eventName) return `SENTIMIENTO DE ${ccy}`;
-      const lower = eventName.toLowerCase();
-      
-      if (lower.includes('cpi') || lower.includes('pce') || lower.includes('rpi') || lower.includes('inflation') || lower.includes('tokyo') || lower.includes('consumer price')) return `${ccy} - INFLACIÓN (IPC)`;
-      if (lower.includes('ppi') || lower.includes('ippi') || lower.includes('producer price') || lower.includes('cgpi')) return `${ccy} - PRECIOS DE PRODUCTOR (IPP)`;
-      if (lower.includes('unemployment') || lower.includes('employment') || lower.includes('jobless') || lower.includes('nfp') || lower.includes('adp') || lower.includes('claimant') || lower.includes('earnings') || lower.includes('household spending')) return `${ccy} - MERCADO LABORAL Y SALARIOS`;
-      if (lower.includes('pmi') || lower.includes('ism') || lower.includes('tankan')) return `${ccy} - ÍNDICES PMI / TANKAN`;
-      if (lower.includes('interest rate') || lower.includes('monetary policy') || lower.includes('ecb press') || lower.includes('fomc') || lower.includes('rate decision') || lower.includes('loan prime') || lower.includes('boj') || lower.includes('bank of japan') || lower.includes('meeting minutes') || lower.includes('speaks') || lower.includes('speech')) return `${ccy} - POLÍTICA MONETARIA Y TASAS`;
-      if (lower.includes('retail sales')) return `${ccy} - VENTAS MINORISTAS`;
-      if (lower.includes('trade balance') || lower.includes('exports') || lower.includes('imports') || lower.includes('current account')) return `${ccy} - BALANZA COMERCIAL`;
-      if (lower.includes('gdp')) return `${ccy} - PRODUCTO INTERNO BRUTO (PIB)`;
-      if (lower.includes('zew') || lower.includes('ifo') || lower.includes('business climate') || lower.includes('confidence') || lower.includes('ratingdog')) return `${ccy} - SENTIMIENTO Y CLIMA DE NEGOCIOS`;
-      if (lower.includes('industrial production') || lower.includes('factory orders') || lower.includes('manufacturing production')) return `${ccy} - PRODUCCIÓN INDUSTRIAL`;
-      if (lower.includes('gdt') || lower.includes('dairy')) return `${ccy} - ÍNDICE DE PRECIOS LÁCTEOS (GDT)`;
-      if (lower.includes('consumer climate') || lower.includes('consumer sentiment')) return `${ccy} - CLIMA Y CONFIANZA DEL CONSUMIDOR`;
-      if (lower.includes('building permit') || lower.includes('home sales')) return `${ccy} - MERCADO INMOBILIARIO`;
-
-      const cleanName = eventName.replace(/^(French|German|Italian|Spanish|Eurozone|US|UK|Japanese|Australian|Canadian|Swiss|Chinese)\s+/i, '');
-      const firstWord = cleanName.split(' ')[0].toUpperCase();
-      return `${ccy} - ${firstWord}`;
+    function isValidConsensus(val) {
+      if (val === null || val === undefined) return false;
+      const str = String(val).trim().toUpperCase();
+      if (str === "" || str === "-" || str === "--" || str === "N/A" || str === "NULL" || str === "UNDEFINED") return false;
+      return true;
     }
 
-    function processExcelFile(file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: false, dateNF: "yyyy-mm-dd" });
-        parseSpreadsheetData(rawRows);
+    // RESOLUCIÓN DE FECHA DE ENCABEZADO A CLAVE ISO Y DÍA FORMATEADO
+    function parseHeaderToIsoAndFormatted(rawHeaderStr) {
+      if (!rawHeaderStr) return { iso: "9999-99-99", formatted: "FECHA DESCONOCIDA" };
+      const str = String(rawHeaderStr).trim();
+      if (!str) return { iso: "9999-99-99", formatted: "FECHA DESCONOCIDA" };
+
+      const refDate = new Date();
+      const currentYear = refDate.getFullYear() || 2026;
+
+      const dayNamesEs = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
+      const monthNamesEs = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+      const monthNamesEn = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+
+      const dayMap = {
+        'SUNDAY': 0, 'DOMINGO': 0, 'MONDAY': 1, 'LUNES': 1,
+        'TUESDAY': 2, 'MARTES': 2, 'WEDNESDAY': 3, 'MIÉRCOLES': 3, 'MIERCOLES': 3,
+        'THURSDAY': 4, 'JUEVES': 4, 'FRIDAY': 5, 'VIERNES': 5,
+        'SATURDAY': 6, 'SÁBADO': 6, 'SABADO': 6
       };
-      reader.readAsArrayBuffer(file);
+
+      // 1. Caso "Current Month <day_num>"
+      if (/Current Month/i.test(str)) {
+        let targetDow = null;
+        for (const [key, dow] of Object.entries(dayMap)) {
+          if (new RegExp('\\b' + key + '\\b', 'i').test(str)) {
+            targetDow = dow;
+            break;
+          }
+        }
+
+        const dayMatch = str.match(/Current Month\s+(\d{1,2})/i);
+        if (dayMatch && targetDow !== null) {
+          const dayNum = parseInt(dayMatch[1], 10);
+          let candidates = [];
+
+          for (let m = 0; m < 12; m++) {
+            const d = new Date(Date.UTC(currentYear, m, dayNum));
+            if (d.getUTCMonth() === m && d.getUTCDay() === targetDow) {
+              candidates.push(d);
+            }
+          }
+
+          if (candidates.length > 0) {
+            candidates.sort((a, b) => Math.abs(a - refDate) - Math.abs(b - refDate));
+            const best = candidates[0];
+            
+            const yyyy = best.getUTCFullYear();
+            const mm = String(best.getUTCMonth() + 1).padStart(2, '0');
+            const dd = String(best.getUTCDate()).padStart(2, '0');
+            const iso = `${yyyy}-${mm}-${dd}`;
+
+            const formatted = `${dayNamesEs[targetDow]}, ${best.getUTCDate()} DE ${monthNamesEs[best.getUTCMonth()]} DE ${yyyy}`;
+            return { iso, formatted };
+          }
+        }
+      }
+
+      // 2. Mes Explícito (Español o Inglés)
+      for (let m = 0; m < 12; m++) {
+        const enM = monthNamesEn[m];
+        const esM = monthNamesEs[m];
+        if (new RegExp('\\b' + enM + '\\b', 'i').test(str) || new RegExp('\\b' + esM + '\\b', 'i').test(str)) {
+          const cleanStrForDay = str.replace(/\b20\d{2}\b/g, '');
+          const dayMatch = cleanStrForDay.match(/\b(\d{1,2})\b/);
+          if (dayMatch) {
+            const dayNum = parseInt(dayMatch[1], 10);
+            const d = new Date(Date.UTC(currentYear, m, dayNum));
+            if (d.getUTCMonth() === m) {
+              const yyyy = d.getUTCFullYear();
+              const mm = String(m + 1).padStart(2, '0');
+              const dd = String(dayNum).padStart(2, '0');
+              const iso = `${yyyy}-${mm}-${dd}`;
+              const formatted = `${dayNamesEs[d.getUTCDay()]}, ${dayNum} DE ${monthNamesEs[m]} DE ${yyyy}`;
+              return { iso, formatted };
+            }
+          }
+        }
+      }
+
+      // 3. Fecha Numérica ISO / Estándar (ej: YYYY-MM-DD o DD/MM/YYYY)
+      const numMatch = str.match(/(\d{1,4})[-/.](\d{1,2})[-/.](\d{1,4})/);
+      if (numMatch) {
+        let p1 = parseInt(numMatch[1], 10), p2 = parseInt(numMatch[2], 10), p3 = parseInt(numMatch[3], 10);
+        let y, m, d;
+        if (p1 > 1000) { y = p1; m = p2 - 1; d = p3; }
+        else if (p3 > 1000) { y = p3; m = p2 - 1; d = p1; }
+        if (y && m >= 0 && m < 12 && d >= 1 && d <= 31) {
+          const dt = new Date(Date.UTC(y, m, d));
+          const yyyy = dt.getUTCFullYear();
+          const mm = String(dt.getUTCMonth() + 1).padStart(2, '0');
+          const dd = String(dt.getUTCDate()).padStart(2, '0');
+          const iso = `${yyyy}-${mm}-${dd}`;
+          const formatted = `${dayNamesEs[dt.getUTCDay()]}, ${dt.getUTCDate()} DE ${monthNamesEs[dt.getUTCMonth()]} DE ${yyyy}`;
+          return { iso, formatted };
+        }
+      }
+
+      return { iso: "9999-99-99", formatted: str.toUpperCase() };
+    }
+
+    async function processFiles(fileList) {
+      const files = Array.from(fileList);
+      if (!files.length) return;
+
+      for (const file of files) {
+        await processSingleFile(file);
+      }
+
+      saveToLocalStorage();
+      renderLiveConsensusApp();
+      excelInput.value = "";
+    }
+
+    function processSingleFile(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: false });
+            parseSpreadsheetData(rawRows);
+          } catch (err) {
+            console.error("Error al procesar el archivo:", file.name, err);
+          }
+          resolve();
+        };
+        reader.onerror = () => resolve();
+        reader.readAsArrayBuffer(file);
+      });
     }
 
     function parseSpreadsheetData(rows) {
-      const daysData = {};
-      let currentDay = "LUNES";
+      let currentIsoKey = "9999-99-99";
+      let currentFormattedDay = "FECHA DESCONOCIDA";
 
       rows.forEach(row => {
         if (!row || row.length === 0) return;
@@ -404,465 +418,273 @@
         const rowString = cleanRow.join(" ").trim();
         if (!rowString) return;
 
-        if (/Time/i.test(cleanRow[1] || "") && /Cur/i.test(cleanRow[2] || "") && /Event/i.test(cleanRow[3] || "")) return;
+        if (cleanRow.includes("Macro Indicator / Sub-Metric") || cleanRow.includes("Consensus") || /Expectation Range/i.test(rowString)) return;
 
-        let detectedDay = null;
-        if (/^(SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|DOMINGO|LUNES|MARTES|MIÉRCOLES|MIERCOLES|JUEVES|VIERNES|SÁBADO|SABADO)/i.test(rowString)) {
-          detectedDay = rowString.toUpperCase();
-        } else {
-          for (let cell of cleanRow) {
-            if (/^\d{4}-\d{2}-\d{2}/.test(cell) || /^\d{1,2}\/\d{1,2}\/\d{2,4}/.test(cell) || /^\d{5}(\.\d+)?$/.test(cell)) {
-              let d;
-              if (/^\d{5}(\.\d+)?$/.test(cell)) {
-                const serial = parseFloat(cell);
-                if (serial > 40000 && serial < 60000) d = new Date(Math.round((serial - 25569) * 86400 * 1000));
-              } else {
-                let dateVal = cell.includes(' ') ? cell.split(' ')[0] : cell;
-                if (dateVal.includes('-')) {
-                  const parts = dateVal.split('-');
-                  d = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
-                } else if (dateVal.includes('/')) {
-                  const parts = dateVal.split('/');
-                  let y = parseInt(parts[2]);
-                  if (y < 100) y += 2000;
-                  d = new Date(Date.UTC(y, parseInt(parts[0]) - 1, parseInt(parts[1])));
-                }
-              }
+        // A) DETECTAR ENCABEZADO DE FECHA
+        let headerRaw = null;
 
-              if (d && !isNaN(d.getTime())) {
-                const dayNames = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
-                const dayName = dayNames[d.getUTCDay()];
-                const dateStr = d.toLocaleDateString('es-ES', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
-                detectedDay = `${dayName}, ${dateStr}`;
-                break; 
-              }
-            }
-          }
+        const targetDateIdx = cleanRow.findIndex(c => String(c).includes("Calendar Target Date:"));
+        if (targetDateIdx !== -1) {
+          headerRaw = cleanRow[targetDateIdx + 1] || cleanRow[targetDateIdx].replace("Calendar Target Date:", "");
+        } else if (/^(SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|DOMINGO|LUNES|MARTES|MIÉRCOLES|MIERCOLES|JUEVES|VIERNES|SÁBADO|SABADO)/i.test(rowString) && !cleanRow.some(c => isAllowedGeo(c))) {
+          headerRaw = rowString;
         }
 
-        if (detectedDay) {
-          currentDay = detectedDay;
-          if (!daysData[currentDay]) daysData[currentDay] = [];
+        if (headerRaw) {
+          const dateInfo = parseHeaderToIsoAndFormatted(headerRaw);
+          currentIsoKey = dateInfo.iso;
+          currentFormattedDay = dateInfo.formatted;
+
+          if (!globalState.daysData[currentIsoKey]) {
+            globalState.daysData[currentIsoKey] = {
+              isoDate: currentIsoKey,
+              formattedDay: currentFormattedDay,
+              events: []
+            };
+          }
           return;
         }
 
-        let time = "", ccy = "", event = "", actual = "", forecast = "", previous = "";
-        let foundCcyIdx = -1;
+        // B) EXTRAER DATOS DEL INDICADOR
+        let time = "-", country = "", indicator = "", consensus = "-", range = "-", prior = "-";
 
-        for (let i = 0; i < Math.min(cleanRow.length, 5); i++) {
-          const cellVal = cleanRow[i].toUpperCase();
-          if (cellVal.length <= 3 && CURRENCIES.includes(cellVal)) {
-            foundCcyIdx = i;
-            ccy = cellVal;
-            break;
-          }
-        }
+        let mergedColIdx = cleanRow.findIndex(c => {
+          if (!c.includes(":")) return false;
+          const prefix = c.split(":")[0].trim().toUpperCase();
+          return isAllowedGeo(prefix);
+        });
 
-        if (foundCcyIdx !== -1) {
-          for (let i = 0; i < foundCcyIdx; i++) {
-            if (/^\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM)?$/i.test(cleanRow[i]) || /^\d{1,2}\.\d{2}/.test(cleanRow[i])) {
-              time = cleanRow[i];
-              break;
+        if (mergedColIdx !== -1) {
+          country = cleanRow[mergedColIdx].split(":")[0].trim().toUpperCase();
+          indicator = cleanRow[mergedColIdx].substring(country.length + 1).trim();
+          consensus = cleanRow[mergedColIdx + 1] || "-";
+          range = cleanRow[mergedColIdx + 2] || "-";
+          prior = cleanRow[mergedColIdx + 3] || "-";
+        } else {
+          let foundGeoIdx = cleanRow.findIndex(c => isAllowedGeo(c));
+          if (foundGeoIdx !== -1) {
+            country = cleanRow[foundGeoIdx].toUpperCase();
+            for (let i = 0; i < foundGeoIdx; i++) {
+              if (/^\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM)?$/i.test(cleanRow[i]) || /^\d{1,2}\.\d{2}/.test(cleanRow[i])) {
+                time = cleanRow[i];
+                break;
+              }
+            }
+            if (foundGeoIdx + 1 < cleanRow.length) indicator = cleanRow[foundGeoIdx + 1];
+            const postIndicator = cleanRow.slice(foundGeoIdx + 2);
+            if (postIndicator.length >= 3) {
+              consensus = postIndicator[0]; range = postIndicator[1]; prior = postIndicator[2];
+            } else if (postIndicator.length === 2) {
+              consensus = postIndicator[0]; prior = postIndicator[1];
+            } else if (postIndicator.length === 1) {
+              consensus = postIndicator[0];
             }
           }
-          if (foundCcyIdx + 1 < cleanRow.length) event = cleanRow[foundCcyIdx + 1];
-          const postEvent = cleanRow.slice(foundCcyIdx + 2);
-          if (postEvent.length >= 3) {
-            actual = postEvent[0] === "" ? postEvent[1] : postEvent[0];
-            forecast = postEvent[0] === "" ? postEvent[2] : postEvent[1];
-            previous = postEvent[0] === "" ? postEvent[3] || "" : postEvent[2] || "";
-          } else if (postEvent.length === 2) {
-            actual = postEvent[0]; forecast = postEvent[1];
-          } else if (postEvent.length === 1) {
-            actual = postEvent[0];
+        }
+
+        if (country && indicator && isAllowedGeo(country) && isValidConsensus(consensus)) {
+          if (!globalState.daysData[currentIsoKey]) {
+            globalState.daysData[currentIsoKey] = {
+              isoDate: currentIsoKey,
+              formattedDay: currentFormattedDay,
+              events: []
+            };
+          }
+
+          const dayObj = globalState.daysData[currentIsoKey];
+          const existingIdx = dayObj.events.findIndex(e => e.country === country && e.indicator === indicator);
+          const newItem = { time, country, indicator, consensus, range, prior, status: 'none' };
+
+          if (existingIdx !== -1) {
+            // Preservar el status previo si ya existía
+            newItem.status = dayObj.events[existingIdx].status || 'none';
+            dayObj.events[existingIdx] = newItem;
+          } else {
+            dayObj.events.push(newItem);
           }
         }
-
-        if (!ccy || !event) return;
-
-        let mappedCCY = ccy;
-        if (['DE', 'FR', 'EU'].includes(ccy)) mappedCCY = 'EUR';
-        if (['UK', 'GB', 'GBR'].includes(ccy)) mappedCCY = 'GBP';
-        if (['CH'].includes(ccy)) mappedCCY = 'CHF';
-        if (['CA', 'CAN'].includes(ccy)) mappedCCY = 'CAD';
-        if (['US', 'USA'].includes(ccy)) mappedCCY = 'USD';
-        if (['JP', 'JPN'].includes(ccy)) mappedCCY = 'JPY';
-        if (['AU', 'AUS'].includes(ccy)) mappedCCY = 'AUD';
-        if (['NZ', 'NZL'].includes(ccy)) mappedCCY = 'NZD';
-        if (['CN', 'CHN'].includes(ccy)) mappedCCY = 'CNH';
-
-        if (isWhitelisted(mappedCCY, event)) {
-          if (!daysData[currentDay]) daysData[currentDay] = [];
-          daysData[currentDay].push({ time, ccy: mappedCCY, event, actual, forecast, previous });
-        }
       });
+    }
 
-      globalState.daysData = daysData;
-      globalState.categoryScores = {};
+    // TOGGLE DE ESTADO DEL EVENTO (NEUTRO -> GREEN -> RED -> NEUTRO)
+    function toggleEventStatus(isoKey, itemIndex) {
+      if (!globalState.daysData[isoKey] || !globalState.daysData[isoKey].events[itemIndex]) return;
+      
+      const currentStatus = globalState.daysData[isoKey].events[itemIndex].status || 'none';
+      let nextStatus = 'none';
+
+      if (currentStatus === 'none') nextStatus = 'green';
+      else if (currentStatus === 'green') nextStatus = 'red';
+      else if (currentStatus === 'red') nextStatus = 'none';
+
+      globalState.daysData[isoKey].events[itemIndex].status = nextStatus;
       saveToLocalStorage();
-      renderLiveInteractiveApp();
+      renderLiveConsensusApp();
     }
 
-    function renderLiveInteractiveApp() {
-      document.getElementById('liveMatrixContainer').classList.remove('hidden');
-      document.getElementById('calendarFilterBar').classList.remove('hidden');
-      renderMatrixTables();
-      renderInteractiveCalendar();
-      recalculateMatrixAndDivergences();
-    }
+    function renderLiveConsensusApp() {
+      const container = document.getElementById('liveConsensusContainer');
+      const emptyState = document.getElementById('emptyState');
+      const summaryBar = document.getElementById('summaryBar');
+      const filterBar = document.getElementById('consensusFilterBar');
+      const totalEventsBadge = document.getElementById('totalEventsBadge');
 
-    function getScoreScaleClass(score) {
-      if (score >= 4) return 'score-scale-strong-bullish font-black';
-      if (score >= 1) return 'score-scale-bullish font-bold';
-      if (score === 0) return 'score-scale-neutral font-medium';
-      if (score >= -3) return 'score-scale-bearish font-bold';
-      return 'score-scale-strong-bearish font-black';
-    }
-
-    function renderMatrixTables() {
-      const forexCurrencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'];
-      const intermarketAssets = ['VIX', 'Oil', 'Gold'];
-
-      const forexBody = document.getElementById('matrixForexBody');
-      const intermarketBody = document.getElementById('matrixIntermarketBody');
-
-      forexBody.innerHTML = forexCurrencies.map(asset => `
-        <tr class="border-b border-zinc-800/50 hover:bg-[#0a0a0f] transition">
-          <td class="p-2 font-bold text-white flex items-center gap-2">
-            <span id="matrix-badge-${asset}" class="badge-${asset === 'CNH' ? 'CNY' : asset} text-[9px] px-2 py-0.5 rounded font-mono">${asset}</span>
-          </td>
-          <td class="p-2 text-center text-zinc-500 font-mono">
-            <input type="number" value="${globalState.matrixPrev[asset] !== undefined ? globalState.matrixPrev[asset] : 0}" oninput="updatePrevMatrix('${asset}', this.value)" class="w-12 bg-[#020203] border border-zinc-700/60 rounded px-1 py-0.5 text-center text-xs text-white focus:outline-none focus:border-cyan-400 font-mono font-bold">
-          </td>
-          <td id="live-events-${asset}" class="p-2 text-center font-mono text-xs text-zinc-300 font-bold">0</td>
-          <td id="live-matrix-${asset}" class="p-2 text-center font-mono text-xs rounded transition-all">0</td>
-        </tr>
-      `).join('');
-
-      intermarketBody.innerHTML = intermarketAssets.map(asset => {
-        const curScore = globalState.intermarketScores[asset] || 0;
-        const assetNameEs = asset === 'Oil' ? 'Petróleo' : asset === 'Gold' ? 'Oro' : 'VIX';
-        return `
-        <tr class="border-b border-zinc-800/50 hover:bg-[#0a0a0f] transition">
-          <td class="p-2 font-bold text-white">${assetNameEs}</td>
-          <td class="p-2 text-center text-zinc-500 font-mono">
-            <input type="number" value="${globalState.matrixPrev[asset] !== undefined ? globalState.matrixPrev[asset] : 0}" oninput="updatePrevMatrix('${asset}', this.value)" class="w-12 bg-[#020203] border border-zinc-700/60 rounded px-1 py-0.5 text-center text-xs text-white focus:outline-none focus:border-cyan-400 font-mono font-bold">
-          </td>
-          <td class="p-2 text-center font-mono">
-            <div class="flex items-center justify-center gap-1">
-              <button onclick="setIntermarketScore('${asset}', 2)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-emerald-500 ${curScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
-              <button onclick="setIntermarketScore('${asset}', 1)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-emerald-400 ${curScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
-              <button onclick="setIntermarketScore('${asset}', 0)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-zinc-500 ${curScore === 0 ? 'score-btn-active-0' : ''}">0</button>
-              <button onclick="setIntermarketScore('${asset}', -1)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-rose-400 ${curScore === -1 ? 'score-btn-active-m1' : ''}">-1</button>
-              <button onclick="setIntermarketScore('${asset}', -2)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-rose-600 ${curScore === -2 ? 'score-btn-active-m2' : ''}">-2</button>
-            </div>
-          </td>
-          <td id="live-matrix-${asset}" class="p-2 text-center font-mono text-xs rounded transition-all">0</td>
-        </tr>
-      `}).join('');
-    }
-
-    function renderInteractiveCalendar() {
-      const container = document.getElementById('interactiveCalendarContainer');
       container.innerHTML = '';
+      let totalCount = 0;
 
-      const searchQuery = (document.getElementById('eventSearchInput')?.value || '').toLowerCase();
+      const sortedIsoKeys = Object.keys(globalState.daysData).sort();
 
-      Object.keys(globalState.daysData).forEach(day => {
-        let events = globalState.daysData[day] || [];
+      if (sortedIsoKeys.length === 0) {
+        emptyState.classList.remove('hidden');
+        summaryBar.classList.add('hidden');
+        filterBar.classList.add('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      summaryBar.classList.remove('hidden');
+      filterBar.classList.remove('hidden');
+
+      const searchQuery = (document.getElementById('indicatorSearchInput')?.value || '').toLowerCase();
+
+      sortedIsoKeys.forEach(isoKey => {
+        const dayObj = globalState.daysData[isoKey];
+        let events = dayObj.events || [];
         if (!events || events.length === 0) return;
 
-        if (activeCurrencyFilter !== 'ALL') {
-          events = events.filter(e => e.ccy === activeCurrencyFilter);
+        if (activeGeoFilter !== 'ALL') {
+          events = events.filter(e => {
+            const c = e.country.toUpperCase();
+            if (activeGeoFilter === 'US') return ['US', 'USA', 'USD'].includes(c);
+            if (activeGeoFilter === 'EUR') return ['EMU', 'EU', 'EUR', 'DE', 'DEU', 'FR', 'FRA'].includes(c);
+            if (activeGeoFilter === 'GB') return ['GB', 'UK', 'GBP'].includes(c);
+            if (activeGeoFilter === 'JP') return ['JP', 'JPN', 'JPY'].includes(c);
+            if (activeGeoFilter === 'CA') return ['CA', 'CAN', 'CAD'].includes(c);
+            if (activeGeoFilter === 'AU') return ['AU', 'AUS', 'AUD'].includes(c);
+            if (activeGeoFilter === 'NZ') return ['NZ', 'NZL', 'NZD'].includes(c);
+            if (activeGeoFilter === 'CH') return ['CH', 'CHE', 'CHF'].includes(c);
+            if (activeGeoFilter === 'CN') return ['CN', 'CHN', 'CNH', 'CNY'].includes(c);
+            return c === activeGeoFilter;
+          });
         }
+
         if (searchQuery) {
-          events = events.filter(e => (e.event || '').toLowerCase().includes(searchQuery) || (e.ccy || '').toLowerCase().includes(searchQuery));
+          events = events.filter(e => (e.indicator || '').toLowerCase().includes(searchQuery) || (e.country || '').toLowerCase().includes(searchQuery));
         }
 
         if (events.length === 0) return;
 
+        totalCount += events.length;
+        const displayDay = dayObj.formattedDay || isoKey;
+
         let dayCard = document.createElement('div');
         dayCard.className = "day-card bg-[#07090e] border border-cyan-500/30 rounded-2xl shadow-xl shadow-cyan-950/20 space-y-4 overflow-hidden transition hover:border-cyan-500/50";
-
-        const translatedDay = translateDayToSpanish(day);
 
         let dayHeader = `
           <div class="bg-[#0b0f19] border-b border-cyan-500/30 px-5 py-3.5 flex justify-between items-center">
             <div class="flex items-center gap-2 bg-cyan-500/15 border border-cyan-400/40 px-3 py-1.5 rounded-xl text-cyan-300 font-bold font-mono text-xs shadow-[0_0_12px_rgba(34,211,238,0.15)]">
               <span>📅</span>
-              <span class="tracking-wider">${escapeHtml(translatedDay)}</span>
+              <span class="tracking-wider">${escapeHtml(displayDay)}</span>
             </div>
-            <span class="text-[10px] text-cyan-200/80 font-mono bg-cyan-950/70 px-2.5 py-1 rounded-lg border border-cyan-500/30 shadow-sm">${events.length} Eventos</span>
+            <span class="text-[10px] text-cyan-200/80 font-mono bg-cyan-950/70 px-2.5 py-1 rounded-lg border border-cyan-500/30 shadow-sm">${events.length} Expectativas</span>
           </div>
         `;
 
         let tableHTML = `
-          <div class="px-4 overflow-x-auto">
+          <div class="px-4 pb-4 overflow-x-auto">
             <table class="w-full text-left text-xs font-mono border-collapse">
               <thead>
                 <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 uppercase tracking-wider">
                   <th class="p-2.5">Hora</th>
-                  <th class="p-2.5">Divisa</th>
-                  <th class="p-2.5">Evento Económico</th>
-                  <th class="p-2.5">Actual</th>
-                  <th class="p-2.5">Pronóstico</th>
-                  <th class="p-2.5">Previo</th>
+                  <th class="p-2.5">País</th>
+                  <th class="p-2.5">Indicador Macroeconómico</th>
+                  <th class="p-2.5 text-center">Consenso / Evaluación</th>
+                  <th class="p-2.5 text-center">Rango Expectativas</th>
+                  <th class="p-2.5 text-center">Previo</th>
                 </tr>
               </thead>
               <tbody>
         `;
 
-        events.forEach((item, idx) => {
-          const badgeClass = `badge-${['USD','EUR','GBP','JPY','CAD','AUD','NZD','CHF','CNH','CNY'].includes(item.ccy) ? item.ccy : 'DEFAULT'}`;
-          const rowBgClass = idx % 2 === 0 ? 'bg-transparent' : 'bg-zinc-900/20';
+        events.forEach((item) => {
+          // Obtener el índice real en la lista completa del día
+          const originalIndex = dayObj.events.findIndex(e => e.country === item.country && e.indicator === item.indicator);
+          const status = item.status || 'none';
+
+          let rowBgClass = 'bg-transparent';
+          let consensusTextColor = 'text-cyan-400';
+          let statusBtnHtml = '';
+
+          if (status === 'green') {
+            rowBgClass = 'row-highlight-green text-emerald-100';
+            consensusTextColor = 'text-emerald-400 font-extrabold';
+            statusBtnHtml = `<button onclick="toggleEventStatus('${isoKey}', ${originalIndex})" title="Resultado: Positivo / Superó Consenso" class="ml-2 px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 transition">🟢 Beat</button>`;
+          } else if (status === 'red') {
+            rowBgClass = 'row-highlight-red text-rose-100';
+            consensusTextColor = 'text-rose-400 font-extrabold';
+            statusBtnHtml = `<button onclick="toggleEventStatus('${isoKey}', ${originalIndex})" title="Resultado: Negativo / Decepcionó Consenso" class="ml-2 px-2 py-0.5 text-[10px] font-bold rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 transition">🔴 Miss</button>`;
+          } else {
+            statusBtnHtml = `<button onclick="toggleEventStatus('${isoKey}', ${originalIndex})" title="Hacer clic para evaluar resultado" class="ml-2 px-2 py-0.5 text-[10px] font-bold rounded bg-zinc-800 text-zinc-400 border border-zinc-700 hover:bg-zinc-700 hover:text-white transition">⚪ Evaluador</button>`;
+          }
 
           tableHTML += `
             <tr class="${rowBgClass} border-b border-zinc-800/30 hover:bg-zinc-800/40 text-zinc-300 transition">
               <td class="p-2.5 text-zinc-400 font-mono text-[11px]">${escapeHtml(item.time)}</td>
-              <td class="p-2.5"><span class="${badgeClass} px-2 py-0.5 rounded font-bold text-[9px] tracking-wide">${escapeHtml(item.ccy)}</span></td>
-              <td class="p-2.5 font-sans text-zinc-200 text-xs font-medium">${escapeHtml(item.event)}</td>
-              <td class="p-2.5 font-bold text-white font-mono">${escapeHtml(item.actual) || '—'}</td>
-              <td class="p-2.5 text-zinc-400 font-mono">${escapeHtml(item.forecast) || '—'}</td>
-              <td class="p-2.5 text-zinc-500 font-mono">${escapeHtml(item.previous) || '—'}</td>
+              <td class="p-2.5"><span class="badge-${escapeHtml(item.country)} px-2 py-0.5 rounded font-bold text-[9px] tracking-wide">${escapeHtml(item.country)}</span></td>
+              <td class="p-2.5 font-sans text-zinc-100 text-xs font-medium">${escapeHtml(item.indicator)}</td>
+              <td class="p-2.5 text-center font-mono text-xs">
+                <span class="${consensusTextColor}">${escapeHtml(item.consensus)}</span>
+                ${statusBtnHtml}
+              </td>
+              <td class="p-2.5 text-center text-zinc-400 font-mono">${escapeHtml(item.range)}</td>
+              <td class="p-2.5 text-center text-zinc-500 font-mono">${escapeHtml(item.prior)}</td>
             </tr>
           `;
-
-          const nextItem = events[idx + 1];
-          const currentCategory = getCategorySentimentTitle(item.ccy, item.event);
-          const nextCategory = nextItem ? getCategorySentimentTitle(nextItem.ccy, nextItem.event) : null;
-
-          if (!nextItem || nextItem.ccy !== item.ccy || nextCategory !== currentCategory) {
-            const categoryTitle = currentCategory;
-            const categoryId = `${day}-${item.ccy}-${categoryTitle}`.replace(/[^a-zA-Z0-9]/g, '-');
-            const scoreObj = globalState.categoryScores[categoryId];
-            const currentScore = scoreObj ? scoreObj.score : 0;
-
-            tableHTML += `
-              <tr>
-                <td colspan="6" class="py-2.5 px-1">
-                  <div class="bg-gradient-to-r from-amber-950/20 via-zinc-900/40 to-zinc-900/20 border border-amber-500/30 rounded-xl p-2.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 my-1">
-                    <div class="flex items-center gap-2">
-                      <span class="text-amber-400 text-xs">📊</span>
-                      <span class="text-xs font-bold text-amber-200 tracking-wide">${escapeHtml(categoryTitle)}</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 font-mono">
-                      <span class="text-[10px] text-zinc-400 mr-1 uppercase">Puntuación:</span>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 2, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-500 transition ${currentScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 1, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-400 transition ${currentScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 0, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-zinc-500 transition ${currentScore === 0 ? 'score-btn-active-0' : ''}">0</button>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', -1, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-400 transition ${currentScore === -1 ? 'score-btn-active-m1' : ''}">-1</button>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', -2, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-600 transition ${currentScore === -2 ? 'score-btn-active-m2' : ''}">-2</button>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            `;
-          }
         });
 
         tableHTML += `
               </tbody>
             </table>
           </div>
-          <div class="px-4 pb-4">
-            <textarea data-day="${escapeHtml(day)}" oninput="saveDailyNote(this.getAttribute('data-day'), this.value)" class="w-full bg-[#030305] border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-300 focus:outline-none focus:border-cyan-500/60 font-mono transition placeholder-zinc-600" rows="1.5" placeholder="Notas de la jornada para ${escapeHtml(translatedDay)} (noticias inesperadas, eventos geopolíticos)...">${escapeHtml(globalState.dailyNotes[day] || '')}</textarea>
-          </div>
         `;
 
         dayCard.innerHTML = dayHeader + tableHTML;
         container.appendChild(dayCard);
       });
+
+      totalEventsBadge.textContent = `${totalCount} Datos de Consenso Filtrados`;
     }
 
-    function filterByCurrency(ccy) {
-      activeCurrencyFilter = ccy;
-      const btns = document.querySelectorAll('.currency-filter-btn');
+    function filterByGeo(geo) {
+      activeGeoFilter = geo;
+      const btns = document.querySelectorAll('.geo-filter-btn');
       btns.forEach(btn => {
-        if (btn.textContent === ccy || (ccy === 'ALL' && btn.textContent === 'TODAS')) {
-          btn.className = "currency-filter-btn px-2 py-1 rounded font-bold bg-cyan-500 text-black";
+        if (btn.getAttribute('onclick').includes(`'${geo}'`)) {
+          btn.className = "geo-filter-btn px-2 py-1 rounded font-bold bg-cyan-500 text-black";
         } else {
-          btn.className = "currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300";
+          btn.className = "geo-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300";
         }
       });
-      renderInteractiveCalendar();
+      renderLiveConsensusApp();
     }
 
-    function applyCalendarFilters() {
-      renderInteractiveCalendar();
+    function applyConsensusFilters() {
+      renderLiveConsensusApp();
     }
 
-    function setCategoryScore(categoryId, ccy, scoreVal, btn) {
-      globalState.categoryScores[categoryId] = { ccy: ccy, score: parseInt(scoreVal) };
-      const parent = btn.parentElement;
-      parent.querySelectorAll('.score-btn').forEach(b => {
-        b.className = "score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 transition";
-      });
-      if (scoreVal === 2) btn.classList.add('score-btn-active-p2');
-      if (scoreVal === 1) btn.classList.add('score-btn-active-p1');
-      if (scoreVal === 0) btn.classList.add('score-btn-active-0');
-      if (scoreVal === -1) btn.classList.add('score-btn-active-m1');
-      if (scoreVal === -2) btn.classList.add('score-btn-active-m2');
-      saveToLocalStorage();
-      recalculateMatrixAndDivergences();
-    }
-
-    function setIntermarketScore(asset, scoreVal) {
-      globalState.intermarketScores[asset] = parseInt(scoreVal);
-      saveToLocalStorage();
-      renderMatrixTables();
-      recalculateMatrixAndDivergences();
-    }
-
-    function saveDailyNote(day, noteText) {
-      globalState.dailyNotes[day] = noteText;
-      saveToLocalStorage();
-    }
-
-    function updatePrevMatrix(asset, val) {
-      globalState.matrixPrev[asset] = parseInt(val) || 0;
-      saveToLocalStorage();
-      recalculateMatrixAndDivergences();
-    }
-
-    function recalculateMatrixAndDivergences() {
-      const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'];
-      const intermarket = ['VIX', 'Oil', 'Gold'];
-
-      if (!globalState.matrixEvents) globalState.matrixEvents = {};
-      if (!globalState.matrixTotals) globalState.matrixTotals = {};
-      if (!globalState.matrixPrev) globalState.matrixPrev = {};
-
-      currencies.forEach(c => globalState.matrixEvents[c] = 0);
-      intermarket.forEach(i => globalState.matrixEvents[i] = globalState.intermarketScores[i] || 0);
-
-      if (globalState.categoryScores) {
-        Object.keys(globalState.categoryScores).forEach(catId => {
-          const item = globalState.categoryScores[catId];
-          if (item && item.ccy && typeof item.score === 'number') {
-            if (globalState.matrixEvents[item.ccy] !== undefined) {
-              globalState.matrixEvents[item.ccy] += item.score;
-            } else {
-              globalState.matrixEvents[item.ccy] = item.score;
-            }
-          }
-        });
-      }
-
-      [...currencies, ...intermarket].forEach(c => {
-        const prev = parseInt(globalState.matrixPrev[c]) || 0;
-        const ev = parseInt(globalState.matrixEvents[c]) || 0;
-        globalState.matrixTotals[c] = prev + ev;
-
-        const eventsEl = document.getElementById(`live-events-${c}`);
-        if (eventsEl) eventsEl.textContent = ev > 0 ? `+${ev}` : ev;
-
-        const totalEl = document.getElementById(`live-matrix-${c}`);
-        if (totalEl) {
-          const val = globalState.matrixTotals[c];
-          totalEl.textContent = val > 0 ? `+${val}` : val;
-          totalEl.className = `p-2 text-center font-mono text-xs rounded transition-all ${getScoreScaleClass(val)}`;
-        }
-      });
-
-      scanDivergences();
-    }
-
-    function formatStandardForexPair(curr1, curr2, score1, score2) {
-      const strong = score1 > score2 ? curr1 : curr2;
-      const weak = score1 > score2 ? curr2 : curr1;
-      const rank1 = CURRENCY_HIERARCHY.indexOf(curr1);
-      const rank2 = CURRENCY_HIERARCHY.indexOf(curr2);
-
-      let base, quote, actionText;
-      if (rank1 !== -1 && rank2 !== -1) {
-        if (rank1 < rank2) {
-          base = curr1; quote = curr2;
-          actionText = (strong === curr1) ? `COMPRA ${base}/${quote}` : `VENTA ${base}/${quote}`;
-        } else {
-          base = curr2; quote = curr1;
-          actionText = (strong === curr2) ? `COMPRA ${base}/${quote}` : `VENTA ${base}/${quote}`;
-        }
-      } else {
-        base = strong; quote = weak;
-        actionText = `COMPRA ${base}/${quote}`;
-      }
-
-      return { pairName: `${base}/${quote}`, actionBadge: actionText, strong: strong, weak: weak };
-    }
-
-    function scanDivergences() {
-      const alertBox = document.getElementById('divergenceAlertBox');
-      const listContainer = document.getElementById('divergenceList');
-      const badge = document.getElementById('divergenceCountBadge');
-
-      const forexList = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF'];
-      let divergencesFound = [];
-
-      for (let i = 0; i < forexList.length; i++) {
-        for (let j = i + 1; j < forexList.length; j++) {
-          const cA = forexList[i];
-          const cB = forexList[j];
-          const scoreA = globalState.matrixTotals[cA] || 0;
-          const scoreB = globalState.matrixTotals[cB] || 0;
-          const diff = Math.abs(scoreA - scoreB);
-
-          if (diff >= 3) {
-            const formatted = formatStandardForexPair(cA, cB, scoreA, scoreB);
-            divergencesFound.push({
-              pair: formatted.pairName,
-              actionBadge: formatted.actionBadge,
-              strong: formatted.strong,
-              weak: formatted.weak,
-              strongScore: globalState.matrixTotals[formatted.strong] || 0,
-              weakScore: globalState.matrixTotals[formatted.weak] || 0,
-              diff: diff
-            });
-          }
-        }
-      }
-
-      divergencesFound.sort((a, b) => b.diff - a.diff);
-
-      if (divergencesFound.length > 0) {
-        alertBox.classList.remove('hidden');
-        badge.textContent = `${divergencesFound.length} Pares Aprobados`;
-        listContainer.innerHTML = divergencesFound.map(d => `
-          <div class="bg-[#030305] border border-cyan-500/30 p-2.5 rounded-xl flex items-center justify-between">
-            <div>
-              <span class="text-zinc-400 text-[10px]">Oportunidad:</span>
-              <span class="font-black text-cyan-400 text-sm block">${escapeHtml(d.pair)}</span>
-            </div>
-            <div class="text-right">
-              <span class="${d.actionBadge.includes('COMPRA') ? 'bg-emerald-950 text-emerald-400 border-emerald-500/30' : 'bg-rose-950 text-rose-400 border-rose-500/30'} border px-2 py-0.5 rounded text-[10px] font-bold block mb-0.5">${escapeHtml(d.actionBadge)}</span>
-              <span class="text-[9px] text-zinc-500">Diferencial: ${d.diff} pts (${escapeHtml(d.strong)}: ${d.strongScore > 0 ? '+' : ''}${d.strongScore} vs ${escapeHtml(d.weak)}: ${d.weakScore > 0 ? '+' : ''}${d.weakScore})</span>
-            </div>
-          </div>
-        `).join('');
-      } else {
-        alertBox.classList.add('hidden');
-      }
-    }
-
-    function resetAllScores() {
-      if (confirm('¿Reiniciar todo el tablero? Esto borrará los datos cargados y puntuaciones.')) {
-        localStorage.removeItem('kairos_macro_engine_state');
-        globalState = {
-          daysData: {},
-          categoryScores: {},
-          matrixEvents: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
-          matrixTotals: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
-          matrixPrev: { USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 },
-          intermarketScores: { VIX: 0, Oil: 0, Gold: 0 },
-          dailyNotes: {}
-        };
-        document.getElementById('interactiveCalendarContainer').innerHTML = '';
-        document.getElementById('liveMatrixContainer').classList.add('hidden');
-        document.getElementById('calendarFilterBar').classList.add('hidden');
-        document.getElementById('divergenceAlertBox').classList.add('hidden');
+    function resetConsensusData() {
+      if (confirm('¿Deseas borrar la tabla de consenso guardada en pantalla?')) {
+        localStorage.removeItem('kairos_consensus_hub_state');
+        globalState = { daysData: {} };
+        renderLiveConsensusApp();
       }
     }
 
     function triggerPrint() {
+      if (!globalState.daysData || Object.keys(globalState.daysData).length === 0) {
+        alert('No hay datos cargados para exportar a PDF.');
+        return;
+      }
       renderPDFPrintPreview();
       setTimeout(() => { window.print(); }, 200);
     }
@@ -874,148 +696,77 @@
 
     function renderReportTemplate(data) {
       const text = {
-        title: "CALENDARIO ECONÓMICO SEMANAL — REPORTE DE RIESGO",
-        subtitle: "Plantilla Semanal · Eventos Agrupados con Evaluación Cuantitativa de Sentimiento",
-        matrixTitle: "MATRIZ DE FUERZA GLOBAL E INTERMERCADO",
-        instructionsTitle: "Instrucciones de Operación:",
-        instructionsBody: "Matriz calculada automáticamente mediante el Motor Integrado de Riesgo Kairos.<br>• Impacto Alto: Muy Bueno (+2) | Bueno (+1) | En Línea (0) | Malo (-1) | Muy Malo (-2)",
-        thAsset: "ACTIVO / DIVISA",
-        thPrev: "SEMANA PREVIA",
-        thCurr: "TOTAL COMBINADO",
-        secA: "SECCIÓN A: DIVISAS (FOREX CORE)",
-        secB: "SECCIÓN B: CATALIZADORES MACRO E INTERMERCADO",
-        vix: "VIX (Volatilidad S&P 500)",
-        oil: "Petróleo (Crudo WTI/Brent)",
-        gold: "Oro (XAU/USD)",
-        time: "HORA", ccy: "DIVISA", event: "EVENTO", actual: "ACTUAL", forecast: "PRONÓSTICO", previous: "PREVIO", sentiment: "EVALUACIÓN",
-        notes: "Notas Diarias (Noticias Inesperadas / Eventos Geopolíticos / Giros Intermercado):",
-        footer: "Inteligencia Institucional de Riesgo Forex · Kairos Integrated Risk Engine"
+        title: "REPORTE MACROECONÓMICO DE CONSENSO Y EXPECTATIVAS",
+        subtitle: "Calendario Filtrado Institucional · Exclusivamente Países Seleccionados con Consenso Válido",
+        time: "HORA", country: "PAÍS / REGIÓN", indicator: "INDICADOR MACROECONÓMICO",
+        consensus: "CONSENSO", range: "RANGO EXPECTATIVAS", prior: "PREVIO",
+        footer: "Inteligencia Institucional de Consenso Macro · Kairos Integrated Risk Engine"
       };
 
       let html = `
-        <div class="report-card bg-white p-8 rounded-xl font-sans mb-12">
+        <div class="report-card bg-white p-8 rounded-xl shadow-lg border border-slate-200 font-sans mb-12">
           <h1 style="font-size: 18px; font-weight: bold; color: #0F172A; margin: 0; border-bottom: 2px solid #0F172A; padding-bottom: 4px;">${text.title}</h1>
-          <h2 style="font-size: 11px; color: #475569; margin: 4px 0 14px 0; font-style: italic;">${text.subtitle}</h2>
-          <div style="background-color: #F8FAFC; border: 1px solid #CBD5E1; padding: 10px; border-radius: 4px; margin-bottom: 16px;">
-            <div style="font-size: 11px; font-weight: bold; color: #0F172A; margin-bottom: 6px;">${text.matrixTitle}</div>
-            <p style="font-size: 9px; margin: 0 0 8px 0; color: #334155; line-height: 1.3;">
-              <strong>${text.instructionsTitle}</strong> ${text.instructionsBody}
-            </p>
-            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
-              <thead>
-                <tr style="background-color: #0F172A; color: white;">
-                  <th style="padding: 5px; text-align: left; width: 40%;">${text.thAsset}</th>
-                  <th style="padding: 5px; text-align: center; width: 30%;">${text.thPrev}</th>
-                  <th style="padding: 5px; text-align: center; width: 30%;">${text.thCurr}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style="background-color: #CBD5E1; font-weight: bold;"><td colspan="3" style="padding: 3px 5px;">${text.secA}</td></tr>
-                ${['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'].map(asset => {
-                  const tot = globalState.matrixTotals[asset] || 0;
-                  const prev = globalState.matrixPrev[asset] || 0;
-                  return `
-                  <tr style="border-bottom: 1px solid #E2E8F0;">
-                    <td style="padding: 3px 5px; font-weight: bold;">${asset}</td>
-                    <td style="border-left: 1px solid #E2E8F0; text-align: center;">${prev > 0 ? '+' : ''}${prev}</td>
-                    <td style="border-left: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #0F172A;">${tot > 0 ? '+' : ''}${tot}</td>
-                  </tr>
-                `}).join('')}
-                <tr style="background-color: #CBD5E1; font-weight: bold;"><td colspan="3" style="padding: 3px 5px;">${text.secB}</td></tr>
-                ${[['VIX', text.vix], ['Oil', text.oil], ['Gold', text.gold]].map(asset => {
-                  const tot = globalState.matrixTotals[asset[0]] || 0;
-                  const prev = globalState.matrixPrev[asset[0]] || 0;
-                  return `
-                  <tr style="border-bottom: 1px solid #E2E8F0;">
-                    <td style="padding: 3px 5px; font-weight: bold;">${asset[1]}</td>
-                    <td style="border-left: 1px solid #E2E8F0; text-align: center;">${prev > 0 ? '+' : ''}${prev}</td>
-                    <td style="border-left: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #0F172A;">${tot > 0 ? '+' : ''}${tot}</td>
-                  </tr>
-                `}).join('')}
-              </tbody>
-            </table>
-          </div>
+          <h2 style="font-size: 11px; color: #475569; margin: 4px 0 16px 0; font-style: italic;">${text.subtitle}</h2>
       `;
 
-      Object.keys(data).forEach(day => {
-        const events = data[day];
+      const sortedIsoKeys = Object.keys(data).sort();
+
+      sortedIsoKeys.forEach(isoKey => {
+        const dayObj = data[isoKey];
+        const events = dayObj.events || [];
         if (!events || events.length === 0) return;
-        const translatedDay = translateDayToSpanish(day);
+        const displayDay = dayObj.formattedDay || isoKey;
 
         html += `
-          <div style="background-color: #1F385C; color: white; padding: 6px 10px; font-weight: bold; font-size: 11px; margin-top: 14px; text-transform: uppercase;">
-            ${escapeHtml(translatedDay)}
+          <div style="background-color: #1F385C; color: white; padding: 6px 10px; font-weight: bold; font-size: 11px; margin-top: 16px; text-transform: uppercase;">
+            ${escapeHtml(displayDay)}
           </div>
-          <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 4px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 12px; border: 1px solid #CBD5E1;">
             <thead>
-              <tr style="border-bottom: 2px solid #1F385C; text-align: left; background-color: #F1F5F9;">
-                <th style="padding: 5px; width: 9%;">${text.time}</th>
-                <th style="padding: 5px; width: 8%;">${text.ccy}</th>
-                <th style="padding: 5px; width: 39%;">${text.event}</th>
-                <th style="padding: 5px; width: 11%;">${text.actual}</th>
-                <th style="padding: 5px; width: 11%;">${text.forecast}</th>
-                <th style="padding: 5px; width: 11%;">${text.previous}</th>
-                <th style="padding: 5px; width: 11%; text-align: center;">${text.sentiment}</th>
+              <tr style="background-color: #0F172A; color: white; text-align: left;">
+                <th style="padding: 6px; width: 8%; border: 1px solid #334155;">${text.time}</th>
+                <th style="padding: 6px; width: 14%; border: 1px solid #334155;">${text.country}</th>
+                <th style="padding: 6px; width: 42%; border: 1px solid #334155;">${text.indicator}</th>
+                <th style="padding: 6px; width: 12%; border: 1px solid #334155; text-align: center;">${text.consensus}</th>
+                <th style="padding: 6px; width: 12%; border: 1px solid #334155; text-align: center;">${text.range}</th>
+                <th style="padding: 6px; width: 12%; border: 1px solid #334155; text-align: center;">${text.prior}</th>
               </tr>
             </thead>
             <tbody>
         `;
 
         events.forEach((item, idx) => {
-          const badgeClass = `badge-${['USD','EUR','GBP','JPY','CAD','AUD','NZD','CHF','CNH','CNY'].includes(item.ccy) ? item.ccy : 'DEFAULT'}`;
+          let rowStyle = idx % 2 === 0 ? 'background-color: #FFFFFF;' : 'background-color: #F8FAFC;';
+          let consensusStyle = 'font-weight: bold; color: #0369A1;';
+
+          if (item.status === 'green') {
+            rowStyle = 'background-color: #dcfce7; color: #166534; font-weight: 600;';
+            consensusStyle = 'font-weight: bold; color: #15803d;';
+          } else if (item.status === 'red') {
+            rowStyle = 'background-color: #fee2e2; color: #991b1b; font-weight: 600;';
+            consensusStyle = 'font-weight: bold; color: #b91c1c;';
+          }
+
           html += `
-            <tr style="border-bottom: 1px solid #E2E8F0;">
-              <td style="padding: 4px 5px; font-family: monospace;">${escapeHtml(item.time)}</td>
-              <td style="padding: 4px 5px;"><span class="${badgeClass}" style="padding: 1px 4px; border-radius: 3px; font-weight: bold; font-size: 9px;">${escapeHtml(item.ccy)}</span></td>
-              <td style="padding: 4px 5px;">${escapeHtml(item.event)}</td>
-              <td style="padding: 4px 5px;">${escapeHtml(item.actual)}</td>
-              <td style="padding: 4px 5px;">${escapeHtml(item.forecast)}</td>
-              <td style="padding: 4px 5px;">${escapeHtml(item.previous)}</td>
-              <td style="padding: 4px 5px; border-left: 1px solid #E2E8F0;"></td>
+            <tr style="${rowStyle} border-bottom: 1px solid #E2E8F0;">
+              <td style="padding: 5px; font-family: monospace; border: 1px solid #E2E8F0; text-align: center;">${escapeHtml(item.time)}</td>
+              <td style="padding: 5px; border: 1px solid #E2E8F0; text-align: center;"><span class="badge-${escapeHtml(item.country)}" style="padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 9px;">${escapeHtml(item.country)}</span></td>
+              <td style="padding: 5px; font-weight: 500; border: 1px solid #E2E8F0;">${escapeHtml(item.indicator)}</td>
+              <td style="padding: 5px; ${consensusStyle} border: 1px solid #E2E8F0; text-align: center;">${escapeHtml(item.consensus)}</td>
+              <td style="padding: 5px; color: #475569; border: 1px solid #E2E8F0; text-align: center;">${escapeHtml(item.range)}</td>
+              <td style="padding: 5px; color: #475569; border: 1px solid #E2E8F0; text-align: center;">${escapeHtml(item.prior)}</td>
             </tr>
           `;
-
-          const nextItem = events[idx + 1];
-          const currentCategory = getCategorySentimentTitle(item.ccy, item.event);
-          const nextCategory = nextItem ? getCategorySentimentTitle(nextItem.ccy, nextItem.event) : null;
-
-          if (!nextItem || nextItem.ccy !== item.ccy || nextCategory !== currentCategory) {
-            const categoryTitle = currentCategory;
-            const categoryId = `${day}-${item.ccy}-${categoryTitle}`.replace(/[^a-zA-Z0-9]/g, '-');
-            const scoreItem = globalState.categoryScores[categoryId];
-            const scoreVal = scoreItem ? scoreItem.score : 0;
-            const formattedVal = scoreVal > 0 ? `+${scoreVal}` : scoreVal;
-
-            html += `
-              <tr style="background-color: #FDF8E7; border-top: 1px solid #D9D9D9; border-bottom: 1px solid #D9D9D9;">
-                <td colspan="6" style="padding: 5px 8px; font-style: italic; font-weight: bold; color: #854D0E; font-size: 9px;">
-                  ${escapeHtml(categoryTitle)}
-                </td>
-                <td style="padding: 4px; text-align: center; border-left: 1px solid #CBD5E1;">
-                  <span style="display: inline-block; padding: 1px 6px; border-radius: 3px; font-weight: bold; font-size: 9px; font-family: monospace;">
-                    ${formattedVal}
-                  </span>
-                </td>
-              </tr>
-            `;
-          }
         });
 
         html += `
             </tbody>
           </table>
-
-          <div style="border: 1px dashed #94A3B8; min-height: 45px; border-radius: 4px; padding: 6px; margin-bottom: 12px; background-color: #FAFAFA;">
-            <span style="font-size: 9px; font-weight: bold; color: #64748B;">
-              ${text.notes}
-            </span>
-            <p style="font-size: 10px; color: #334155; margin-top: 4px; font-family: monospace;">${escapeHtml(globalState.dailyNotes[day] || '—')}</p>
-          </div>
         `;
       });
 
       html += `
-        <div style="margin-top: 20px; border-top: 1px solid #CBD5E1; padding-top: 6px; text-align: center; font-size: 8px; color: #64748B;">
+        <div style="margin-top: 24px; border-top: 1px solid #CBD5E1; padding-top: 6px; text-align: center; font-size: 8px; color: #64748B;">
           ${text.footer}
         </div>
       </div>`;
