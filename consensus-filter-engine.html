@@ -226,19 +226,37 @@
       return { daysData: newDaysData };
     }
 
+    // CORRECCIÓN SAFARI IPADOS / IOS EXPORT (BLOB OCTET-STREAM + DELAY CLEANUP)
     function exportStateJSON() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalState, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `kairos_consensus_backup_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      try {
+        const dataStr = JSON.stringify(globalState, null, 2);
+        const blob = new Blob([dataStr], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.href = url;
+        downloadAnchor.download = `kairos_consensus_backup_${new Date().toISOString().slice(0,10)}.json`;
+        
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        
+        setTimeout(() => {
+          if (document.body.contains(downloadAnchor)) {
+            document.body.removeChild(downloadAnchor);
+          }
+          URL.revokeObjectURL(url);
+        }, 2000);
+      } catch (err) {
+        console.error("Export error:", err);
+        alert("Error al exportar el archivo JSON de respaldo.");
+      }
     }
 
+    // CORRECCIÓN IMPORTACIÓN CONTINUA (RESET DE INPUT VALUE EN FINALLY)
     function importStateJSON(e) {
       const file = e.target.files[0];
       if (!file) return;
+
       const reader = new FileReader();
       reader.onload = function(evt) {
         try {
@@ -248,9 +266,14 @@
             saveToLocalStorage();
             renderLiveConsensusApp();
             alert('¡Respaldo de consenso cargado correctamente!');
+          } else {
+            throw new Error("Formato JSON no válido");
           }
         } catch(err) {
+          console.error("Import error:", err);
           alert('Error al leer el archivo JSON de respaldo.');
+        } finally {
+          e.target.value = '';
         }
       };
       reader.readAsText(file);
@@ -274,7 +297,6 @@
       return true;
     }
 
-    // RESOLUCIÓN DE FECHA DE ENCABEZADO A CLAVE ISO Y DÍA FORMATEADO
     function parseHeaderToIsoAndFormatted(rawHeaderStr) {
       if (!rawHeaderStr) return { iso: "9999-99-99", formatted: "FECHA DESCONOCIDA" };
       const str = String(rawHeaderStr).trim();
@@ -294,7 +316,6 @@
         'SATURDAY': 6, 'SÁBADO': 6, 'SABADO': 6
       };
 
-      // 1. Caso "Current Month <day_num>"
       if (/Current Month/i.test(str)) {
         let targetDow = null;
         for (const [key, dow] of Object.entries(dayMap)) {
@@ -331,7 +352,6 @@
         }
       }
 
-      // 2. Mes Explícito (Español o Inglés)
       for (let m = 0; m < 12; m++) {
         const enM = monthNamesEn[m];
         const esM = monthNamesEs[m];
@@ -353,7 +373,6 @@
         }
       }
 
-      // 3. Fecha Numérica ISO / Estándar (ej: YYYY-MM-DD o DD/MM/YYYY)
       const numMatch = str.match(/(\d{1,4})[-/.](\d{1,2})[-/.](\d{1,4})/);
       if (numMatch) {
         let p1 = parseInt(numMatch[1], 10), p2 = parseInt(numMatch[2], 10), p3 = parseInt(numMatch[3], 10);
@@ -420,7 +439,6 @@
 
         if (cleanRow.includes("Macro Indicator / Sub-Metric") || cleanRow.includes("Consensus") || /Expectation Range/i.test(rowString)) return;
 
-        // A) DETECTAR ENCABEZADO DE FECHA
         let headerRaw = null;
 
         const targetDateIdx = cleanRow.findIndex(c => String(c).includes("Calendar Target Date:"));
@@ -445,7 +463,6 @@
           return;
         }
 
-        // B) EXTRAER DATOS DEL INDICADOR
         let time = "-", country = "", indicator = "", consensus = "-", range = "-", prior = "-";
 
         let mergedColIdx = cleanRow.findIndex(c => {
@@ -496,7 +513,6 @@
           const newItem = { time, country, indicator, consensus, range, prior, status: 'none' };
 
           if (existingIdx !== -1) {
-            // Preservar el status previo si ya existía
             newItem.status = dayObj.events[existingIdx].status || 'none';
             dayObj.events[existingIdx] = newItem;
           } else {
@@ -506,7 +522,6 @@
       });
     }
 
-    // TOGGLE DE ESTADO DEL EVENTO (NEUTRO -> GREEN -> RED -> NEUTRO)
     function toggleEventStatus(isoKey, itemIndex) {
       if (!globalState.daysData[isoKey] || !globalState.daysData[isoKey].events[itemIndex]) return;
       
@@ -607,7 +622,6 @@
         `;
 
         events.forEach((item) => {
-          // Obtener el índice real en la lista completa del día
           const originalIndex = dayObj.events.findIndex(e => e.country === item.country && e.indicator === item.indicator);
           const status = item.status || 'none';
 
@@ -706,7 +720,7 @@
       let html = `
         <div class="report-card bg-white p-8 rounded-xl shadow-lg border border-slate-200 font-sans mb-12">
           <h1 style="font-size: 18px; font-weight: bold; color: #0F172A; margin: 0; border-bottom: 2px solid #0F172A; padding-bottom: 4px;">${text.title}</h1>
-          <h2 style="font-size: 11px; color: #475569; margin: 4px 0 16px 0; font-style: italic;">${text.subtitle}</h2>
+          <h2 style="font-size: 11px; color: #475569; margin: 4px 0 14px 0; font-style: italic;">${text.subtitle}</h2>
       `;
 
       const sortedIsoKeys = Object.keys(data).sort();
