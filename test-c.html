@@ -33,8 +33,19 @@
                 <p class="text-sm text-gray-400 mt-1">Calculates economic indicator net changes, currency totals, and cross-pair biases across all 28 standard forex pairs.</p>
             </div>
             <div class="flex items-center gap-2 flex-wrap">
+                <!-- Export Backup Button -->
+                <button onclick="exportData()" class="px-3 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-dark transition cursor-pointer">
+                    <i class="fa-solid fa-download mr-1"></i> Export Backup (.json)
+                </button>
+                <!-- Import Backup Button & Hidden File Input -->
+                <button onclick="triggerImport()" class="px-3 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-dark transition cursor-pointer">
+                    <i class="fa-solid fa-upload mr-1"></i> Import Backup (.json)
+                </button>
+                <input type="file" id="jsonFileInput" accept=".json" class="hidden" onchange="importData(event)">
+
+                <!-- Reset Button -->
                 <button onclick="resetToDefaults()" class="px-3 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-dark transition cursor-pointer">
-                    <i class="fa-solid fa-rotate-left mr-1"></i> Reset to Latest Baseline
+                    <i class="fa-solid fa-rotate-left mr-1"></i> Reset to Baseline
                 </button>
             </div>
         </div>
@@ -147,7 +158,7 @@
     </div>
 
     <script>
-        // Updated baseline data reflecting current mid-2026 economic metrics
+        // Baseline data set
         const defaultData = {
             "USD": [
                 { name: "ISM Mfg PMI", previous: 49.2, forecast: 50.1, actual: 50.4, type: "PMI", weight: "5.0" },
@@ -484,6 +495,49 @@
                 document.getElementById('view-currency').classList.remove('hidden');
                 renderCurrencyTable(tab);
             }
+        }
+
+        // Export Data State to JSON Backup File
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            const timestamp = new Date().toISOString().slice(0, 10);
+            
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `forex_valuation_backup_${timestamp}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // Trigger Hidden File Selector for Import
+        function triggerImport() {
+            document.getElementById('jsonFileInput').click();
+        }
+
+        // Import JSON File into State
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (typeof imported === 'object' && imported !== null && imported.USD) {
+                        appData = imported;
+                        document.getElementById('lastUpdatedNotice').innerText = `Data Status: Loaded from Backup`;
+                        refreshApp();
+                        alert('Backup restored successfully!');
+                    } else {
+                        alert('Invalid backup structure. Please provide a valid JSON export from this tool.');
+                    }
+                } catch (err) {
+                    alert('Failed to parse JSON file. Please ensure the file is valid.');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset input selection
         }
 
         function resetToDefaults() {
