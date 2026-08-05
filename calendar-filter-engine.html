@@ -94,7 +94,7 @@
         </div>
       </div>
 
-      <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS CON DESGLOSE DETALLADO -->
+      <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS -->
       <div id="divergenceAlertBox" class="hidden bg-cyan-950/20 border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3">
         <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2">
           <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
@@ -187,7 +187,6 @@
 
   <!-- LÓGICA DE JS INTERNO DEL MOTOR -->
   <script>
-    // Helper para escapar HTML
     function escapeHtml(str) {
       if (!str) return '';
       return String(str)
@@ -321,7 +320,6 @@
       }
     }
 
-    // EXPORTACIÓN COMPATIBLE CON SAFARI (IPADOS / IOS)
     function exportStateJSON() {
       try {
         const dataStr = JSON.stringify(globalState, null, 2);
@@ -347,7 +345,6 @@
       }
     }
 
-    // IMPORTACIÓN SEGURA CON REINICIO DE INPUT
     function importStateJSON(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -400,22 +397,21 @@
       if (e.target.files.length) processExcelFile(e.target.files[0]);
     }
 
-    // FILTRO WHITELIST + BLACKLIST (OPEC & PETRÓLEO DESCARTE AUTOMÁTICO)
+    // FILTRO WHITELIST + BLACKLIST (DESCARTE AUTOMÁTICO DE OPEC E INVENTARIOS DE PETRÓLEO)
     function isWhitelisted(ccy, eventName) {
       if (!eventName) return false;
       const lower = String(eventName).toLowerCase();
 
-      // Blacklist de exclusión (OPEC, Inventarios de Petróleo/Crudo)
-      const blacklist = ['opec', 'crude oil inventories', 'oil inventories', 'eia crude', 'gasoline inventories', 'distillate stocks', 'baker hughes'];
+      // Blacklist de exclusión estricta
+      const blacklist = ['opec', 'crude oil', 'oil inventories', 'eia crude', 'gasoline inventories', 'distillate stocks', 'baker hughes', 'fed regional', 'mpc member', 'executive board member'];
       if (blacklist.some(term => lower.includes(term))) return false;
 
-      if (lower.includes('fed regional') || lower.includes('mpc member') || lower.includes('executive board member')) return false;
       if (WHITELIST.UNIVERSAL.some(term => lower.includes(term))) return true;
       const terms = WHITELIST[ccy] || [];
       return terms.some(term => lower.includes(term));
     }
 
-    // CATEGORIZACIÓN CON SEPARACIÓN ESTRICTA DE PMIS (ISM vs S&P Global vs Ivey vs Tankan)
+    // CATEGORIZACIÓN GENERAL DE RESPALDO
     function getCategorySentimentTitle(ccy, eventName) {
       if (!eventName) return `SENTIMIENTO DE ${ccy}`;
       const lower = eventName.toLowerCase();
@@ -424,7 +420,6 @@
       if (lower.includes('ppi') || lower.includes('ippi') || lower.includes('producer price') || lower.includes('cgpi')) return `${ccy} - PRECIOS DE PRODUCTOR (IPP)`;
       if (lower.includes('unemployment') || lower.includes('employment') || lower.includes('jobless') || lower.includes('nfp') || lower.includes('adp') || lower.includes('claimant') || lower.includes('earnings') || lower.includes('household spending') || lower.includes('jolts') || lower.includes('job openings') || lower.includes('labor turnover') || lower.includes('employment cost') || lower.includes('eci') || lower.includes('challenger')) return `${ccy} - MERCADO LABORAL Y SALARIOS`;
       
-      // Categorización Granular de PMIs
       if (lower.includes('ism')) return `${ccy} - PMI ISM`;
       if (lower.includes('s&p') || lower.includes('markit') || lower.includes('hcob') || lower.includes('caixin')) return `${ccy} - PMI S&P GLOBAL / CAIXIN`;
       if (lower.includes('ivey')) return `${ccy} - PMI IVEY`;
@@ -444,6 +439,21 @@
       const cleanName = eventName.replace(/^(French|German|Italian|Spanish|Eurozone|US|UK|Japanese|Australian|Canadian|Swiss|Chinese)\s+/i, '');
       const firstWord = cleanName.split(' ')[0].toUpperCase();
       return `${ccy} - ${firstWord}`;
+    }
+
+    // TÍTULO ÚNICO E INTELIGENTE PARA LA FILA AMARILLA
+    function getSmartGroupTitle(ccy, blockEvents) {
+      if (!blockEvents || blockEvents.length === 0) return `${ccy} - EVENTO MACRO`;
+
+      const uniqueNames = Array.from(new Set(blockEvents.map(e => e.event.trim())));
+
+      if (uniqueNames.length === 1) {
+        return `${ccy} - ${uniqueNames[0]}`;
+      } else if (uniqueNames.length === 2) {
+        return `${ccy} - ${uniqueNames[0]} / ${uniqueNames[1]}`;
+      } else {
+        return getCategorySentimentTitle(ccy, blockEvents[0].event);
+      }
     }
 
     function processExcelFile(file) {
@@ -627,7 +637,6 @@
       `}).join('');
     }
 
-    // MOSTRAR NOMBRES DE EVENTOS REALES EN LAS FILAS AMARILLAS
     function renderInteractiveCalendar() {
       const container = document.getElementById('interactiveCalendarContainer');
       container.innerHTML = '';
@@ -635,8 +644,11 @@
       const searchQuery = (document.getElementById('eventSearchInput')?.value || '').toLowerCase();
 
       Object.keys(globalState.daysData).forEach(day => {
-        let events = globalState.daysData[day] || [];
-        if (!events || events.length === 0) return;
+        let rawEvents = globalState.daysData[day] || [];
+        if (!rawEvents || rawEvents.length === 0) return;
+
+        // Limpieza de seguridad anti OPEC y no-whitelisted
+        let events = rawEvents.filter(e => isWhitelisted(e.ccy, e.event));
 
         if (activeCurrencyFilter !== 'ALL') {
           events = events.filter(e => e.ccy === activeCurrencyFilter);
@@ -702,41 +714,36 @@
           const nextCategory = nextItem ? getCategorySentimentTitle(nextItem.ccy, nextItem.event) : null;
 
           if (!nextItem || nextItem.ccy !== item.ccy || nextCategory !== currentCategory) {
-            const categoryTitle = currentCategory;
-            const categoryId = `${day}-${item.ccy}-${categoryTitle}`.replace(/[^a-zA-Z0-9]/g, '-');
+            // Título Unificado Inteligente
+            const smartTitle = getSmartGroupTitle(item.ccy, currentBlockEvents);
+            const categoryId = `${day}-${item.ccy}-${currentCategory}`.replace(/[^a-zA-Z0-9]/g, '-');
             const scoreObj = globalState.categoryScores[categoryId];
             const currentScore = scoreObj ? scoreObj.score : 0;
 
-            // Extraer nombres reales de los datos contenidos en este bloque
-            const eventsInBlockNames = Array.from(new Set(currentBlockEvents.map(e => e.event))).join(' • ');
+            const eventsSummaryText = Array.from(new Set(currentBlockEvents.map(e => e.event))).join(' / ');
 
             tableHTML += `
               <tr>
                 <td colspan="6" class="py-2.5 px-1">
                   <div class="bg-gradient-to-r from-amber-950/20 via-zinc-900/40 to-zinc-900/20 border border-amber-500/30 rounded-xl p-2.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 my-1">
-                    <div class="flex flex-col gap-0.5">
-                      <div class="flex items-center gap-2">
-                        <span class="text-amber-400 text-xs">📊</span>
-                        <span class="text-xs font-bold text-amber-200 tracking-wide">${escapeHtml(categoryTitle)}</span>
-                      </div>
-                      <div class="text-[10px] text-amber-300/80 font-sans pl-5 font-normal">
-                        📌 ${escapeHtml(eventsInBlockNames)}
-                      </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-amber-400 text-xs">📊</span>
+                      <span class="text-xs font-bold text-amber-200 tracking-wide">${escapeHtml(smartTitle)}</span>
                     </div>
                     <div class="flex items-center gap-1.5 font-mono self-end sm:self-auto">
                       <span class="text-[10px] text-zinc-400 mr-1 uppercase">Puntuación:</span>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 2, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-500 transition ${currentScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 1, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-400 transition ${currentScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 0, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-zinc-500 transition ${currentScore === 0 ? 'score-btn-active-0' : ''}">0</button>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', -1, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-400 transition ${currentScore === -1 ? 'score-btn-active-m1' : ''}">-1</button>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', -2, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-600 transition ${currentScore === -2 ? 'score-btn-active-m2' : ''}">-2</button>
+                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 2, '${escapeHtml(smartTitle)}', '${escapeHtml(eventsSummaryText)}', this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-500 transition ${currentScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
+                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 1, '${escapeHtml(smartTitle)}', '${escapeHtml(eventsSummaryText)}', this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-400 transition ${currentScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
+                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 0, '${escapeHtml(smartTitle)}', '${escapeHtml(eventsSummaryText)}', this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-zinc-500 transition ${currentScore === 0 ? 'score-btn-active-0' : ''}">0</button>
+                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', -1, '${escapeHtml(smartTitle)}', '${escapeHtml(eventsSummaryText)}', this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-400 transition ${currentScore === -1 ? 'score-btn-active-m1' : ''}">-1</button>
+                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', -2, '${escapeHtml(smartTitle)}', '${escapeHtml(eventsSummaryText)}', this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-600 transition ${currentScore === -2 ? 'score-btn-active-m2' : ''}">-2</button>
                     </div>
                   </div>
                 </td>
               </tr>
             `;
 
-            currentBlockEvents = []; // Limpiar para el siguiente bloque
+            currentBlockEvents = [];
           }
         });
 
@@ -771,8 +778,14 @@
       renderInteractiveCalendar();
     }
 
-    function setCategoryScore(categoryId, ccy, scoreVal, btn) {
-      globalState.categoryScores[categoryId] = { ccy: ccy, score: parseInt(scoreVal) };
+    function setCategoryScore(categoryId, ccy, scoreVal, title, eventsSummary, btn) {
+      globalState.categoryScores[categoryId] = { 
+        ccy: ccy, 
+        score: parseInt(scoreVal),
+        title: title || '',
+        eventsSummary: eventsSummary || ''
+      };
+
       const parent = btn.parentElement;
       parent.querySelectorAll('.score-btn').forEach(b => {
         b.className = "score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 transition";
@@ -870,29 +883,28 @@
       return { pairName: `${base}/${quote}`, actionBadge: actionText, strong: strong, weak: weak };
     }
 
-    // EXTRAER DESGLOSE COMPLETO DE FACTORES PARA UNA DIVISA
+    // EXTRAER DESGLOSE LIMPIO Y ELEGANTE PARA CADA DIVISA
     function getCurrencyScoreBreakdown(ccy) {
       const breakdown = [];
       const prev = parseInt(globalState.matrixPrev[ccy]) || 0;
       if (prev !== 0) {
-        breakdown.push({ label: 'Previo (Manual)', score: prev });
+        breakdown.push({ label: 'Fuerza Previa (Manual)', score: prev });
       }
 
       if (globalState.categoryScores) {
         Object.keys(globalState.categoryScores).forEach(catId => {
           const item = globalState.categoryScores[catId];
           if (item && item.ccy === ccy && item.score !== 0) {
-            const parts = catId.split('-');
-            let title = parts.slice(2).join('-').trim();
-            if (!title) title = catId;
-            breakdown.push({ label: title, score: item.score });
+            let label = item.title || item.eventsSummary || 'Evento Macro';
+            label = label.replace(new RegExp(`^${ccy}\\s*-\\s*`, 'i'), '');
+            breakdown.push({ label: label, score: item.score });
           }
         });
       }
       return breakdown;
     }
 
-    // ESCÁNER CON DESGLOSE DETALLADO DE EVENTOS QUE DAN/QUITAN VALOR
+    // ESCÁNER DE DIVERGENCIAS CON DISEÑO EJECUTIVO MODERNO
     function scanDivergences() {
       const alertBox = document.getElementById('divergenceAlertBox');
       const listContainer = document.getElementById('divergenceList');
@@ -934,32 +946,54 @@
           const weakBreakdown = getCurrencyScoreBreakdown(d.weak);
 
           return `
-            <div class="bg-[#030305] border border-cyan-500/30 p-3 rounded-xl space-y-2">
-              <div class="flex items-center justify-between">
+            <div class="bg-[#05060a] border border-zinc-800 hover:border-cyan-500/40 p-3.5 rounded-2xl space-y-3 transition shadow-lg">
+              <!-- Encabezado de Par y Acción -->
+              <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
                 <div>
-                  <span class="text-zinc-400 text-[10px]">Oportunidad:</span>
-                  <span class="font-black text-cyan-400 text-sm block">${escapeHtml(d.pair)}</span>
+                  <span class="text-[10px] text-zinc-500 uppercase font-mono block">Oportunidad Macro</span>
+                  <span class="font-black text-cyan-400 text-base font-mono tracking-tight">${escapeHtml(d.pair)}</span>
                 </div>
-                <div class="text-right">
-                  <span class="${d.actionBadge.includes('COMPRA') ? 'bg-emerald-950 text-emerald-400 border-emerald-500/30' : 'bg-rose-950 text-rose-400 border-rose-500/30'} border px-2 py-0.5 rounded text-[10px] font-bold block mb-0.5">${escapeHtml(d.actionBadge)}</span>
-                  <span class="text-[9px] text-zinc-400">Diferencial: <strong class="text-white">${d.diff} pts</strong> (${escapeHtml(d.strong)}: ${d.strongScore > 0 ? '+' : ''}${d.strongScore} vs ${escapeHtml(d.weak)}: ${d.weakScore > 0 ? '+' : ''}${d.weakScore})</span>
+                <div class="text-right font-mono">
+                  <span class="${d.actionBadge.includes('COMPRA') ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40' : 'bg-rose-950/80 text-rose-400 border-rose-500/40'} border px-2.5 py-1 rounded-lg text-[11px] font-black block mb-1 shadow-sm">${escapeHtml(d.actionBadge)}</span>
+                  <span class="text-[10px] text-zinc-400">Diferencial: <strong class="text-white">${d.diff} pts</strong></span>
                 </div>
               </div>
-              
-              <!-- Desglose explícito de factores que otorgan/quitan fuerza -->
-              <div class="pt-2 border-t border-zinc-800/80 text-[10px] space-y-1 font-sans">
-                <div>
-                  <span class="font-bold text-emerald-400 font-mono">${escapeHtml(d.strong)} (+${d.strongScore}):</span>
-                  <span class="text-zinc-300 ml-1">
-                    ${strongBreakdown.length > 0 ? strongBreakdown.map(b => `<span class="inline-block bg-emerald-950/40 text-emerald-300 border border-emerald-800/50 px-1.5 py-0.2 rounded my-0.5">${escapeHtml(b.label)} (${b.score > 0 ? '+' : ''}${b.score})</span>`).join(' ') : '<span class="text-zinc-500">Sin eventos evaluados</span>'}
-                  </span>
+
+              <!-- Bloques Limpios para Divisa Fuerte vs Débil -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-sans">
+                
+                <!-- Divisa Fuerte -->
+                <div class="bg-[#090b12] border border-emerald-500/20 rounded-xl p-2.5 space-y-1.5">
+                  <div class="flex justify-between items-center border-b border-emerald-500/10 pb-1 font-mono">
+                    <span class="font-bold text-emerald-400 text-[11px]">${escapeHtml(d.strong)} (Fuerte)</span>
+                    <span class="bg-emerald-500/20 text-emerald-300 font-bold px-1.5 py-0.2 rounded text-[10px]">+${d.strongScore}</span>
+                  </div>
+                  <div class="space-y-1">
+                    ${strongBreakdown.length > 0 ? strongBreakdown.map(b => `
+                      <div class="flex items-center justify-between text-[11px] text-zinc-300 bg-zinc-900/60 px-2 py-1 rounded border border-zinc-800/50">
+                        <span class="truncate pr-1">${escapeHtml(b.label)}</span>
+                        <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
+                      </div>
+                    `).join('') : '<span class="text-[10px] text-zinc-500 block italic">Sin eventos</span>'}
+                  </div>
                 </div>
-                <div>
-                  <span class="font-bold text-rose-400 font-mono">${escapeHtml(d.weak)} (${d.weakScore}):</span>
-                  <span class="text-zinc-300 ml-1">
-                    ${weakBreakdown.length > 0 ? weakBreakdown.map(b => `<span class="inline-block bg-rose-950/40 text-rose-300 border border-rose-800/50 px-1.5 py-0.2 rounded my-0.5">${escapeHtml(b.label)} (${b.score > 0 ? '+' : ''}${b.score})</span>`).join(' ') : '<span class="text-zinc-500">Sin eventos evaluados</span>'}
-                  </span>
+
+                <!-- Divisa Débil -->
+                <div class="bg-[#090b12] border border-rose-500/20 rounded-xl p-2.5 space-y-1.5">
+                  <div class="flex justify-between items-center border-b border-rose-500/10 pb-1 font-mono">
+                    <span class="font-bold text-rose-400 text-[11px]">${escapeHtml(d.weak)} (Débil)</span>
+                    <span class="bg-rose-500/20 text-rose-300 font-bold px-1.5 py-0.2 rounded text-[10px]">${d.weakScore}</span>
+                  </div>
+                  <div class="space-y-1">
+                    ${weakBreakdown.length > 0 ? weakBreakdown.map(b => `
+                      <div class="flex items-center justify-between text-[11px] text-zinc-300 bg-zinc-900/60 px-2 py-1 rounded border border-zinc-800/50">
+                        <span class="truncate pr-1">${escapeHtml(b.label)}</span>
+                        <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
+                      </div>
+                    `).join('') : '<span class="text-[10px] text-zinc-500 block italic">Sin eventos</span>'}
+                  </div>
                 </div>
+
               </div>
             </div>
           `;
@@ -1064,7 +1098,8 @@
       `;
 
       Object.keys(data).forEach(day => {
-        const events = data[day];
+        let rawEv = data[day] || [];
+        let events = rawEv.filter(e => isWhitelisted(e.ccy, e.event));
         if (!events || events.length === 0) return;
         const translatedDay = translateDayToSpanish(day);
 
@@ -1087,7 +1122,10 @@
             <tbody>
         `;
 
+        let currentBlockEvents = [];
+
         events.forEach((item, idx) => {
+          currentBlockEvents.push(item);
           const badgeClass = `badge-${['USD','EUR','GBP','JPY','CAD','AUD','NZD','CHF','CNH','CNY'].includes(item.ccy) ? item.ccy : 'DEFAULT'}`;
           html += `
             <tr style="border-bottom: 1px solid #E2E8F0;">
@@ -1106,8 +1144,8 @@
           const nextCategory = nextItem ? getCategorySentimentTitle(nextItem.ccy, nextItem.event) : null;
 
           if (!nextItem || nextItem.ccy !== item.ccy || nextCategory !== currentCategory) {
-            const categoryTitle = currentCategory;
-            const categoryId = `${day}-${item.ccy}-${categoryTitle}`.replace(/[^a-zA-Z0-9]/g, '-');
+            const smartTitle = getSmartGroupTitle(item.ccy, currentBlockEvents);
+            const categoryId = `${day}-${item.ccy}-${currentCategory}`.replace(/[^a-zA-Z0-9]/g, '-');
             const scoreItem = globalState.categoryScores[categoryId];
             const scoreVal = scoreItem ? scoreItem.score : 0;
             const formattedVal = scoreVal > 0 ? `+${scoreVal}` : scoreVal;
@@ -1115,7 +1153,7 @@
             html += `
               <tr style="background-color: #FDF8E7; border-top: 1px solid #D9D9D9; border-bottom: 1px solid #D9D9D9;">
                 <td colspan="6" style="padding: 5px 8px; font-style: italic; font-weight: bold; color: #854D0E; font-size: 9px;">
-                  ${escapeHtml(categoryTitle)}
+                  ${escapeHtml(smartTitle)}
                 </td>
                 <td style="padding: 4px; text-align: center; border-left: 1px solid #CBD5E1;">
                   <span style="display: inline-block; padding: 1px 6px; border-radius: 3px; font-weight: bold; font-size: 9px; font-family: monospace;">
@@ -1124,6 +1162,8 @@
                 </td>
               </tr>
             `;
+
+            currentBlockEvents = [];
           }
         });
 
