@@ -1,5 +1,789 @@
 <!DOCTYPE html>
+<html lang="en"><!DOCTYPE html>
 <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forex Fundamental Valuation & Sentiment Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0b0e14; color: #e1e7ef; font-family: 'Inter', system-ui, sans-serif; }
+        .bg-card { background-color: #151a23; }
+        .bg-card-hover:hover { background-color: #1c2330; }
+        .border-dark { border-color: #242b38; }
+        .bar-long { background-color: #26a69a; }
+        .bar-short { background-color: #ef5350; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-dark pb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-chart-bar text-blue-500"></i> Fundamental Valuation & Sentiment Dashboard
+                </h1>
+                <p class="text-sm text-gray-400 mt-1">Calculates economic indicator net changes, currency totals, and cross-pair biases across all 28 standard forex pairs.</p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+                <!-- Auto Fetch Button -->
+                <button id="fetchBtn" onclick="autoUpdateData()" class="px-3.5 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded border border-emerald-500 transition flex items-center gap-1.5 shadow cursor-pointer">
+                    <i class="fa-solid fa-cloud-arrow-down" id="fetchIcon"></i> Auto-Fetch Data
+                </button>
+                <button onclick="resetToDefaults()" class="px-3 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-dark transition cursor-pointer">
+                    <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Currency Summary Score Cards -->
+        <div id="currencySummary" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+            <!-- Dynamic Score Badges -->
+        </div>
+
+        <!-- CURRENCY STRENGTH BAR CHART -->
+        <div class="bg-card rounded-lg border border-dark p-4">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-sm font-semibold text-gray-300 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-column text-blue-400"></i> Currency Total Valuation Ranking
+                </h3>
+                <span id="lastUpdatedNotice" class="text-xs text-gray-500">Last updated: Local Default</span>
+            </div>
+            <div class="h-44 w-full">
+                <canvas id="currencyBarChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap gap-2 border-b border-dark pb-2">
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-2 rounded-t font-semibold text-sm transition bg-blue-600 text-white cursor-pointer">
+                <i class="fa-solid fa-sliders mr-2"></i> Cross Pairs Sentiment (28)
+            </button>
+            <button onclick="switchTab('USD')" id="tab-USD" class="tab-btn px-3 py-2 rounded-t font-semibold text-sm transition text-gray-400 hover:text-white bg-card cursor-pointer">USD</button>
+            <button onclick="switchTab('EUR')" id="tab-EUR" class="tab-btn px-3 py-2 rounded-t font-semibold text-sm transition text-gray-400 hover:text-white bg-card cursor-pointer">EUR</button>
+            <button onclick="switchTab('GBP')" id="tab-GBP" class="tab-btn px-3 py-2 rounded-t font-semibold text-sm transition text-gray-400 hover:text-white bg-card cursor-pointer">GBP</button>
+            <button onclick="switchTab('JPY')" id="tab-JPY" class="tab-btn px-3 py-2 rounded-t font-semibold text-sm transition text-gray-400 hover:text-white bg-card cursor-pointer">JPY</button>
+            <button onclick="switchTab('AUD')" id="tab-AUD" class="tab-btn px-3 py-2 rounded-t font-semibold text-sm transition text-gray-400 hover:text-white bg-card cursor-pointer">AUD</button>
+            <button onclick="switchTab('NZD')" id="tab-NZD" class="tab-btn px-3 py-2 rounded-t font-semibold text-sm transition text-gray-400 hover:text-white bg-card cursor-pointer">NZD</button>
+            <button onclick="switchTab('CAD')" id="tab-CAD" class="tab-btn px-3 py-2 rounded-t font-semibold text-sm transition text-gray-400 hover:text-white bg-card cursor-pointer">CAD</button>
+            <button onclick="switchTab('CHF')" id="tab-CHF" class="tab-btn px-3 py-2 rounded-t font-semibold text-sm transition text-gray-400 hover:text-white bg-card cursor-pointer">CHF</button>
+        </div>
+
+        <!-- TAB CONTENT: Dashboard (Sentiment Chart & Controls) -->
+        <div id="view-dashboard" class="tab-view space-y-4">
+            <div class="bg-card rounded-lg border border-dark p-4">
+                
+                <!-- Controls Toolbar for Sorting & Filtering -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-3 border-b border-dark">
+                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-left-right-to-line text-green-400"></i> Pair Sentiment & Directional Bias
+                    </h2>
+
+                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                        <!-- Sort Selector -->
+                        <div class="flex items-center gap-1 bg-gray-900 border border-dark rounded px-2 py-1 text-xs text-gray-300">
+                            <i class="fa-solid fa-sort text-blue-400"></i>
+                            <span class="text-gray-500 mr-1">Sort:</span>
+                            <select id="sortSelect" onchange="setSort(this.value)" class="bg-transparent text-white font-medium focus:outline-none cursor-pointer">
+                                <option value="divergence" class="bg-gray-900">Highest Divergence (|Diff|)</option>
+                                <option value="bullish" class="bg-gray-900">Most Bullish (+Diff)</option>
+                                <option value="bearish" class="bg-gray-900">Most Bearish (-Diff)</option>
+                                <option value="default" class="bg-gray-900">Default Pair Order</option>
+                            </select>
+                        </div>
+
+                        <!-- Filter Selector -->
+                        <div class="flex items-center gap-1 bg-gray-900 border border-dark rounded px-2 py-1 text-xs text-gray-300">
+                            <i class="fa-solid fa-filter text-amber-400"></i>
+                            <span class="text-gray-500 mr-1">Filter:</span>
+                            <select id="filterSelect" onchange="setFilter(this.value)" class="bg-transparent text-white font-medium focus:outline-none cursor-pointer">
+                                <option value="all" class="bg-gray-900">All Pairs (28)</option>
+                                <option value="strong" class="bg-gray-900">Strong Divergence (|Diff| ≥ 8)</option>
+                                <option value="bullish" class="bg-gray-900">Bullish Pairs Only</option>
+                                <option value="bearish" class="bg-gray-900">Bearish Pairs Only</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sentiment Bars Container -->
+                <div id="sentimentBarsContainer" class="space-y-3">
+                    <!-- Dynamic rows -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: Currency Detail Tables -->
+        <div id="view-currency" class="tab-view hidden">
+            <div class="bg-card rounded-lg border border-dark overflow-hidden">
+                <div class="p-4 border-b border-dark flex justify-between items-center">
+                    <h2 id="currencyDetailTitle" class="text-lg font-semibold text-white">USD Indicators</h2>
+                    <span id="currencyDetailTotal" class="text-base font-bold text-blue-400">Total Valuation: +5</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-900 text-gray-400 uppercase text-xs">
+                            <tr>
+                                <th class="p-3">Indicator</th>
+                                <th class="p-3 w-28">Previous</th>
+                                <th class="p-3 w-28">Forecast</th>
+                                <th class="p-3 w-28">Actual</th>
+                                <th class="p-3 text-right">Net Change</th>
+                                <th class="p-3 text-center">Valuation Score</th>
+                                <th class="p-3 text-right">Weight</th>
+                            </tr>
+                        </thead>
+                        <tbody id="currencyTableBody" class="divide-y divide-gray-800">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const defaultData = {
+            "USD": [
+                { name: "ISM Mfg PMI", previous: 52.7, forecast: 53.3, actual: 54.0, type: "PMI", weight: "5.0" },
+                { name: "ISM Services PMI", previous: 53.6, forecast: 53.7, actual: 54.5, type: "PMI", weight: "5.0" },
+                { name: "CPI MoM (Headline)", previous: 0.006, forecast: 0.005, actual: 0.005, type: "CPI", weight: "5.0" },
+                { name: "Unemployment Rate", previous: 0.043, forecast: 0.043, actual: 0.043, type: "UNEMP_RATE", weight: "5.0" },
+                { name: "NFP", previous: 115, forecast: 85, actual: 172, type: "NFP", weight: "5.0" },
+                { name: "Retail Sales MoM", previous: 0.005, forecast: 0.005, actual: 0.01, type: "PCT_GROWTH", weight: "4.0" },
+                { name: "CB Consumer Confidence", previous: 92.2, forecast: 92.4, actual: 90.8, type: "CONFIDENCE", weight: "4.0" },
+                { name: "NFIB Small Business Index", previous: 95.9, forecast: 96.0, actual: 95.3, type: "INDEX_SMALL", weight: "3.0" },
+                { name: "Atlanta Fed GDPNow", previous: 0.03, forecast: 0.03, actual: 0.033, type: "PCT_GROWTH", weight: "4.0" }
+            ],
+            "EUR": [
+                { name: "HCOB Mfg PMI", previous: 51.4, forecast: 51.5, actual: 52.0, type: "PMI", weight: "High" },
+                { name: "HCOB Services PMI", previous: 49.4, forecast: 49.8, actual: 51.6, type: "PMI", weight: "High" },
+                { name: "CPI MoM", previous: 0.001, forecast: -0.001, actual: -0.001, type: "CPI", weight: "High" },
+                { name: "Unemployment Rate", previous: 0.063, forecast: 6.3, actual: 0.063, type: "EUR_UNEMP_FIXED", weight: "Med" },
+                { name: "Germany Unemp Change", previous: -1, forecast: 5, actual: 6, type: "GER_UNEMP_CHANGE", weight: "Med" },
+                { name: "Retail Sales MoM", previous: -0.003, forecast: 0.002, actual: 0.002, type: "PCT_GROWTH", weight: "Med" },
+                { name: "Consumer Confidence", previous: -17.7, forecast: -17.7, actual: -17.7, type: "CONFIDENCE", weight: "Low" },
+                { name: "IFO Business Climate", previous: 85.0, forecast: 85.6, actual: 85.6, type: "INDEX_SMALL", weight: "Med" },
+                { name: "Industrial Production MoM", previous: 0.003, forecast: 0.003, actual: -0.002, type: "PCT_GROWTH", weight: "Low" }
+            ],
+            "GBP": [
+                { name: "S&P Mfg PMI", previous: 52.5, forecast: 52.0, actual: 52.8, type: "PMI", weight: "5.0" },
+                { name: "S&P Services PMI", previous: 48.8, forecast: 49.4, actual: 51.8, type: "PMI", weight: "5.0" },
+                { name: "CPI MoM", previous: 0.001, forecast: 0.001, actual: 0.002, type: "CPI", weight: "5.0" },
+                { name: "Unemployment Rate", previous: 0.049, forecast: 0.049, actual: 0.049, type: "UNEMP_RATE", weight: "5.0" },
+                { name: "Claimant Count", previous: 1.3, forecast: 29.4, actual: 6.7, type: "GBP_CLAIMANT", weight: "4.0" },
+                { name: "Retail Sales MoM", previous: 0.012, forecast: -0.003, actual: 0.01, type: "GBP_RETAIL", weight: "4.0" },
+                { name: "GfK Consumer Confidence", previous: -23.0, forecast: -24.0, actual: -23.0, type: "CONFIDENCE", weight: "4.0" },
+                { name: "CBI Industrial Trends", previous: -41.0, forecast: -33.0, actual: -45.0, type: "SURVEY_5", weight: "3.0" },
+                { name: "Monthly GDP", previous: -0.001, forecast: 0.0, actual: 0.001, type: "CPI", weight: "5.0" }
+            ],
+            "JPY": [
+                { name: "Jibun Mfg PMI", previous: 54.5, forecast: 54.9, actual: 54.8, type: "PMI", weight: "5.0" },
+                { name: "Jibun Services PMI", previous: 50.0, forecast: 51.8, actual: 52.2, type: "PMI", weight: "5.0" },
+                { name: "Tokyo CPI MoM", previous: 0.001, forecast: 0.002, actual: 0.003, type: "CPI", weight: "5.0" },
+                { name: "Unemployment Rate", previous: 0.025, forecast: 0.025, actual: 0.025, type: "UNEMP_RATE", weight: "5.0" },
+                { name: "Cash Earnings MoM", previous: 0.006, forecast: 0.008, actual: 0.011, type: "PCT_GROWTH", weight: "5.0" },
+                { name: "Retail Sales MoM", previous: 0.004, forecast: 0.003, actual: 0.006, type: "PCT_GROWTH", weight: "4.0" },
+                { name: "Consumer Survey", previous: 33.6, forecast: 34.1, actual: 33.8, type: "PMI", weight: "4.0" },
+                { name: "Reuters Tankan", previous: 13.0, forecast: 13.0, actual: 13.0, type: "SURVEY_5", weight: "4.0" },
+                { name: "JCER Monthly GDP", previous: 0.001, forecast: 0.002, actual: 0.003, type: "CPI", weight: "4.0" }
+            ],
+            "AUD": [
+                { name: "Judo Mfg PMI", previous: 50.7, forecast: 51.2, actual: 51.5, type: "PMI", weight: "5.0" },
+                { name: "Judo Services PMI", previous: 48.7, forecast: 49.9, actual: 50.5, type: "AUD_SERVICES", weight: "5.0" },
+                { name: "CPI Indicator MoM", previous: 0.042, forecast: 0.043, actual: 0.040, type: "CPI", weight: "5.0" },
+                { name: "Unemployment Rate", previous: 0.044, forecast: 0.044, actual: 0.044, type: "UNEMP_RATE", weight: "5.0" },
+                { name: "Employment Change", previous: 44.0, forecast: 16.4, actual: 76.3, type: "JOBS_K", weight: "5.0" },
+                { name: "Retail Sales MoM", previous: 0.001, forecast: 0.003, actual: 0.006, type: "PCT_GROWTH", weight: "4.0" },
+                { name: "Westpac Sentiment", previous: 82.4, forecast: 83.0, actual: 84.6, type: "CONFIDENCE", weight: "4.0" },
+                { name: "NAB Business Confidence", previous: -14.0, forecast: -14.0, actual: -5.0, type: "SURVEY_5", weight: "4.0" },
+                { name: "AIG Industry Index", previous: -5.2, forecast: -4.0, actual: -3.1, type: "SURVEY_5", weight: "3.0" }
+            ],
+            "NZD": [
+                { name: "BusNZ Mfg PMI", previous: 51.3, forecast: 51.3, actual: 59.7, type: "PMI", weight: "5.0" },
+                { name: "BusNZ Services PMI", previous: 48.0, forecast: 48.0, actual: 50.6, type: "PMI", weight: "5.0" },
+                { name: "Food Prices MoM", previous: 0.010, forecast: 0.010, actual: 0.006, type: "CPI", weight: "4.0" },
+                { name: "Unemployment Rate", previous: 0.043, forecast: 0.044, actual: 0.046, type: "UNEMP_RATE", weight: "5.0" },
+                { name: "MEI Jobs Change", previous: 0.001, forecast: 0.0, actual: -0.002, type: "CPI", weight: "4.0" },
+                { name: "Card Transactions", previous: 0.016, forecast: 0.016, actual: -0.014, type: "CARD_TRANS", weight: "4.0" },
+                { name: "ANZ Consumer Confidence", previous: 85.0, forecast: 86.0, actual: 83.2, type: "CONFIDENCE", weight: "4.0" },
+                { name: "ANZ Business Confidence", previous: 36.6, forecast: 36.6, actual: 56.1, type: "ANZ_BIZ", weight: "4.0" },
+                { name: "BusNZ Activity Index", previous: 0.008, forecast: 0.01, actual: 0.005, type: "PCT_GROWTH", weight: "4.0" }
+            ],
+            "CAD": [
+                { name: "S&P Mfg PMI", previous: 52.9, forecast: 52.9, actual: 53.0, type: "PMI", weight: "5.0" },
+                { name: "Ivey PMI", previous: 58.2, forecast: 59.1, actual: 56.2, type: "PMI", weight: "5.0" },
+                { name: "CPI MoM", previous: 0.010, forecast: -0.002, actual: -0.004, type: "CPI", weight: "5.0" },
+                { name: "Unemployment Rate", previous: 0.066, forecast: 0.066, actual: 0.065, type: "UNEMP_RATE", weight: "5.0" },
+                { name: "Net Employment Change", previous: 87.8, forecast: 11.2, actual: 18.2, type: "CAD_JOBS", weight: "5.0" },
+                { name: "Retail Sales MoM", previous: 0.004, forecast: 0.01, actual: 0.01, type: "PCT_GROWTH", weight: "4.0" },
+                { name: "CB Consumer Survey", previous: 48.95, forecast: 48.95, actual: 49.42, type: "PMI", weight: "4.0" },
+                { name: "CFIB Business Barometer", previous: 53.1, forecast: 53.5, actual: 52.8, type: "PMI", weight: "3.0" },
+                { name: "Monthly GDP MoM", previous: 0.001, forecast: 0.004, actual: 0.005, type: "CPI", weight: "5.0" }
+            ],
+            "CHF": [
+                { name: "Procure Mfg PMI", previous: 57.3, forecast: 56.4, actual: 54.3, type: "PMI", weight: "5.0" },
+                { name: "Procure Services PMI", previous: 49.8, forecast: 50.2, actual: 49.5, type: "PMI", weight: "5.0" },
+                { name: "CPI MoM", previous: 0.002, forecast: 0.001, actual: 0.0, type: "CPI", weight: "5.0" },
+                { name: "Unemp Rate", previous: 0.030, forecast: 0.030, actual: 0.031, type: "UNEMP_RATE", weight: "5.0" },
+                { name: "Unemp Change", previous: 1.2, forecast: 1.0, actual: 1.8, type: "CHF_UNEMP_CHANGE", weight: "4.0" },
+                { name: "Retail Sales MoM", previous: 0.002, forecast: 0.004, actual: -0.001, type: "PCT_GROWTH", weight: "4.0" },
+                { name: "Consumer Sentiment", previous: -38.0, forecast: -35.0, actual: -36.0, type: "CONFIDENCE", weight: "4.0" },
+                { name: "KOF Indicator", previous: 99.8, forecast: 99.0, actual: 101.2, type: "CONFIDENCE", weight: "4.0" },
+                { name: "SECO Economic Indicators", previous: 0.011, forecast: 0.012, type: "CPI", actual: 0.010, weight: "5.0" }
+            ]
+        };
+
+        const pairsList = [
+            "EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDCAD", "USDCHF", "USDJPY",
+            "EURGBP", "EURAUD", "EURNZD", "EURCAD", "EURCHF", "EURJPY",
+            "GBPAUD", "GBPNZD", "GBPCAD", "GBPCHF", "GBPJPY",
+            "AUDNZD", "AUDCAD", "AUDCHF", "AUDJPY",
+            "NZDCAD", "NZDCHF", "NZDJPY",
+            "CADCHF", "CADJPY", "CHFJPY"
+        ];
+
+        let appData = JSON.parse(JSON.stringify(defaultData));
+        let activeTab = 'dashboard';
+        let currentSort = 'divergence';
+        let currentFilter = 'all';
+        let barChartInstance = null;
+
+        // SMART NORMALIZER: Safely converts manual text inputs or API values to raw formula decimals
+        function parseInputValue(input, type) {
+            if (input === null || input === undefined || input === '') return 0.0;
+            
+            let strVal = input.toString().trim().toUpperCase();
+            if (strVal.includes('K')) strVal = strVal.replace('K', '');
+            
+            const isExplicitPercent = strVal.includes('%');
+            const cleanStr = strVal.replace('%', '');
+            let num = parseFloat(cleanStr);
+            
+            if (isNaN(num)) return 0.0;
+
+            const percentTypes = ["CPI", "UNEMP_RATE", "PCT_GROWTH", "EUR_UNEMP_FIXED", "CARD_TRANS"];
+            
+            if (percentTypes.includes(type)) {
+                if (isExplicitPercent) {
+                    return num / 100.0;
+                }
+                if (Math.abs(num) >= 0.08) {
+                    return num / 100.0;
+                }
+            }
+            return num;
+        }
+
+        function evaluateIndicator(ind) {
+            let netChange = 0;
+            if (ind.type === "GBP_CLAIMANT" || ind.type === "GBP_RETAIL" || ind.type === "CAD_JOBS") {
+                netChange = (ind.actual !== null && ind.forecast !== null) ? (ind.actual - ind.forecast) : 0;
+            } else {
+                netChange = (ind.actual !== null && ind.previous !== null) ? (ind.actual - ind.previous) : 0;
+            }
+            netChange = parseFloat(netChange.toFixed(4));
+
+            let score = 0;
+            switch(ind.type) {
+                case "PMI":
+                    if (netChange >= 2) score = 2;
+                    else if (netChange >= 0.5) score = 1;
+                    else if (netChange > -0.5) score = 0;
+                    else if (netChange > -2) score = -1;
+                    else score = -2;
+                    break;
+                case "AUD_SERVICES":
+                    if (netChange >= 1.5) score = 2;
+                    else if (netChange >= 0.5) score = 1;
+                    else if (netChange > -0.5) score = 0;
+                    else if (netChange > -1.5) score = -1;
+                    else score = -2;
+                    break;
+                case "CPI":
+                    if (netChange >= 0.003) score = 2;
+                    else if (netChange >= 0.001) score = 1;
+                    else if (netChange > -0.001) score = 0;
+                    else if (netChange > -0.003) score = -1;
+                    else score = -2;
+                    break;
+                case "UNEMP_RATE":
+                    if (netChange <= -0.002) score = 2;
+                    else if (netChange <= -0.001) score = 1;
+                    else if (netChange === 0) score = 0;
+                    else if (netChange < 0.002) score = -1;
+                    else score = -2;
+                    break;
+                case "NFP":
+                    if (netChange >= 50) score = 2;
+                    else if (netChange >= 15) score = 1;
+                    else if (netChange > -15) score = 0;
+                    else if (netChange > -50) score = -1;
+                    else score = -2;
+                    break;
+                case "JOBS_K":
+                    if (netChange >= 30) score = 2;
+                    else if (netChange >= 10) score = 1;
+                    else if (netChange > -10) score = 0;
+                    else if (netChange > -30) score = -1;
+                    else score = -2;
+                    break;
+                case "PCT_GROWTH":
+                    if (netChange >= 0.005) score = 2;
+                    else if (netChange >= 0.002) score = 1;
+                    else if (netChange > -0.002) score = 0;
+                    else if (netChange > -0.005) score = -1;
+                    else score = -2;
+                    break;
+                case "CONFIDENCE":
+                    if (netChange >= 3) score = 2;
+                    else if (netChange >= 1) score = 1;
+                    else if (netChange > -1) score = 0;
+                    else if (netChange > -3) score = -1;
+                    else score = -2;
+                    break;
+                case "INDEX_SMALL":
+                    if (netChange >= 2) score = 2;
+                    else if (netChange >= 0.8) score = 1;
+                    else if (netChange > -0.8) score = 0;
+                    else if (netChange > -2) score = -1;
+                    else score = -2;
+                    break;
+                case "EUR_UNEMP_FIXED":
+                    score = 0;
+                    break;
+                case "GER_UNEMP_CHANGE":
+                    if (ind.actual <= -10) score = 2;
+                    else if (ind.actual < 0) score = 1;
+                    else if (ind.actual === 0) score = 0;
+                    else if (ind.actual < 10) score = -1;
+                    else score = -2;
+                    break;
+                case "GBP_CLAIMANT":
+                    if (netChange <= -15) score = 2;
+                    else if (netChange <= -5) score = 1;
+                    else if (netChange > -5 && netChange < 5) score = 0;
+                    else if (netChange < 15) score = -1;
+                    else score = -2;
+                    break;
+                case "GBP_RETAIL":
+                    if (netChange >= 0.005) score = 2;
+                    else if (netChange >= 0.002) score = 1;
+                    else if (netChange > -0.002 && netChange < 0.002) score = 0;
+                    else if (netChange > -0.005) score = -1;
+                    else score = -2;
+                    break;
+                case "SURVEY_5":
+                    if (netChange >= 5) score = 2;
+                    else if (netChange >= 2) score = 1;
+                    else if (netChange > -2 && netChange < 2) score = 0;
+                    else if (netChange > -5) score = -1;
+                    else score = -2;
+                    break;
+                case "ANZ_BIZ":
+                    if (netChange >= 10) score = 2;
+                    else if (netChange >= 3) score = 1;
+                    else if (netChange > -3 && netChange < 3) score = 0;
+                    else if (netChange > -10) score = -1;
+                    else score = -2;
+                    break;
+                case "CARD_TRANS":
+                    if (netChange >= 0.01) score = 2;
+                    else if (netChange >= 0.003) score = 1;
+                    else if (netChange > -0.003 && netChange < 0.003) score = 0;
+                    else if (netChange > -0.01) score = -1;
+                    else score = -2;
+                    break;
+                case "CAD_JOBS":
+                    if (netChange >= 15) score = 2;
+                    else if (netChange >= 5) score = 1;
+                    else if (netChange > -5 && netChange < 5) score = 0;
+                    else if (netChange > -15) score = -1;
+                    else score = -2;
+                    break;
+                case "CHF_UNEMP_CHANGE":
+                    if (netChange <= -1) score = 2;
+                    else if (netChange <= -0.3) score = 1;
+                    else if (netChange > -0.3 && netChange < 0.3) score = 0;
+                    else if (netChange < 1) score = -1;
+                    else score = -2;
+                    break;
+                default:
+                    score = 0;
+            }
+
+            return { netChange, score };
+        }
+
+        function calculateTotals() {
+            const totals = {};
+            for (const c in appData) {
+                let sum = 0;
+                appData[c].forEach(ind => {
+                    const evalResult = evaluateIndicator(ind);
+                    ind.netChange = evalResult.netChange;
+                    ind.score = evalResult.score;
+                    sum += ind.score;
+                });
+                totals[c] = sum;
+            }
+            return totals;
+        }
+
+        function renderSummaryScores(totals) {
+            const container = document.getElementById('currencySummary');
+            container.innerHTML = '';
+            for (const c in totals) {
+                const score = totals[c];
+                const scoreColor = score > 0 ? 'text-green-400' : score < 0 ? 'text-red-400' : 'text-gray-400';
+                container.innerHTML += `
+                    <div class="bg-card p-3 rounded-lg border border-dark text-center cursor-pointer bg-card-hover" onclick="switchTab('${c}')">
+                        <div class="text-xs font-bold text-gray-400">${c}</div>
+                        <div class="text-xl font-extrabold ${scoreColor}">${score > 0 ? '+' + score : score}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderCurrencyBarChart(totals) {
+            const ctx = document.getElementById('currencyBarChart').getContext('2d');
+            const currencies = Object.keys(totals);
+            const scores = currencies.map(c => totals[c]);
+            const backgroundColors = scores.map(s => s > 0 ? '#26a69a' : s < 0 ? '#ef5350' : '#9ca3af');
+
+            if (barChartInstance) {
+                barChartInstance.data.labels = currencies;
+                barChartInstance.data.datasets[0].data = scores;
+                barChartInstance.data.datasets[0].backgroundColor = backgroundColors;
+                barChartInstance.update();
+            } else {
+                barChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: currencies,
+                        datasets: [{
+                            label: 'Valuation Total',
+                            data: scores,
+                            backgroundColor: backgroundColors,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ` Score: ${ctx.raw > 0 ? '+' + ctx.raw : ctx.raw}`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                grid: { color: '#1c2330' },
+                                ticks: { color: '#9ca3af' }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#ffffff', font: { weight: 'bold' } }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function setSort(val) {
+            currentSort = val;
+            const totals = calculateTotals();
+            renderSentimentBars(totals);
+        }
+
+        function setFilter(val) {
+            currentFilter = val;
+            const totals = calculateTotals();
+            renderSentimentBars(totals);
+        }
+
+        function renderSentimentBars(totals) {
+            const container = document.getElementById('sentimentBarsContainer');
+            container.innerHTML = '';
+
+            let pairsData = pairsList.map(pair => {
+                const base = pair.substring(0, 3);
+                const quote = pair.substring(3, 6);
+                const baseScore = totals[base] || 0;
+                const quoteScore = totals[quote] || 0;
+                const diff = baseScore - quoteScore;
+                const absDiff = Math.abs(diff);
+
+                let longPct = Math.round(50 + (diff * 2.5));
+                longPct = Math.max(5, Math.min(95, longPct));
+                const shortPct = 100 - longPct;
+
+                let biasText = 'Neutral';
+                let badgeBg = 'bg-gray-800 text-gray-300 border-gray-700';
+                
+                if (diff >= 8) {
+                    biasText = 'Strong Bullish';
+                    badgeBg = 'bg-emerald-950/80 text-emerald-400 border-emerald-800/60';
+                } else if (diff >= 3) {
+                    biasText = 'Bullish';
+                    badgeBg = 'bg-green-950/60 text-green-400 border-green-800/40';
+                } else if (diff <= -8) {
+                    biasText = 'Strong Bearish';
+                    badgeBg = 'bg-rose-950/80 text-rose-400 border-rose-800/60';
+                } else if (diff <= -3) {
+                    biasText = 'Bearish';
+                    badgeBg = 'bg-red-950/60 text-red-400 border-red-800/40';
+                }
+
+                return { pair, base, quote, baseScore, quoteScore, diff, absDiff, longPct, shortPct, biasText, badgeBg };
+            });
+
+            // Filter
+            if (currentFilter === 'strong') {
+                pairsData = pairsData.filter(p => p.absDiff >= 8);
+            } else if (currentFilter === 'bullish') {
+                pairsData = pairsData.filter(p => p.diff > 0);
+            } else if (currentFilter === 'bearish') {
+                pairsData = pairsData.filter(p => p.diff < 0);
+            }
+
+            // Sort
+            if (currentSort === 'divergence') {
+                pairsData.sort((a, b) => b.absDiff - a.absDiff);
+            } else if (currentSort === 'bullish') {
+                pairsData.sort((a, b) => b.diff - a.diff);
+            } else if (currentSort === 'bearish') {
+                pairsData.sort((a, b) => a.diff - b.diff);
+            }
+
+            if (pairsData.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center text-gray-500 italic border border-dark rounded bg-gray-900/40">No currency pairs match the selected filter.</div>`;
+                return;
+            }
+
+            pairsData.forEach(p => {
+                const diffFormatted = p.diff > 0 ? '+' + p.diff : p.diff;
+
+                container.innerHTML += `
+                    <div class="bg-gray-900/80 p-3 rounded-lg border border-dark hover:border-gray-700 transition space-y-2">
+                        <!-- Row 1: Pair, Badge, Score Diff -->
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-white text-base tracking-wide">${p.pair}</span>
+                                <span class="text-[11px] font-semibold px-2 py-0.5 rounded border ${p.badgeBg}">${p.biasText}</span>
+                            </div>
+                            <div class="text-xs text-gray-400 font-mono">
+                                Score Diff: <span class="font-bold text-white">${diffFormatted}</span> 
+                                <span class="text-gray-500 text-[11px]">(${p.baseScore} vs ${p.quoteScore})</span>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Short % | Bar | Long % -->
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs text-rose-400 font-bold w-10 text-right shrink-0">${p.shortPct}%</span>
+                            <div class="flex-1 h-4 bg-gray-800 rounded-md overflow-hidden flex shadow-inner">
+                                <div class="bar-short h-full transition-all duration-300" style="width: ${p.shortPct}%" title="Short / Bearish: ${p.shortPct}%"></div>
+                                <div class="bar-long h-full transition-all duration-300" style="width: ${p.longPct}%" title="Long / Bullish: ${p.longPct}%"></div>
+                            </div>
+                            <span class="text-xs text-emerald-400 font-bold w-10 shrink-0">${p.longPct}%</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderCurrencyTable(curr) {
+            document.getElementById('currencyDetailTitle').innerText = `${curr} Economic Valuation Indicators`;
+            const totals = calculateTotals();
+            const totalScore = totals[curr];
+            document.getElementById('currencyDetailTotal').innerText = `Total Valuation: ${totalScore > 0 ? '+' + totalScore : totalScore}`;
+            
+            const tbody = document.getElementById('currencyTableBody');
+            tbody.innerHTML = '';
+
+            appData[curr].forEach((ind, idx) => {
+                const scoreColor = ind.score > 0 ? 'text-green-400 font-bold' : ind.score < 0 ? 'text-red-400 font-bold' : 'text-gray-400';
+                const isPercentType = ["CPI", "UNEMP_RATE", "PCT_GROWTH", "EUR_UNEMP_FIXED", "CARD_TRANS"].includes(ind.type);
+
+                // Format values with Excel-style percentage symbols
+                const formatDisplayVal = (val) => {
+                    if (val === null || val === undefined) return '';
+                    if (isPercentType) {
+                        return (val * 100).toFixed(2) + '%';
+                    }
+                    return val;
+                };
+
+                const formatNetChange = (val) => {
+                    if (val === null || val === undefined) return '-';
+                    if (isPercentType) {
+                        const pct = (val * 100).toFixed(2);
+                        return (val > 0 ? '+' + pct : pct) + '%';
+                    }
+                    return val > 0 ? '+' + val : val;
+                };
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-800/50">
+                        <td class="p-3 font-medium text-white">${ind.name}</td>
+                        <td class="p-3">
+                            <input type="text" value="${formatDisplayVal(ind.previous)}" 
+                            onchange="updateValue('${curr}', ${idx}, 'previous', this.value)"
+                            class="w-full bg-gray-900 border border-dark rounded px-2 py-1 text-xs text-white focus:border-blue-500 outline-none font-mono">
+                        </td>
+                        <td class="p-3">
+                            <input type="text" value="${formatDisplayVal(ind.forecast)}" 
+                            onchange="updateValue('${curr}', ${idx}, 'forecast', this.value)"
+                            class="w-full bg-gray-900 border border-dark rounded px-2 py-1 text-xs text-white focus:border-blue-500 outline-none font-mono">
+                        </td>
+                        <td class="p-3">
+                            <input type="text" value="${formatDisplayVal(ind.actual)}" 
+                            onchange="updateValue('${curr}', ${idx}, 'actual', this.value)"
+                            class="w-full bg-gray-900 border border-dark rounded px-2 py-1 text-xs text-white focus:border-blue-500 outline-none font-mono">
+                        </td>
+                        <td class="p-3 text-right font-mono text-gray-300">${formatNetChange(ind.netChange)}</td>
+                        <td class="p-3 text-center font-mono ${scoreColor}">${ind.score > 0 ? '+' + ind.score : ind.score}</td>
+                        <td class="p-3 text-right text-gray-400">${ind.weight}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateValue(curr, index, field, val) {
+            const ind = appData[curr][index];
+            const normalizedVal = parseInputValue(val, ind.type);
+            appData[curr][index][field] = normalizedVal;
+            refreshApp();
+        }
+
+        // AUTOMATED FINNHUB API DATA FETCHING WITH 30-DAY WINDOW
+        async function autoUpdateData() {
+            const btn = document.getElementById('fetchBtn');
+            const icon = document.getElementById('fetchIcon');
+            
+            const apiKey = 'd9nr6n9r01qqbd5rpli0'; 
+            
+            // Look back 30 days to catch all recent economic releases
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const pastDateObj = new Date();
+            pastDateObj.setDate(pastDateObj.getDate() - 30);
+            const pastDate = pastDateObj.toISOString().split('T')[0];
+
+            const url = `https://finnhub.io/api/v1/calendar/economic?from=${pastDate}&to=${today}&token=${apiKey}`;
+
+            btn.disabled = true;
+            btn.classList.add('opacity-75');
+            icon.className = "fa-solid fa-spinner fa-spin";
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                let updatedCount = 0;
+
+                if (data && data.economicCalendar && Array.isArray(data.economicCalendar)) {
+                    // Sort descending so the most recent data comes first
+                    const releases = data.economicCalendar.sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0));
+
+                    releases.forEach(release => {
+                        if (!release.event) return;
+                        const releaseEvent = release.event.toLowerCase();
+
+                        for (const currency in appData) {
+                            appData[currency].forEach(ind => {
+                                const indName = ind.name.toLowerCase();
+                                
+                                // Flexible match between Finnhub event name & dashboard indicator name
+                                const isMatch = indName.includes(releaseEvent) || releaseEvent.includes(indName);
+
+                                if (isMatch) {
+                                    if (release.actual !== null && release.actual !== undefined) {
+                                        ind.actual = parseInputValue(release.actual, ind.type);
+                                        updatedCount++;
+                                    }
+                                    if (release.prev !== null && release.prev !== undefined) {
+                                        ind.previous = parseInputValue(release.prev, ind.type);
+                                    }
+                                    if (release.estimate !== null && release.estimate !== undefined) {
+                                        ind.forecast = parseInputValue(release.estimate, ind.type);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+
+                const dateStr = now.toLocaleDateString();
+                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('lastUpdatedNotice').innerText = `Last updated: ${dateStr} at ${timeStr} (${updatedCount} releases synced)`;
+
+                refreshApp();
+
+            } catch (err) {
+                alert("API Fetch Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
+                icon.className = "fa-solid fa-cloud-arrow-down";
+            }
+        }
+
+        function switchTab(tab) {
+            activeTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-card', 'text-gray-400');
+            });
+
+            document.getElementById(`tab-${tab}`).classList.remove('bg-card', 'text-gray-400');
+            document.getElementById(`tab-${tab}`).classList.add('bg-blue-600', 'text-white');
+
+            if (tab === 'dashboard') {
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                document.getElementById('view-currency').classList.add('hidden');
+            } else {
+                document.getElementById('view-dashboard').classList.add('hidden');
+                document.getElementById('view-currency').classList.remove('hidden');
+                renderCurrencyTable(tab);
+            }
+        }
+
+        function resetToDefaults() {
+            appData = JSON.parse(JSON.stringify(defaultData));
+            document.getElementById('lastUpdatedNotice').innerText = `Last updated: Local Default`;
+            refreshApp();
+        }
+
+        function refreshApp() {
+            const totals = calculateTotals();
+            renderSummaryScores(totals);
+            renderCurrencyBarChart(totals);
+            renderSentimentBars(totals);
+            if (activeTab !== 'dashboard') {
+                renderCurrencyTable(activeTab);
+            }
+        }
+
+        // Initialize App
+        refreshApp();
+    </script>
+</body>
+</html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
