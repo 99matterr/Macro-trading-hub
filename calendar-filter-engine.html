@@ -883,7 +883,7 @@
       return { pairName: `${base}/${quote}`, actionBadge: actionText, strong: strong, weak: weak };
     }
 
-    // EXTRAER DESGLOSE LIMPIO Y ELEGANTE PARA CADA DIVISA
+    // EXTRAER DESGLOSE DIRECTAMENTE DESDE LOS EVENTOS REALES DEL CALENDARIO (DAYSDATA)
     function getCurrencyScoreBreakdown(ccy) {
       const breakdown = [];
       const prev = parseInt(globalState.matrixPrev[ccy]) || 0;
@@ -891,16 +891,49 @@
         breakdown.push({ label: 'Fuerza Previa (Manual)', score: prev });
       }
 
+      const matchedCatIds = new Set();
+
+      if (globalState.daysData) {
+        Object.keys(globalState.daysData).forEach(day => {
+          let rawEv = globalState.daysData[day] || [];
+          let events = rawEv.filter(e => isWhitelisted(e.ccy, e.event) && e.ccy === ccy);
+          if (!events || events.length === 0) return;
+
+          let currentBlockEvents = [];
+          events.forEach((item, idx) => {
+            currentBlockEvents.push(item);
+            const nextItem = events[idx + 1];
+            const currentCategory = getCategorySentimentTitle(item.ccy, item.event);
+            const nextCategory = nextItem ? getCategorySentimentTitle(nextItem.ccy, nextItem.event) : null;
+
+            if (!nextItem || nextCategory !== currentCategory) {
+              const categoryId = `${day}-${item.ccy}-${currentCategory}`.replace(/[^a-zA-Z0-9]/g, '-');
+              const scoreObj = globalState.categoryScores[categoryId];
+
+              if (scoreObj && scoreObj.score !== 0) {
+                matchedCatIds.add(categoryId);
+                const uniqueNames = Array.from(new Set(currentBlockEvents.map(e => e.event.trim())));
+                const label = uniqueNames.join(' / ');
+                breakdown.push({ label: label, score: scoreObj.score });
+              }
+              currentBlockEvents = [];
+            }
+          });
+        });
+      }
+
+      // Fallback para puntuaciones previas sin asociar en el loop
       if (globalState.categoryScores) {
         Object.keys(globalState.categoryScores).forEach(catId => {
           const item = globalState.categoryScores[catId];
-          if (item && item.ccy === ccy && item.score !== 0) {
+          if (item && item.ccy === ccy && item.score !== 0 && !matchedCatIds.has(catId)) {
             let label = item.title || item.eventsSummary || 'Evento Macro';
             label = label.replace(new RegExp(`^${ccy}\\s*-\\s*`, 'i'), '');
             breakdown.push({ label: label, score: item.score });
           }
         });
       }
+
       return breakdown;
     }
 
