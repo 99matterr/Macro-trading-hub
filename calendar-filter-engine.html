@@ -94,7 +94,7 @@
         </div>
       </div>
 
-      <!-- ESCÁNER DE DIVERGENCIAS MACRO -->
+      <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS CON DESGLOSE DETALLADO -->
       <div id="divergenceAlertBox" class="hidden bg-cyan-950/20 border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3">
         <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2">
           <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
@@ -102,7 +102,7 @@
           </span>
           <span id="divergenceCountBadge" class="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded font-bold">0 Pares Aprobados</span>
         </div>
-        <div id="divergenceList" class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs"></div>
+        <div id="divergenceList" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs"></div>
       </div>
 
       <!-- MATRIZ VIVA DE FUERZA GLOBAL E INTERMERCADO -->
@@ -203,7 +203,7 @@
         'interest rate decision', 'monetary policy statement', 'press conference', 'meeting minutes', 
         'speaks', 'speech', 'president speaks', 'summary of opinions', 'fomc', 'ecb', 'boe', 'boc', 
         'rba', 'rbnz', 'snb', 'pboc', 'economic projections', 'dot plot', 'monetary policy assessment', 
-        'financial stability report', 'opec', 'testimony', 'budget', 'autumn statement', 'spring budget', 
+        'financial stability report', 'testimony', 'budget', 'autumn statement', 'spring budget', 
         'fiscal statement', 'statement', 'cash rate', 'overnight rate', 'policy rate', 'bank rate'
       ],
       USD: [
@@ -218,7 +218,7 @@
         'monetary policy report', 'cpi', 'ppi', 'ippi', 'gdp', 'employment change', 'unemployment rate', 
         'retail sales', 'trade balance', 'ivey pmi', 'boc business outlook', 'cfib',
         'consumer confidence', 'business confidence', 'building permits', 'housing starts', 
-        'crude oil inventories', 'eia', 'overnight rate', 'boc rate'
+        'overnight rate', 'boc rate'
       ],
       EUR: [
         'cpi', 'ppi', 'gdp', 'pmi', 'zew', 'retail sales', 'industrial production', 'trade balance', 
@@ -400,15 +400,22 @@
       if (e.target.files.length) processExcelFile(e.target.files[0]);
     }
 
+    // FILTRO WHITELIST + BLACKLIST (OPEC & PETRÓLEO DESCARTE AUTOMÁTICO)
     function isWhitelisted(ccy, eventName) {
       if (!eventName) return false;
       const lower = String(eventName).toLowerCase();
+
+      // Blacklist de exclusión (OPEC, Inventarios de Petróleo/Crudo)
+      const blacklist = ['opec', 'crude oil inventories', 'oil inventories', 'eia crude', 'gasoline inventories', 'distillate stocks', 'baker hughes'];
+      if (blacklist.some(term => lower.includes(term))) return false;
+
       if (lower.includes('fed regional') || lower.includes('mpc member') || lower.includes('executive board member')) return false;
       if (WHITELIST.UNIVERSAL.some(term => lower.includes(term))) return true;
       const terms = WHITELIST[ccy] || [];
       return terms.some(term => lower.includes(term));
     }
 
+    // CATEGORIZACIÓN CON SEPARACIÓN ESTRICTA DE PMIS (ISM vs S&P Global vs Ivey vs Tankan)
     function getCategorySentimentTitle(ccy, eventName) {
       if (!eventName) return `SENTIMIENTO DE ${ccy}`;
       const lower = eventName.toLowerCase();
@@ -416,7 +423,14 @@
       if (lower.includes('cpi') || lower.includes('pce') || lower.includes('rpi') || lower.includes('inflation') || lower.includes('tokyo') || lower.includes('consumer price') || lower.includes('hicp')) return `${ccy} - INFLACIÓN (IPC)`;
       if (lower.includes('ppi') || lower.includes('ippi') || lower.includes('producer price') || lower.includes('cgpi')) return `${ccy} - PRECIOS DE PRODUCTOR (IPP)`;
       if (lower.includes('unemployment') || lower.includes('employment') || lower.includes('jobless') || lower.includes('nfp') || lower.includes('adp') || lower.includes('claimant') || lower.includes('earnings') || lower.includes('household spending') || lower.includes('jolts') || lower.includes('job openings') || lower.includes('labor turnover') || lower.includes('employment cost') || lower.includes('eci') || lower.includes('challenger')) return `${ccy} - MERCADO LABORAL Y SALARIOS`;
-      if (lower.includes('pmi') || lower.includes('ism') || lower.includes('tankan') || lower.includes('ivey')) return `${ccy} - ÍNDICES PMI / TANKAN`;
+      
+      // Categorización Granular de PMIs
+      if (lower.includes('ism')) return `${ccy} - PMI ISM`;
+      if (lower.includes('s&p') || lower.includes('markit') || lower.includes('hcob') || lower.includes('caixin')) return `${ccy} - PMI S&P GLOBAL / CAIXIN`;
+      if (lower.includes('ivey')) return `${ccy} - PMI IVEY`;
+      if (lower.includes('tankan')) return `${ccy} - ENCUESTA TANKAN`;
+      if (lower.includes('pmi')) return `${ccy} - ÍNDICES PMI`;
+
       if (lower.includes('interest rate') || lower.includes('monetary policy') || lower.includes('ecb press') || lower.includes('fomc') || lower.includes('rate decision') || lower.includes('loan prime') || lower.includes('boj') || lower.includes('bank of japan') || lower.includes('meeting minutes') || lower.includes('speaks') || lower.includes('speech') || lower.includes('dot plot') || lower.includes('projections') || lower.includes('cash rate') || lower.includes('overnight rate') || lower.includes('bank rate') || lower.includes('ocr')) return `${ccy} - POLÍTICA MONETARIA Y TASAS`;
       if (lower.includes('retail sales')) return `${ccy} - VENTAS MINORISTAS`;
       if (lower.includes('trade balance') || lower.includes('exports') || lower.includes('imports') || lower.includes('current account')) return `${ccy} - BALANZA COMERCIAL`;
@@ -540,7 +554,7 @@
         if (['JP', 'JPN'].includes(ccy)) mappedCCY = 'JPY';
         if (['AU', 'AUS'].includes(ccy)) mappedCCY = 'AUD';
         if (['NZ', 'NZL'].includes(ccy)) mappedCCY = 'NZD';
-        if (['CN', 'CHN', 'CNY'].includes(ccy)) mappedCCY = 'CNH'; // Remaps CNY to CNH correctly
+        if (['CN', 'CHN', 'CNY'].includes(ccy)) mappedCCY = 'CNH';
 
         if (isWhitelisted(mappedCCY, event)) {
           if (!daysData[currentDay]) daysData[currentDay] = [];
@@ -613,6 +627,7 @@
       `}).join('');
     }
 
+    // MOSTRAR NOMBRES DE EVENTOS REALES EN LAS FILAS AMARILLAS
     function renderInteractiveCalendar() {
       const container = document.getElementById('interactiveCalendarContainer');
       container.innerHTML = '';
@@ -663,7 +678,11 @@
               <tbody>
         `;
 
+        let currentBlockEvents = [];
+
         events.forEach((item, idx) => {
+          currentBlockEvents.push(item);
+
           const badgeClass = `badge-${['USD','EUR','GBP','JPY','CAD','AUD','NZD','CHF','CNH','CNY'].includes(item.ccy) ? item.ccy : 'DEFAULT'}`;
           const rowBgClass = idx % 2 === 0 ? 'bg-transparent' : 'bg-zinc-900/20';
 
@@ -688,15 +707,23 @@
             const scoreObj = globalState.categoryScores[categoryId];
             const currentScore = scoreObj ? scoreObj.score : 0;
 
+            // Extraer nombres reales de los datos contenidos en este bloque
+            const eventsInBlockNames = Array.from(new Set(currentBlockEvents.map(e => e.event))).join(' • ');
+
             tableHTML += `
               <tr>
                 <td colspan="6" class="py-2.5 px-1">
                   <div class="bg-gradient-to-r from-amber-950/20 via-zinc-900/40 to-zinc-900/20 border border-amber-500/30 rounded-xl p-2.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 my-1">
-                    <div class="flex items-center gap-2">
-                      <span class="text-amber-400 text-xs">📊</span>
-                      <span class="text-xs font-bold text-amber-200 tracking-wide">${escapeHtml(categoryTitle)}</span>
+                    <div class="flex flex-col gap-0.5">
+                      <div class="flex items-center gap-2">
+                        <span class="text-amber-400 text-xs">📊</span>
+                        <span class="text-xs font-bold text-amber-200 tracking-wide">${escapeHtml(categoryTitle)}</span>
+                      </div>
+                      <div class="text-[10px] text-amber-300/80 font-sans pl-5 font-normal">
+                        📌 ${escapeHtml(eventsInBlockNames)}
+                      </div>
                     </div>
-                    <div class="flex items-center gap-1.5 font-mono">
+                    <div class="flex items-center gap-1.5 font-mono self-end sm:self-auto">
                       <span class="text-[10px] text-zinc-400 mr-1 uppercase">Puntuación:</span>
                       <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 2, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-500 transition ${currentScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
                       <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 1, this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-400 transition ${currentScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
@@ -708,6 +735,8 @@
                 </td>
               </tr>
             `;
+
+            currentBlockEvents = []; // Limpiar para el siguiente bloque
           }
         });
 
@@ -841,6 +870,29 @@
       return { pairName: `${base}/${quote}`, actionBadge: actionText, strong: strong, weak: weak };
     }
 
+    // EXTRAER DESGLOSE COMPLETO DE FACTORES PARA UNA DIVISA
+    function getCurrencyScoreBreakdown(ccy) {
+      const breakdown = [];
+      const prev = parseInt(globalState.matrixPrev[ccy]) || 0;
+      if (prev !== 0) {
+        breakdown.push({ label: 'Previo (Manual)', score: prev });
+      }
+
+      if (globalState.categoryScores) {
+        Object.keys(globalState.categoryScores).forEach(catId => {
+          const item = globalState.categoryScores[catId];
+          if (item && item.ccy === ccy && item.score !== 0) {
+            const parts = catId.split('-');
+            let title = parts.slice(2).join('-').trim();
+            if (!title) title = catId;
+            breakdown.push({ label: title, score: item.score });
+          }
+        });
+      }
+      return breakdown;
+    }
+
+    // ESCÁNER CON DESGLOSE DETALLADO DE EVENTOS QUE DAN/QUITAN VALOR
     function scanDivergences() {
       const alertBox = document.getElementById('divergenceAlertBox');
       const listContainer = document.getElementById('divergenceList');
@@ -877,18 +929,41 @@
       if (divergencesFound.length > 0) {
         alertBox.classList.remove('hidden');
         badge.textContent = `${divergencesFound.length} Pares Aprobados`;
-        listContainer.innerHTML = divergencesFound.map(d => `
-          <div class="bg-[#030305] border border-cyan-500/30 p-2.5 rounded-xl flex items-center justify-between">
-            <div>
-              <span class="text-zinc-400 text-[10px]">Oportunidad:</span>
-              <span class="font-black text-cyan-400 text-sm block">${escapeHtml(d.pair)}</span>
+        listContainer.innerHTML = divergencesFound.map(d => {
+          const strongBreakdown = getCurrencyScoreBreakdown(d.strong);
+          const weakBreakdown = getCurrencyScoreBreakdown(d.weak);
+
+          return `
+            <div class="bg-[#030305] border border-cyan-500/30 p-3 rounded-xl space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-zinc-400 text-[10px]">Oportunidad:</span>
+                  <span class="font-black text-cyan-400 text-sm block">${escapeHtml(d.pair)}</span>
+                </div>
+                <div class="text-right">
+                  <span class="${d.actionBadge.includes('COMPRA') ? 'bg-emerald-950 text-emerald-400 border-emerald-500/30' : 'bg-rose-950 text-rose-400 border-rose-500/30'} border px-2 py-0.5 rounded text-[10px] font-bold block mb-0.5">${escapeHtml(d.actionBadge)}</span>
+                  <span class="text-[9px] text-zinc-400">Diferencial: <strong class="text-white">${d.diff} pts</strong> (${escapeHtml(d.strong)}: ${d.strongScore > 0 ? '+' : ''}${d.strongScore} vs ${escapeHtml(d.weak)}: ${d.weakScore > 0 ? '+' : ''}${d.weakScore})</span>
+                </div>
+              </div>
+              
+              <!-- Desglose explícito de factores que otorgan/quitan fuerza -->
+              <div class="pt-2 border-t border-zinc-800/80 text-[10px] space-y-1 font-sans">
+                <div>
+                  <span class="font-bold text-emerald-400 font-mono">${escapeHtml(d.strong)} (+${d.strongScore}):</span>
+                  <span class="text-zinc-300 ml-1">
+                    ${strongBreakdown.length > 0 ? strongBreakdown.map(b => `<span class="inline-block bg-emerald-950/40 text-emerald-300 border border-emerald-800/50 px-1.5 py-0.2 rounded my-0.5">${escapeHtml(b.label)} (${b.score > 0 ? '+' : ''}${b.score})</span>`).join(' ') : '<span class="text-zinc-500">Sin eventos evaluados</span>'}
+                  </span>
+                </div>
+                <div>
+                  <span class="font-bold text-rose-400 font-mono">${escapeHtml(d.weak)} (${d.weakScore}):</span>
+                  <span class="text-zinc-300 ml-1">
+                    ${weakBreakdown.length > 0 ? weakBreakdown.map(b => `<span class="inline-block bg-rose-950/40 text-rose-300 border border-rose-800/50 px-1.5 py-0.2 rounded my-0.5">${escapeHtml(b.label)} (${b.score > 0 ? '+' : ''}${b.score})</span>`).join(' ') : '<span class="text-zinc-500">Sin eventos evaluados</span>'}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div class="text-right">
-              <span class="${d.actionBadge.includes('COMPRA') ? 'bg-emerald-950 text-emerald-400 border-emerald-500/30' : 'bg-rose-950 text-rose-400 border-rose-500/30'} border px-2 py-0.5 rounded text-[10px] font-bold block mb-0.5">${escapeHtml(d.actionBadge)}</span>
-              <span class="text-[9px] text-zinc-500">Diferencial: ${d.diff} pts (${escapeHtml(d.strong)}: ${d.strongScore > 0 ? '+' : ''}${d.strongScore} vs ${escapeHtml(d.weak)}: ${d.weakScore > 0 ? '+' : ''}${d.weakScore})</span>
-            </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       } else {
         alertBox.classList.add('hidden');
       }
