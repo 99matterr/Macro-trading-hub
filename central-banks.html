@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kairos Macro Hub // Monitor de Bancos Centrales</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- LIBRERÍAS DE FIREBASE (SINCRONIZACIÓN EN TIEMPO REAL EN LA NUBE) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
   <style>
     body { background-color: #030305; color: #d4d4d8; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -53,8 +58,14 @@
           <p class="text-zinc-400 text-xs mt-1">Monitor de Política Monetaria, Tasas de Interés y Expectativas de Mercado</p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
+          
+          <!-- Estado de Sincronización -->
+          <span id="syncBadge" class="text-xs font-mono font-bold bg-cyan-950/60 text-cyan-400 border border-cyan-500/40 px-2.5 py-1.5 rounded-lg flex items-center gap-1">
+            <span>☁️</span> <span id="syncText">Cargando Nube...</span>
+          </span>
+
           <span id="saveNotice" class="hidden text-emerald-400 text-xs font-mono font-bold bg-emerald-950/60 border border-emerald-500/40 px-3 py-1.5 rounded-lg">
-            ✓ ¡Guardado!
+            ✓ ¡Sincronizado!
           </span>
 
           <button onclick="toggleEditMode()" id="editToggleBtn" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs px-3.5 py-2 rounded-lg font-semibold transition border border-zinc-700 flex items-center gap-1.5">
@@ -83,7 +94,7 @@
       <div class="bg-[#07080d] border border-zinc-800 p-5 rounded-2xl space-y-4 shadow-lg">
         <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
           <h3 class="text-xs font-bold text-white uppercase tracking-wider">Matriz de Tasas y Sesgo Monetario Actual</h3>
-          <span class="text-[10px] text-zinc-500 font-mono">Guardado automático en navegador</span>
+          <span class="text-[10px] text-zinc-500 font-mono">Sincronización multi-dispositivo activa</span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs font-mono">
@@ -191,6 +202,29 @@
   <script src="inject-engine.js"></script>
 
   <script>
+    // Configuración de tu proyecto Firebase cargada con éxito
+    const firebaseConfig = {
+      apiKey: "AIzaSyDExmY2_RXRU1B222EPJsGEG_eFGaTvZyk",
+      authDomain: "kiaros-hub.firebaseapp.com",
+      databaseURL: "https://kiaros-hub-default-rtdb.firebaseio.com",
+      projectId: "kiaros-hub",
+      storageBucket: "kiaros-hub.firebasestorage.app",
+      messagingSenderId: "257934951756",
+      appId: "1:257934951756:web:55e14dd6f0f451f3ad7be9",
+      measurementId: "G-D00VKSK2EM"
+    };
+
+    let db = null;
+    let isFirebaseActive = false;
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+      isFirebaseActive = true;
+    } catch (e) {
+      console.warn("Error iniciando Firebase, se usará modo local:", e);
+    }
+
     const STANCE_MAP = {
       'Hawkish': { label: '🟢 Hawkish (Restrictivo - Alcista)', class: 'stance-hawkish' },
       'Hawkish Pause': { label: '🟢 Pausa Restrictiva (Hawkish Pause)', class: 'stance-hawkish-pause' },
@@ -202,125 +236,16 @@
       'Dovish': { label: '🔴 Dovish (Flexible - Bajista)', class: 'stance-dovish' }
     };
 
-    /* DATOS EXACTOS DE TU CÓDIGO ORIGINAL */
     const DEFAULT_BANKS = [
-      { 
-        id: 'FED', 
-        ccy: 'USD', 
-        name: 'Reserva Federal', 
-        fullName: 'Federal Reserve (Fed)', 
-        rate: '3.50% - 3.75%', 
-        stance: 'Hawkish Pause', 
-        nextMeeting: '2026-09-16', 
-        probCut: '5', 
-        probHold: '65', 
-        probHike: '30', 
-        notes: 'Tasa mantenida en 3.50%-3.75% el 29 de julio. Votación 9-3 con disidencia hawkish pidiendo alza de 25 pb debido a riesgos inflacionarios energéticos.' 
-      },
-      { 
-        id: 'ECB', 
-        ccy: 'EUR', 
-        name: 'Banco Central Europeo', 
-        fullName: 'European Central Bank (BCE)', 
-        rate: '2.25%', 
-        stance: 'Neutral', 
-        nextMeeting: '2026-09-10', 
-        probCut: '15', 
-        probHold: '80', 
-        probHike: '5', 
-        notes: 'Tasa de depósito mantenida en 2.25% en julio. Mantiene un enfoque dependiente de datos reunión a reunión sin compromiso previo de trayectoria.' 
-      },
-      { 
-        id: 'BOE', 
-        ccy: 'GBP', 
-        name: 'Banco de Inglaterra', 
-        fullName: 'Bank of England (BoE)', 
-        rate: '3.75%', 
-        stance: 'Hawkish Pause', 
-        nextMeeting: '2026-09-17', 
-        probCut: '10', 
-        probHold: '65', 
-        probHike: '25', 
-        notes: 'Mantuvo la tasa en 3.75% el 30 de julio en votación dividida 6-3. Tres miembros votaron por un alza a 4.00% ante presiones de precios.' 
-      },
-      { 
-        id: 'BOJ', 
-        ccy: 'JPY', 
-        name: 'Banco de Japón', 
-        fullName: 'Bank of Japan (BoJ)', 
-        rate: '1.00%', 
-        stance: 'Hawkish', 
-        nextMeeting: '2026-09-18', 
-        probCut: '0', 
-        probHold: '70', 
-        probHike: '30', 
-        notes: 'Tasa mantenida en 1.00% tras el alza previa. Votación 8-1 con disidencia pidiendo alza a 1.25%. IPC subyacente se mantiene firme.' 
-      },
-      { 
-        id: 'BOC', 
-        ccy: 'CAD', 
-        name: 'Banco de Canadá', 
-        fullName: 'Bank of Canada (BoC)', 
-        rate: '2.25%', 
-        stance: 'Neutral', 
-        nextMeeting: '2026-09-02', 
-        probCut: '20', 
-        probHold: '75', 
-        probHike: '5', 
-        notes: 'Tasa mantenida en 2.25% por sexta reunión consecutiva el 15 de julio. Monitorea la volatilidad del petróleo y el crecimiento moderado.' 
-      },
-      { 
-        id: 'RBA', 
-        ccy: 'AUD', 
-        name: 'Banco de Reserva de Australia', 
-        fullName: 'Reserve Bank of Australia (RBA)', 
-        rate: '4.35%', 
-        stance: 'Hawkish Pause', 
-        nextMeeting: '2026-08-11', 
-        probCut: '5', 
-        probHold: '85', 
-        probHike: '10', 
-        notes: 'Tasa clave en 4.35%. Próxima reunión el 11 de agosto. Enfriamiento en el mercado laboral reduce urgencia de alzas inmediatas.' 
-      },
-      { 
-        id: 'RBNZ', 
-        ccy: 'NZD', 
-        name: 'Banco de Reserva de Nueva Zelanda', 
-        fullName: 'Reserve Bank of New Zealand (RBNZ)', 
-        rate: '2.50%', 
-        stance: 'Hawkish', 
-        nextMeeting: '2026-09-02', 
-        probCut: '0', 
-        probHold: '60', 
-        probHike: '40', 
-        notes: 'Elevó la tasa clave 25 pb a 2.50% en su revisión de julio para contener expectativas de inflación. Abre la puerta a ajustes adicionales.' 
-      },
-      { 
-        id: 'SNB', 
-        ccy: 'CHF', 
-        name: 'Banco Nacional Suizo', 
-        fullName: 'Swiss National Bank (SNB)', 
-        rate: '0.00%', 
-        stance: 'Neutral', 
-        nextMeeting: '2026-09-24', 
-        probCut: '10', 
-        probHold: '80', 
-        probHike: '10', 
-        notes: 'Tasa mantenida en 0.00% con inflación en 0.6%. El SNB se mantiene alerta ante la firmeza del franco suizo y riesgos geopolíticos.' 
-      },
-      { 
-        id: 'PBOC', 
-        ccy: 'CNH', 
-        name: 'Banco Popular de China', 
-        fullName: 'People\'s Bank of China (PBoC)', 
-        rate: '3.00%', 
-        stance: 'Dovish', 
-        nextMeeting: '2026-08-20', 
-        probCut: '35', 
-        probHold: '65', 
-        probHike: '0', 
-        notes: 'LPR a 1 año mantenida en 3.00% y a 5 años en 3.50% en julio. Política acomodaticia activa para impulsar el consumo e inmobiliario.' 
-      }
+      { id: 'FED', ccy: 'USD', name: 'Reserva Federal', fullName: 'Federal Reserve (Fed)', rate: '3.50% - 3.75%', stance: 'Hawkish Pause', nextMeeting: '2026-09-16', probCut: '5', probHold: '65', probHike: '30', notes: 'Tasa mantenida en 3.50%-3.75% el 29 de julio. Votación 9-3 con disidencia hawkish pidiendo alza de 25 pb debido a riesgos inflacionarios energéticos.' },
+      { id: 'ECB', ccy: 'EUR', name: 'Banco Central Europeo', fullName: 'European Central Bank (BCE)', rate: '2.25%', stance: 'Neutral', nextMeeting: '2026-09-10', probCut: '15', probHold: '80', probHike: '5', notes: 'Tasa de depósito mantenida en 2.25% en julio. Mantiene un enfoque dependiente de datos reunión a reunión sin compromiso previo de trayectoria.' },
+      { id: 'BOE', ccy: 'GBP', name: 'Banco de Inglaterra', fullName: 'Bank of England (BoE)', rate: '3.75%', stance: 'Hawkish Pause', nextMeeting: '2026-09-17', probCut: '10', probHold: '65', probHike: '25', notes: 'Mantuvo la tasa en 3.75% el 30 de julio en votación dividida 6-3. Tres miembros votaron por un alza a 4.00% ante presiones de precios.' },
+      { id: 'BOJ', ccy: 'JPY', name: 'Banco de Japón', fullName: 'Bank of Japan (BoJ)', rate: '1.00%', stance: 'Hawkish', nextMeeting: '2026-09-18', probCut: '0', probHold: '70', probHike: '30', notes: 'Tasa mantenida en 1.00% tras el alza previa. Votación 8-1 con disidencia pidiendo alza a 1.25%. IPC subyacente se mantiene firme.' },
+      { id: 'BOC', ccy: 'CAD', name: 'Banco de Canadá', fullName: 'Bank of Canada (BoC)', rate: '2.25%', stance: 'Neutral', nextMeeting: '2026-09-02', probCut: '20', probHold: '75', probHike: '5', notes: 'Tasa mantenida en 2.25% por sexta reunión consecutiva el 15 de julio. Monitorea la volatilidad del petróleo y el crecimiento moderado.' },
+      { id: 'RBA', ccy: 'AUD', name: 'Banco de Reserva de Australia', fullName: 'Reserve Bank of Australia (RBA)', rate: '4.35%', stance: 'Hawkish Pause', nextMeeting: '2026-08-11', probCut: '5', probHold: '85', probHike: '10', notes: 'Tasa clave en 4.35%. Próxima reunión el 11 de agosto. Enfriamiento en el mercado laboral reduce urgencia de alzas inmediatas.' },
+      { id: 'RBNZ', ccy: 'NZD', name: 'Banco de Reserva de Nueva Zelanda', fullName: 'Reserve Bank of New Zealand (RBNZ)', rate: '2.50%', stance: 'Hawkish', nextMeeting: '2026-09-02', probCut: '0', probHold: '60', probHike: '40', notes: 'Elevó la tasa clave 25 pb a 2.50% en su revisión de julio para contener expectativas de inflación. Abre la puerta a ajustes adicionales.' },
+      { id: 'SNB', ccy: 'CHF', name: 'Banco Nacional Suizo', fullName: 'Swiss National Bank (SNB)', rate: '0.00%', stance: 'Neutral', nextMeeting: '2026-09-24', probCut: '10', probHold: '80', probHike: '10', notes: 'Tasa mantenida en 0.00% con inflación en 0.6%. El SNB se mantiene alerta ante la firmeza del franco suizo y riesgos geopolíticos.' },
+      { id: 'PBOC', ccy: 'CNH', name: 'Banco Popular de China', fullName: 'People\'s Bank of China (PBoC)', rate: '3.00%', stance: 'Dovish', nextMeeting: '2026-08-20', probCut: '35', probHold: '65', probHike: '0', notes: 'LPR a 1 año mantenida en 3.00% y a 5 años en 3.50% en julio. Política acomodaticia activa para impulsar el consumo e inmobiliario.' }
     ];
 
     let banksData = [];
@@ -328,8 +253,58 @@
     let expandedCards = {};
 
     window.addEventListener('DOMContentLoaded', () => {
-      loadFromLocalStorage();
+      initSyncEngine();
     });
+
+    function initSyncEngine() {
+      // 1. Cargar cache local inmediatamente
+      const local = localStorage.getItem('kairos_central_bank_state');
+      if (local) {
+        try { banksData = JSON.parse(local); } catch(e) { banksData = JSON.parse(JSON.stringify(DEFAULT_BANKS)); }
+      } else {
+        banksData = JSON.parse(JSON.stringify(DEFAULT_BANKS));
+      }
+      renderApp();
+
+      // 2. Conectar sincronización automática en tiempo real con Firebase
+      if (isFirebaseActive && db) {
+        document.getElementById('syncText').textContent = "Conectado a la Nube";
+        
+        db.ref('kairos_central_banks').on('value', (snapshot) => {
+          const cloudData = snapshot.val();
+          if (cloudData && Array.isArray(cloudData)) {
+            banksData = cloudData;
+            localStorage.setItem('kairos_central_bank_state', JSON.stringify(banksData));
+            renderApp();
+            showSyncNotification();
+          } else {
+            // Si la base de datos está vacía, subir el primer estado
+            db.ref('kairos_central_banks').set(banksData);
+          }
+        });
+      } else {
+        document.getElementById('syncText').textContent = "Modo Local";
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem('kairos_central_bank_state', JSON.stringify(banksData));
+      if (isFirebaseActive && db) {
+        db.ref('kairos_central_banks').set(banksData);
+      }
+      renderSummaryTable();
+    }
+
+    function showSyncNotification() {
+      const notice = document.getElementById('saveNotice');
+      notice.classList.remove('hidden');
+      setTimeout(() => { notice.classList.add('hidden'); }, 2000);
+    }
+
+    function manualSave() {
+      saveState();
+      showSyncNotification();
+    }
 
     function toggleEditMode() {
       isEditMode = !isEditMode;
@@ -364,29 +339,6 @@
     function collapseAllCards() {
       banksData.forEach((_, idx) => expandedCards[idx] = false);
       renderBankCards();
-    }
-
-    function saveToLocalStorage() {
-      localStorage.setItem('kairos_central_bank_state', JSON.stringify(banksData));
-      renderSummaryTable();
-    }
-
-    function manualSave() {
-      saveToLocalStorage();
-      const notice = document.getElementById('saveNotice');
-      notice.classList.remove('hidden');
-      setTimeout(() => { notice.classList.add('hidden'); }, 2500);
-    }
-
-    function loadFromLocalStorage() {
-      const saved = localStorage.getItem('kairos_central_bank_state');
-      if (saved) {
-        try { banksData = JSON.parse(saved); }
-        catch (e) { banksData = JSON.parse(JSON.stringify(DEFAULT_BANKS)); }
-      } else {
-        banksData = JSON.parse(JSON.stringify(DEFAULT_BANKS));
-      }
-      renderApp();
     }
 
     function renderApp() {
@@ -528,13 +480,13 @@
 
     function updateBankField(index, field, value) {
       banksData[index][field] = value;
-      saveToLocalStorage();
+      saveState();
     }
 
     function resetCentralBankData() {
       if (confirm('¿Restablecer los datos de bancos centrales a los valores por defecto?')) {
         banksData = JSON.parse(JSON.stringify(DEFAULT_BANKS));
-        saveToLocalStorage();
+        saveState();
         renderApp();
       }
     }
