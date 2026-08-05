@@ -199,16 +199,62 @@
     }
 
     const WHITELIST = {
-      UNIVERSAL: ['interest rate decision', 'monetary policy statement', 'press conference', 'meeting minutes', 'speaks', 'speech', 'president speaks', 'summary of opinions'],
-      USD: ['nfp', 'nonfarm payrolls', 'adp', 'unemployment rate', 'average hourly earnings', 'jobless claims', 'cpi', 'pce', 'ppi', 'gdp', 'ism', 'pmi', 'industrial production', 'retail sales', 'consumer sentiment', 'building permits', 'home sales', 'trade balance'],
-      CAD: ['monetary policy report', 'cpi', 'ppi', 'ippi', 'gdp', 'employment change', 'unemployment rate', 'retail sales', 'trade balance', 'ivey pmi'],
-      EUR: ['cpi', 'ppi', 'gdp', 'pmi', 'zew', 'retail sales', 'industrial production', 'trade balance', 'ifo', 'business climate', 'unemployment', 'consumer climate'],
-      CHF: ['cpi', 'ppi', 'gdp', 'industrial production', 'pmi', 'retail sales', 'unemployment'],
-      GBP: ['cpi', 'rpi', 'ppi', 'gdp', 'unemployment rate', 'claimant count', 'average earnings', 'pmi', 'retail sales'],
-      JPY: ['ppi', 'cgpi', 'tankan', 'cpi', 'tokyo', 'national cpi', 'inflation', 'consumer price', 'gdp', 'trade balance', 'household spending', 'exports', 'imports', 'pmi', 'retail sales', 'industrial production', 'unemployment', 'jobless', 'boj', 'bank of japan', 'tertiary industry', 'current account'],
-      AUD: ['cpi', 'ppi', 'employment change', 'unemployment rate', 'gdp', 'retail sales', 'westpac', 'trade balance', 'pmi'],
-      NZD: ['cpi', 'ppi', 'gdt', 'gdp', 'employment change', 'unemployment rate', 'pmi', 'retail sales', 'trade balance'],
-      CNH: ['lpr', 'loan prime rate', 'cpi', 'ppi', 'gdp', 'pmi', 'industrial production', 'retail sales', 'trade balance']
+      UNIVERSAL: [
+        'interest rate decision', 'monetary policy statement', 'press conference', 'meeting minutes', 
+        'speaks', 'speech', 'president speaks', 'summary of opinions', 'fomc', 'ecb', 'boe', 'boc', 
+        'rba', 'rbnz', 'snb', 'pboc', 'economic projections', 'dot plot', 'monetary policy assessment', 
+        'financial stability report', 'opec'
+      ],
+      USD: [
+        'nfp', 'nonfarm payrolls', 'adp', 'unemployment rate', 'average hourly earnings', 'jobless claims', 
+        'cpi', 'pce', 'ppi', 'gdp', 'ism', 'pmi', 'industrial production', 'retail sales', 
+        'consumer sentiment', 'consumer confidence', 'business confidence', 'nfib', 'michigan',
+        'building permits', 'home sales', 'trade balance', 'jolts', 'job openings', 
+        'employment cost index', 'eci', 'durable goods', 'unit labor costs'
+      ],
+      CAD: [
+        'monetary policy report', 'cpi', 'ppi', 'ippi', 'gdp', 'employment change', 'unemployment rate', 
+        'retail sales', 'trade balance', 'ivey pmi', 'boc business outlook', 'cfib',
+        'consumer confidence', 'business confidence', 'building permits', 'housing starts', 
+        'crude oil inventories', 'eia'
+      ],
+      EUR: [
+        'cpi', 'ppi', 'gdp', 'pmi', 'zew', 'retail sales', 'industrial production', 'trade balance', 
+        'ifo', 'business climate', 'unemployment', 'consumer climate', 'consumer confidence', 
+        'business confidence', 'economic sentiment', 'sentix', 'hicp', 'negotiated wages'
+      ],
+      CHF: [
+        'cpi', 'ppi', 'gdp', 'industrial production', 'pmi', 'retail sales', 'unemployment', 
+        'trade balance', 'kof', 'svme', 'seco', 'consumer confidence', 'business confidence', 
+        'foreign currency reserves'
+      ],
+      GBP: [
+        'cpi', 'rpi', 'ppi', 'gdp', 'unemployment rate', 'claimant count', 'average earnings', 
+        'pmi', 'retail sales', 'consumer confidence', 'business confidence', 'gfk', 'cbi', 
+        'public sector net borrowing', 'nationwide'
+      ],
+      JPY: [
+        'ppi', 'cgpi', 'tankan', 'cpi', 'tokyo', 'national cpi', 'inflation', 'consumer price', 
+        'gdp', 'trade balance', 'household spending', 'exports', 'imports', 'pmi', 'retail sales', 
+        'industrial production', 'unemployment', 'jobless', 'boj', 'bank of japan', 'tertiary industry', 
+        'current account', 'machine orders', 'monetary base', 'consumer confidence', 'business confidence', 
+        'economy watchers'
+      ],
+      AUD: [
+        'cpi', 'ppi', 'employment change', 'unemployment rate', 'gdp', 'retail sales', 'westpac', 
+        'trade balance', 'pmi', 'nab', 'consumer confidence', 'business confidence', 
+        'consumer sentiment', 'business sentiment', 'building approvals', 'private capex', 'caixin', 'china pmi'
+      ],
+      NZD: [
+        'cpi', 'ppi', 'gdt', 'gdp', 'employment change', 'unemployment rate', 'pmi', 'retail sales', 
+        'trade balance', 'anz', 'consumer confidence', 'business confidence', 
+        'consumer sentiment', 'business sentiment', 'building consents', 'dairy price index'
+      ],
+      CNH: [
+        'lpr', 'loan prime rate', 'cpi', 'ppi', 'gdp', 'pmi', 'industrial production', 'retail sales', 
+        'trade balance', 'caixin', 'consumer confidence', 'business confidence', 'business sentiment', 
+        'new yuan loans', 'm2'
+      ]
     };
 
     const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH', 'CNY', 'DE', 'FR', 'UK', 'EU', 'CH', 'CA', 'US', 'JP', 'JPN', 'AU', 'AUS', 'NZ', 'NZL', 'GB', 'GBR', 'CN', 'CHN'];
@@ -365,17 +411,17 @@
       
       if (lower.includes('cpi') || lower.includes('pce') || lower.includes('rpi') || lower.includes('inflation') || lower.includes('tokyo') || lower.includes('consumer price')) return `${ccy} - INFLACIÓN (IPC)`;
       if (lower.includes('ppi') || lower.includes('ippi') || lower.includes('producer price') || lower.includes('cgpi')) return `${ccy} - PRECIOS DE PRODUCTOR (IPP)`;
-      if (lower.includes('unemployment') || lower.includes('employment') || lower.includes('jobless') || lower.includes('nfp') || lower.includes('adp') || lower.includes('claimant') || lower.includes('earnings') || lower.includes('household spending')) return `${ccy} - MERCADO LABORAL Y SALARIOS`;
-      if (lower.includes('pmi') || lower.includes('ism') || lower.includes('tankan')) return `${ccy} - ÍNDICES PMI / TANKAN`;
-      if (lower.includes('interest rate') || lower.includes('monetary policy') || lower.includes('ecb press') || lower.includes('fomc') || lower.includes('rate decision') || lower.includes('loan prime') || lower.includes('boj') || lower.includes('bank of japan') || lower.includes('meeting minutes') || lower.includes('speaks') || lower.includes('speech')) return `${ccy} - POLÍTICA MONETARIA Y TASAS`;
+      if (lower.includes('unemployment') || lower.includes('employment') || lower.includes('jobless') || lower.includes('nfp') || lower.includes('adp') || lower.includes('claimant') || lower.includes('earnings') || lower.includes('household spending') || lower.includes('jolts') || lower.includes('employment cost')) return `${ccy} - MERCADO LABORAL Y SALARIOS`;
+      if (lower.includes('pmi') || lower.includes('ism') || lower.includes('tankan') || lower.includes('ivey')) return `${ccy} - ÍNDICES PMI / TANKAN`;
+      if (lower.includes('interest rate') || lower.includes('monetary policy') || lower.includes('ecb press') || lower.includes('fomc') || lower.includes('rate decision') || lower.includes('loan prime') || lower.includes('boj') || lower.includes('bank of japan') || lower.includes('meeting minutes') || lower.includes('speaks') || lower.includes('speech') || lower.includes('dot plot') || lower.includes('projections')) return `${ccy} - POLÍTICA MONETARIA Y TASAS`;
       if (lower.includes('retail sales')) return `${ccy} - VENTAS MINORISTAS`;
       if (lower.includes('trade balance') || lower.includes('exports') || lower.includes('imports') || lower.includes('current account')) return `${ccy} - BALANZA COMERCIAL`;
       if (lower.includes('gdp')) return `${ccy} - PRODUCTO INTERNO BRUTO (PIB)`;
-      if (lower.includes('zew') || lower.includes('ifo') || lower.includes('business climate') || lower.includes('confidence') || lower.includes('ratingdog')) return `${ccy} - SENTIMIENTO Y CLIMA DE NEGOCIOS`;
-      if (lower.includes('industrial production') || lower.includes('factory orders') || lower.includes('manufacturing production')) return `${ccy} - PRODUCCIÓN INDUSTRIAL`;
+      if (lower.includes('consumer confidence') || lower.includes('consumer sentiment') || lower.includes('consumer climate') || lower.includes('michigan') || lower.includes('gfk') || lower.includes('seco')) return `${ccy} - CONFIANZA DEL CONSUMIDOR`;
+      if (lower.includes('business confidence') || lower.includes('business sentiment') || lower.includes('business climate') || lower.includes('zew') || lower.includes('ifo') || lower.includes('cbi') || lower.includes('nfib') || lower.includes('cfib') || lower.includes('economy watchers') || lower.includes('sentix') || lower.includes('nab') || lower.includes('anz') || lower.includes('economic sentiment')) return `${ccy} - CONFIANZA Y CLIMA DE NEGOCIOS`;
+      if (lower.includes('industrial production') || lower.includes('factory orders') || lower.includes('manufacturing production') || lower.includes('machine orders')) return `${ccy} - PRODUCCIÓN INDUSTRIAL`;
       if (lower.includes('gdt') || lower.includes('dairy')) return `${ccy} - ÍNDICE DE PRECIOS LÁCTEOS (GDT)`;
-      if (lower.includes('consumer climate') || lower.includes('consumer sentiment')) return `${ccy} - CLIMA Y CONFIANZA DEL CONSUMIDOR`;
-      if (lower.includes('building permit') || lower.includes('home sales')) return `${ccy} - MERCADO INMOBILIARIO`;
+      if (lower.includes('building permit') || lower.includes('building approvals') || lower.includes('building consents') || lower.includes('home sales') || lower.includes('housing starts')) return `${ccy} - MERCADO INMOBILIARIO`;
 
       const cleanName = eventName.replace(/^(French|German|Italian|Spanish|Eurozone|US|UK|Japanese|Australian|Canadian|Swiss|Chinese)\s+/i, '');
       const firstWord = cleanName.split(' ')[0].toUpperCase();
@@ -490,7 +536,7 @@
         if (['JP', 'JPN'].includes(ccy)) mappedCCY = 'JPY';
         if (['AU', 'AUS'].includes(ccy)) mappedCCY = 'AUD';
         if (['NZ', 'NZL'].includes(ccy)) mappedCCY = 'NZD';
-        if (['CN', 'CHN'].includes(ccy)) mappedCCY = 'CNH';
+        if (['CN', 'CHN', 'CNY'].includes(ccy)) mappedCCY = 'CNH'; // Remaps CNY to CNH correctly
 
         if (isWhitelisted(mappedCCY, event)) {
           if (!daysData[currentDay]) daysData[currentDay] = [];
