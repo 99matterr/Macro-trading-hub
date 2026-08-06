@@ -61,7 +61,7 @@
                 <h3 class="text-sm font-semibold text-gray-300 flex items-center gap-2">
                     <i class="fa-solid fa-chart-column text-blue-400"></i> Currency Total Valuation Ranking
                 </h3>
-                <span id="lastUpdatedNotice" class="text-xs text-gray-500 font-mono">Data Status: Updated (Static Baseline)</span>
+                <span id="lastUpdatedNotice" class="text-xs text-gray-500 font-mono">Data Status: Baseline (Aug 6, 2026)</span>
             </div>
             <div class="h-44 w-full">
                 <canvas id="currencyBarChart"></canvas>
@@ -158,95 +158,95 @@
     </div>
 
     <script>
-        // Baseline data set
+        // Updated baseline data set through August 6, 2026
         const defaultData = {
             "USD": [
-                { name: "ISM Mfg PMI", previous: 49.2, forecast: 50.1, actual: 50.4, type: "PMI", weight: "5.0" },
-                { name: "ISM Services PMI", previous: 53.8, forecast: 53.5, actual: 54.2, type: "PMI", weight: "5.0" },
-                { name: "CPI MoM", previous: 0.003, forecast: 0.002, actual: 0.002, type: "CPI", weight: "5.0" },
-                { name: "Unemployment Rate", previous: 0.043, forecast: 0.043, actual: 0.042, type: "UNEMP_RATE", weight: "5.0" },
-                { name: "NFP", previous: 145, forecast: 160, actual: 175, type: "NFP", weight: "5.0" },
-                { name: "Retail Sales MoM", previous: 0.004, forecast: 0.005, actual: 0.007, type: "PCT_GROWTH", weight: "4.0" },
-                { name: "CB Consumer Confidence", previous: 100.4, forecast: 101.0, actual: 101.8, type: "CONFIDENCE", weight: "4.0" },
-                { name: "NFIB Small Business Index", previous: 90.5, forecast: 91.0, actual: 91.5, type: "INDEX_SMALL", weight: "3.0" },
-                { name: "Atlanta Fed GDPNow", previous: 0.025, forecast: 0.028, actual: 0.030, type: "PCT_GROWTH", weight: "4.0" }
+                { name: "ISM Mfg PMI", previous: 54.0, forecast: 54.0, actual: 55.6, type: "PMI", weight: "5.0" },
+                { name: "ISM Services PMI", previous: 54.0, forecast: 54.5, actual: 54.1, type: "PMI", weight: "5.0" },
+                { name: "CPI MoM", previous: 0.005, forecast: -0.001, actual: -0.004, type: "CPI", weight: "5.0" },
+                { name: "Unemployment Rate", previous: 0.043, forecast: 0.043, actual: 0.043, type: "UNEMP_RATE", weight: "5.0" },
+                { name: "NFP", previous: 172, forecast: 57, actual: 110, type: "NFP", weight: "5.0" },
+                { name: "Retail Sales MoM", previous: 0.010, forecast: 0.003, actual: 0.002, type: "PCT_GROWTH", weight: "4.0" },
+                { name: "CB Consumer Confidence", previous: 90.8, forecast: 99.8, actual: 100.3, type: "CONFIDENCE", weight: "4.0" },
+                { name: "NFIB Small Business Index", previous: 95.3, forecast: 95.0, actual: 91.5, type: "INDEX_SMALL", weight: "3.0" },
+                { name: "Atlanta Fed GDPNow", previous: 0.033, forecast: 0.028, actual: 0.025, type: "PCT_GROWTH", weight: "4.0" }
             ],
             "EUR": [
-                { name: "HCOB Mfg PMI", previous: 45.8, forecast: 46.2, actual: 46.5, type: "PMI", weight: "High" },
-                { name: "HCOB Services PMI", previous: 51.2, forecast: 51.5, actual: 51.8, type: "PMI", weight: "High" },
-                { name: "CPI MoM", previous: 0.002, forecast: 0.001, actual: 0.001, type: "CPI", weight: "High" },
-                { name: "Unemployment Rate", previous: 0.064, forecast: 6.4, actual: 0.064, type: "EUR_UNEMP_FIXED", weight: "Med" },
-                { name: "Germany Unemp Change", previous: 10, forecast: 8, actual: 6, type: "GER_UNEMP_CHANGE", weight: "Med" },
-                { name: "Retail Sales MoM", previous: -0.001, forecast: 0.001, actual: 0.002, type: "PCT_GROWTH", weight: "Med" },
-                { name: "Consumer Confidence", previous: -14.0, forecast: -13.5, actual: -13.0, type: "CONFIDENCE", weight: "Low" },
-                { name: "IFO Business Climate", previous: 88.5, forecast: 88.9, actual: 89.2, type: "INDEX_SMALL", weight: "Med" },
-                { name: "Industrial Production MoM", previous: -0.005, forecast: 0.001, actual: 0.002, type: "PCT_GROWTH", weight: "Low" }
+                { name: "HCOB Mfg PMI", previous: 51.4, forecast: 52.0, actual: 51.9, type: "PMI", weight: "High" },
+                { name: "HCOB Services PMI", previous: 51.6, forecast: 51.7, actual: 51.7, type: "PMI", weight: "High" },
+                { name: "CPI MoM", previous: -0.001, forecast: 0.001, actual: 0.000, type: "CPI", weight: "High" },
+                { name: "Unemployment Rate", previous: 0.063, forecast: 0.064, actual: 0.064, type: "EUR_UNEMP_FIXED", weight: "Med" },
+                { name: "Germany Unemp Change", previous: -1, forecast: 5, actual: 6, type: "GER_UNEMP_CHANGE", weight: "Med" },
+                { name: "Retail Sales MoM", previous: 0.002, forecast: 0.002, actual: 0.001, type: "PCT_GROWTH", weight: "Med" },
+                { name: "Consumer Confidence", previous: -17.7, forecast: -14.0, actual: -13.0, type: "CONFIDENCE", weight: "Low" },
+                { name: "IFO Business Climate", previous: 85.7, forecast: 86.1, actual: 86.6, type: "INDEX_SMALL", weight: "Med" },
+                { name: "Industrial Production MoM", previous: -0.002, forecast: 0.001, actual: -0.006, type: "PCT_GROWTH", weight: "Low" }
             ],
             "GBP": [
-                { name: "S&P Mfg PMI", previous: 51.2, forecast: 51.5, actual: 51.8, type: "PMI", weight: "5.0" },
-                { name: "S&P Services PMI", previous: 52.4, forecast: 52.8, actual: 53.2, type: "PMI", weight: "5.0" },
-                { name: "CPI MoM", previous: 0.003, forecast: 0.002, actual: 0.002, type: "CPI", weight: "5.0" },
-                { name: "Unemployment Rate", previous: 0.044, forecast: 0.044, actual: 0.043, type: "UNEMP_RATE", weight: "5.0" },
-                { name: "Claimant Count", previous: 5.2, forecast: 4.1, actual: 3.5, type: "GBP_CLAIMANT", weight: "4.0" },
-                { name: "Retail Sales MoM", previous: 0.002, forecast: 0.004, actual: 0.006, type: "GBP_RETAIL", weight: "4.0" },
-                { name: "GfK Consumer Confidence", previous: -17.0, forecast: -16.0, actual: -15.0, type: "CONFIDENCE", weight: "4.0" },
-                { name: "CBI Industrial Trends", previous: -18.0, forecast: -15.0, actual: -12.0, type: "SURVEY_5", weight: "3.0" },
-                { name: "Monthly GDP", previous: 0.001, forecast: 0.002, actual: 0.003, type: "CPI", weight: "5.0" }
+                { name: "S&P Mfg PMI", previous: 52.5, forecast: 52.8, actual: 51.9, type: "PMI", weight: "5.0" },
+                { name: "S&P Services PMI", previous: 51.8, forecast: 52.1, actual: 52.1, type: "PMI", weight: "5.0" },
+                { name: "CPI MoM", previous: 0.002, forecast: 0.002, actual: 0.001, type: "CPI", weight: "5.0" },
+                { name: "Unemployment Rate", previous: 0.049, forecast: 0.049, actual: 0.049, type: "UNEMP_RATE", weight: "5.0" },
+                { name: "Claimant Count", previous: 1.3, forecast: 29.4, actual: 6.7, type: "GBP_CLAIMANT", weight: "4.0" },
+                { name: "Retail Sales MoM", previous: 0.010, forecast: -0.002, actual: -0.012, type: "GBP_RETAIL", weight: "4.0" },
+                { name: "GfK Consumer Confidence", previous: -23, forecast: -22, actual: -17, type: "CONFIDENCE", weight: "4.0" },
+                { name: "CBI Industrial Trends", previous: -45, forecast: -38, actual: -45, type: "SURVEY_5", weight: "3.0" },
+                { name: "Monthly GDP", previous: 0.001, forecast: 0.002, actual: 0.004, type: "CPI", weight: "5.0" }
             ],
             "JPY": [
-                { name: "Jibun Mfg PMI", previous: 50.1, forecast: 50.5, actual: 50.8, type: "PMI", weight: "5.0" },
-                { name: "Jibun Services PMI", previous: 52.0, forecast: 52.4, actual: 52.7, type: "PMI", weight: "5.0" },
-                { name: "Tokyo CPI MoM", previous: 0.002, forecast: 0.002, actual: 0.003, type: "CPI", weight: "5.0" },
-                { name: "Unemployment Rate", previous: 0.026, forecast: 0.025, actual: 0.025, type: "UNEMP_RATE", weight: "5.0" },
-                { name: "Cash Earnings MoM", previous: 0.015, forecast: 0.018, actual: 0.020, type: "PCT_GROWTH", weight: "5.0" },
-                { name: "Retail Sales MoM", previous: 0.008, forecast: 0.005, actual: 0.007, type: "PCT_GROWTH", weight: "4.0" },
-                { name: "Consumer Survey", previous: 36.5, forecast: 37.0, actual: 37.5, type: "PMI", weight: "4.0" },
-                { name: "Reuters Tankan", previous: 12.0, forecast: 14.0, actual: 15.0, type: "SURVEY_5", weight: "4.0" },
-                { name: "JCER Monthly GDP", previous: 0.001, forecast: 0.002, actual: 0.002, type: "CPI", weight: "4.0" }
+                { name: "Jibun Mfg PMI", previous: 54.8, forecast: 52.2, actual: 52.1, type: "PMI", weight: "5.0" },
+                { name: "Jibun Services PMI", previous: 52.2, forecast: 53.9, actual: 53.7, type: "PMI", weight: "5.0" },
+                { name: "Tokyo CPI MoM", previous: 0.003, forecast: 0.002, actual: 0.002, type: "CPI", weight: "5.0" },
+                { name: "Unemployment Rate", previous: 0.025, forecast: 0.025, actual: 0.025, type: "UNEMP_RATE", weight: "5.0" },
+                { name: "Cash Earnings MoM", previous: 0.011, forecast: 0.011, actual: 0.012, type: "PCT_GROWTH", weight: "5.0" },
+                { name: "Retail Sales MoM", previous: 0.006, forecast: 0.002, actual: 0.006, type: "PCT_GROWTH", weight: "4.0" },
+                { name: "Consumer Survey", previous: 33.8, forecast: 36.5, actual: 36.7, type: "PMI", weight: "4.0" },
+                { name: "Reuters Tankan", previous: 13, forecast: null, actual: 11, type: "SURVEY_5", weight: "4.0" },
+                { name: "JCER Monthly GDP", previous: 0.003, forecast: 0.002, actual: 0.002, type: "CPI", weight: "4.0" }
             ],
             "AUD": [
-                { name: "Judo Mfg PMI", previous: 50.2, forecast: 50.5, actual: 50.8, type: "PMI", weight: "5.0" },
-                { name: "Judo Services PMI", previous: 51.0, forecast: 51.3, actual: 51.6, type: "AUD_SERVICES", weight: "5.0" },
-                { name: "CPI Indicator MoM", previous: 0.038, forecast: 0.036, actual: 0.035, type: "CPI", weight: "5.0" },
-                { name: "Unemployment Rate", previous: 0.041, forecast: 0.041, actual: 0.040, type: "UNEMP_RATE", weight: "5.0" },
-                { name: "Employment Change", previous: 38.0, forecast: 42.0, actual: 48.0, type: "JOBS_K", weight: "5.0" },
-                { name: "Retail Sales MoM", previous: 0.003, forecast: 0.004, actual: 0.005, type: "PCT_GROWTH", weight: "4.0" },
-                { name: "Westpac Sentiment", previous: 94.2, forecast: 95.0, actual: 96.1, type: "CONFIDENCE", weight: "4.0" },
-                { name: "NAB Business Confidence", previous: 6.0, forecast: 7.0, actual: 8.0, type: "SURVEY_5", weight: "4.0" },
-                { name: "AIG Industry Index", previous: -2.0, forecast: -1.0, actual: 0.5, type: "SURVEY_5", weight: "3.0" }
+                { name: "Judo Mfg PMI", previous: 51.5, forecast: 47.4, actual: 47.5, type: "PMI", weight: "5.0" },
+                { name: "Judo Services PMI", previous: 50.5, forecast: 50.8, actual: 50.4, type: "AUD_SERVICES", weight: "5.0" },
+                { name: "CPI Indicator MoM", previous: 0.040, forecast: 0.038, actual: 0.038, type: "CPI", weight: "5.0" },
+                { name: "Unemployment Rate", previous: 0.044, forecast: 0.041, actual: 0.041, type: "UNEMP_RATE", weight: "5.0" },
+                { name: "Employment Change", previous: 76.3, forecast: 20.0, actual: 50.2, type: "JOBS_K", weight: "5.0" },
+                { name: "Retail Sales MoM", previous: 0.006, forecast: 0.002, actual: 0.005, type: "PCT_GROWTH", weight: "4.0" },
+                { name: "Westpac Sentiment", previous: 84.6, forecast: 84.0, actual: 82.7, type: "CONFIDENCE", weight: "4.0" },
+                { name: "NAB Business Confidence", previous: -5, forecast: -2, actual: 4, type: "SURVEY_5", weight: "4.0" },
+                { name: "AIG Industry Index", previous: -3.1, forecast: -5.0, actual: -6.1, type: "SURVEY_5", weight: "3.0" }
             ],
             "NZD": [
-                { name: "BusNZ Mfg PMI", previous: 49.5, forecast: 50.0, actual: 50.4, type: "PMI", weight: "5.0" },
-                { name: "BusNZ Services PMI", previous: 50.2, forecast: 50.6, actual: 51.0, type: "PMI", weight: "5.0" },
-                { name: "Food Prices MoM", previous: 0.004, forecast: 0.003, actual: 0.002, type: "CPI", weight: "4.0" },
-                { name: "Unemployment Rate", previous: 0.046, forecast: 0.046, actual: 0.045, type: "UNEMP_RATE", weight: "5.0" },
-                { name: "MEI Jobs Change", previous: 0.002, forecast: 0.003, actual: 0.004, type: "CPI", weight: "4.0" },
-                { name: "Card Transactions", previous: 0.005, forecast: 0.006, actual: 0.008, type: "CARD_TRANS", weight: "4.0" },
-                { name: "ANZ Consumer Confidence", previous: 93.0, forecast: 94.0, actual: 95.2, type: "CONFIDENCE", weight: "4.0" },
-                { name: "ANZ Business Confidence", previous: 42.0, forecast: 44.0, actual: 46.5, type: "ANZ_BIZ", weight: "4.0" },
-                { name: "BusNZ Activity Index", previous: 0.005, forecast: 0.006, actual: 0.007, type: "PCT_GROWTH", weight: "4.0" }
+                { name: "BusNZ Mfg PMI", previous: 59.7, forecast: null, actual: 51.1, type: "PMI", weight: "5.0" },
+                { name: "BusNZ Services PMI", previous: 50.6, forecast: null, actual: 40.2, type: "PMI", weight: "5.0" },
+                { name: "Food Prices MoM", previous: 0.006, forecast: null, actual: -0.002, type: "CPI", weight: "4.0" },
+                { name: "Unemployment Rate", previous: 0.046, forecast: 0.047, actual: 0.046, type: "UNEMP_RATE", weight: "5.0" },
+                { name: "MEI Jobs Change", previous: -0.002, forecast: 0.000, actual: 0.001, type: "CPI", weight: "4.0" },
+                { name: "Card Transactions", previous: -0.014, forecast: null, actual: -0.003, type: "CARD_TRANS", weight: "4.0" },
+                { name: "ANZ Consumer Confidence", previous: 83.2, forecast: 85.0, actual: 87.9, type: "CONFIDENCE", weight: "4.0" },
+                { name: "ANZ Business Confidence", previous: 56.1, forecast: null, actual: 27.1, type: "ANZ_BIZ", weight: "4.0" },
+                { name: "BusNZ Activity Index", previous: 0.005, forecast: 0.006, actual: -0.002, type: "PCT_GROWTH", weight: "4.0" }
             ],
             "CAD": [
-                { name: "S&P Mfg PMI", previous: 50.4, forecast: 50.7, actual: 51.0, type: "PMI", weight: "5.0" },
-                { name: "Ivey PMI", previous: 53.5, forecast: 54.0, actual: 54.5, type: "PMI", weight: "5.0" },
-                { name: "CPI MoM", previous: 0.002, forecast: 0.002, actual: 0.001, type: "CPI", weight: "5.0" },
+                { name: "S&P Mfg PMI", previous: 53.0, forecast: null, actual: 47.8, type: "PMI", weight: "5.0" },
+                { name: "Ivey PMI", previous: 56.2, forecast: 52.5, actual: 57.6, type: "PMI", weight: "5.0" },
+                { name: "CPI MoM", previous: -0.004, forecast: 0.001, actual: -0.001, type: "CPI", weight: "5.0" },
                 { name: "Unemployment Rate", previous: 0.065, forecast: 0.065, actual: 0.064, type: "UNEMP_RATE", weight: "5.0" },
-                { name: "Net Employment Change", previous: 25.0, forecast: 28.0, actual: 32.0, type: "CAD_JOBS", weight: "5.0" },
-                { name: "Retail Sales MoM", previous: 0.005, forecast: 0.006, actual: 0.008, type: "PCT_GROWTH", weight: "4.0" },
-                { name: "CB Consumer Survey", previous: 51.2, forecast: 51.8, actual: 52.4, type: "PMI", weight: "4.0" },
-                { name: "CFIB Business Barometer", previous: 55.0, forecast: 55.5, actual: 56.1, type: "PMI", weight: "3.0" },
-                { name: "Monthly GDP MoM", previous: 0.002, forecast: 0.003, actual: 0.004, type: "CPI", weight: "5.0" }
+                { name: "Net Employment Change", previous: 18.2, forecast: -1.4, actual: -1.4, type: "CAD_JOBS", weight: "5.0" },
+                { name: "Retail Sales MoM", previous: 0.010, forecast: -0.006, actual: -0.008, type: "PCT_GROWTH", weight: "4.0" },
+                { name: "CB Consumer Survey", previous: 49.42, forecast: null, actual: 50.15, type: "PMI", weight: "4.0" },
+                { name: "CFIB Business Barometer", previous: 52.8, forecast: 53.0, actual: 55.4, type: "PMI", weight: "3.0" },
+                { name: "Monthly GDP MoM", previous: 0.005, forecast: 0.001, actual: 0.003, type: "CPI", weight: "5.0" }
             ],
             "CHF": [
-                { name: "Procure Mfg PMI", previous: 48.5, forecast: 49.0, actual: 49.6, type: "PMI", weight: "5.0" },
-                { name: "Procure Services PMI", previous: 51.0, forecast: 51.4, actual: 51.8, type: "PMI", weight: "5.0" },
-                { name: "CPI MoM", previous: 0.001, forecast: 0.001, actual: 0.001, type: "CPI", weight: "5.0" },
-                { name: "Unemp Rate", previous: 0.024, forecast: 0.024, actual: 0.024, type: "UNEMP_RATE", weight: "5.0" },
-                { name: "Unemp Change", previous: 0.5, forecast: 0.3, actual: 0.1, type: "CHF_UNEMP_CHANGE", weight: "4.0" },
-                { name: "Retail Sales MoM", previous: 0.001, forecast: 0.002, actual: 0.003, type: "PCT_GROWTH", weight: "4.0" },
-                { name: "Consumer Sentiment", previous: -25.0, forecast: -23.0, actual: -21.5, type: "CONFIDENCE", weight: "4.0" },
-                { name: "KOF Indicator", previous: 101.5, forecast: 102.0, actual: 102.8, type: "CONFIDENCE", weight: "4.0" },
-                { name: "SECO Economic Indicators", previous: 0.015, forecast: 0.016, type: "CPI", actual: 0.018, weight: "5.0" }
+                { name: "Procure Mfg PMI", previous: 54.3, forecast: 44.0, actual: 43.1, type: "PMI", weight: "5.0" },
+                { name: "Procure Services PMI", previous: 49.5, forecast: 51.0, actual: 52.4, type: "PMI", weight: "5.0" },
+                { name: "CPI MoM", previous: 0.000, forecast: -0.001, actual: -0.002, type: "CPI", weight: "5.0" },
+                { name: "Unemp Rate", previous: 0.031, forecast: 0.024, actual: 0.024, type: "UNEMP_RATE", weight: "5.0" },
+                { name: "Unemp Change", previous: 1.8, forecast: 1.5, actual: 1.2, type: "CHF_UNEMP_CHANGE", weight: "4.0" },
+                { name: "Retail Sales MoM", previous: -0.001, forecast: 0.001, actual: 0.003, type: "PCT_GROWTH", weight: "4.0" },
+                { name: "Consumer Sentiment", previous: -36.0, forecast: -35.0, actual: -34.0, type: "CONFIDENCE", weight: "4.0" },
+                { name: "KOF Indicator", previous: 101.2, forecast: 101.0, actual: 101.0, type: "CONFIDENCE", weight: "4.0" },
+                { name: "SECO Economic Indicators", previous: 0.010, forecast: 0.012, actual: 0.012, type: "CPI", weight: "5.0" }
             ]
         };
 
@@ -264,13 +264,105 @@
         let currentSort = 'divergence';
         let currentFilter = 'all';
         let barChartInstance = null;
+        const STORAGE_KEY = 'forex_dashboard_data_v2';
+
+        // ------------------ LOCAL STORAGE & STATE MANAGEMENT ------------------
+
+        function validateAppData(data) {
+            const requiredCurrencies = ["USD", "EUR", "GBP", "JPY", "AUD", "NZD", "CAD", "CHF"];
+            if (typeof data !== 'object' || data === null) return false;
+            return requiredCurrencies.every(curr => Array.isArray(data[curr]));
+        }
+
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+            } catch (e) {
+                console.error("Failed to save state to localStorage:", e);
+            }
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (validateAppData(parsed)) {
+                        appData = parsed;
+                        return true;
+                    }
+                } catch (e) {
+                    console.error("Failed to parse localStorage data:", e);
+                }
+            }
+            return false;
+        }
+
+        // Export Data State using modern Blob object
+        function exportData() {
+            const jsonStr = JSON.stringify(appData, null, 2);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const downloadAnchor = document.createElement('a');
+            const timestamp = new Date().toISOString().slice(0, 10);
+            downloadAnchor.href = url;
+            downloadAnchor.download = `forex_valuation_backup_${timestamp}.json`;
+            
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function triggerImport() {
+            document.getElementById('jsonFileInput').click();
+        }
+
+        // Import JSON File with Strict Schema Validation
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (validateAppData(imported)) {
+                        appData = imported;
+                        saveToLocalStorage();
+                        document.getElementById('lastUpdatedNotice').innerText = `Data Status: Loaded from Backup File`;
+                        refreshApp();
+                        alert('Backup restored successfully!');
+                    } else {
+                        alert('Invalid backup structure! The file must contain valid datasets for all 8 major currencies.');
+                    }
+                } catch (err) {
+                    alert('Failed to parse JSON file. Ensure it is a valid backup file.');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function resetToDefaults() {
+            if (confirm("Reset all economic indicators back to the baseline default data? Any unsaved local changes will be cleared.")) {
+                appData = JSON.parse(JSON.stringify(defaultData));
+                localStorage.removeItem(STORAGE_KEY);
+                document.getElementById('lastUpdatedNotice').innerText = `Data Status: Reset to Baseline (Aug 6, 2026)`;
+                refreshApp();
+            }
+        }
+
+        // ------------------ CALCULATION & PARSING LOGIC ------------------
 
         function parseInputValue(input, type) {
-            if (input === null || input === undefined || input === '') return 0.0;
+            if (input === null || input === undefined || input === '') return null;
             let strVal = input.toString().trim().toUpperCase().replace('K', '');
+            if (strVal === '-' || strVal === 'N/A') return null;
             const isExplicitPercent = strVal.includes('%');
             let num = parseFloat(strVal.replace('%', ''));
-            if (isNaN(num)) return 0.0;
+            if (isNaN(num)) return null;
 
             const percentTypes = ["CPI", "UNEMP_RATE", "PCT_GROWTH", "EUR_UNEMP_FIXED", "CARD_TRANS"];
             if (percentTypes.includes(type)) {
@@ -340,6 +432,8 @@
             }
             return totals;
         }
+
+        // ------------------ UI RENDERING FUNCTIONS ------------------
 
         function renderSummaryScores(totals) {
             const container = document.getElementById('currencySummary');
@@ -497,64 +591,20 @@
             }
         }
 
-        // Export Data State to JSON Backup File
-        function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
-            const downloadAnchor = document.createElement('a');
-            const timestamp = new Date().toISOString().slice(0, 10);
-            
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `forex_valuation_backup_${timestamp}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        // Trigger Hidden File Selector for Import
-        function triggerImport() {
-            document.getElementById('jsonFileInput').click();
-        }
-
-        // Import JSON File into State
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (typeof imported === 'object' && imported !== null && imported.USD) {
-                        appData = imported;
-                        document.getElementById('lastUpdatedNotice').innerText = `Data Status: Loaded from Backup`;
-                        refreshApp();
-                        alert('Backup restored successfully!');
-                    } else {
-                        alert('Invalid backup structure. Please provide a valid JSON export from this tool.');
-                    }
-                } catch (err) {
-                    alert('Failed to parse JSON file. Please ensure the file is valid.');
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = ''; // Reset input selection
-        }
-
-        function resetToDefaults() {
-            appData = JSON.parse(JSON.stringify(defaultData));
-            document.getElementById('lastUpdatedNotice').innerText = `Data Status: Reset to Baseline`;
-            refreshApp();
-        }
-
         function refreshApp() {
             const totals = calculateTotals();
             renderSummaryScores(totals);
             renderCurrencyBarChart(totals);
             renderSentimentBars(totals);
             if (activeTab !== 'dashboard') renderCurrencyTable(activeTab);
+            saveToLocalStorage(); // Auto-save all state changes locally
         }
 
         // Initialize App on load
+        const isRestored = loadFromLocalStorage();
+        if (isRestored) {
+            document.getElementById('lastUpdatedNotice').innerText = `Data Status: Restored from Local Storage`;
+        }
         refreshApp();
     </script>
 </body>
