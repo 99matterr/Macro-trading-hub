@@ -34,14 +34,14 @@
             </div>
             <div class="flex items-center gap-2 flex-wrap">
                 <!-- Export Backup Button -->
-                <button onclick="exportData()" class="px-3 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-dark transition cursor-pointer">
+                <button onclick="exportData()" class="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded border border-blue-500 transition cursor-pointer shadow">
                     <i class="fa-solid fa-download mr-1"></i> Export Backup (.json)
                 </button>
                 <!-- Import Backup Button & Hidden File Input -->
                 <button onclick="triggerImport()" class="px-3 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-dark transition cursor-pointer">
                     <i class="fa-solid fa-upload mr-1"></i> Import Backup (.json)
                 </button>
-                <input type="file" id="jsonFileInput" accept=".json" class="hidden" onchange="importData(event)">
+                <input type="file" id="jsonFileInput" accept=".json,application/json" class="hidden" onchange="importData(event)">
 
                 <!-- Reset Button -->
                 <button onclick="resetToDefaults()" class="px-3 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-dark transition cursor-pointer">
@@ -155,6 +155,30 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- GLOBAL MODAL CONTAINER FOR DUAL-ENGINE BACKUP & RESTORE -->
+    <div id="backupModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-[#151a23] border border-[#242b38] rounded-xl p-6 max-w-xl w-full text-white space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                <h3 id="modalTitle" class="text-base font-bold text-blue-400 flex items-center gap-2">
+                    <i class="fa-solid fa-database"></i> Backup Data Manager
+                </h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white font-bold text-lg">&times;</button>
+            </div>
+            
+            <p id="modalDescription" class="text-xs text-gray-400">Manage your local storage data below:</p>
+
+            <div id="modalActionArea" class="flex flex-wrap gap-2">
+                <!-- Dynamic Action Buttons -->
+            </div>
+
+            <textarea id="modalJsonText" class="w-full h-56 bg-[#0b0e14] border border-gray-800 rounded-lg p-3 text-xs font-mono text-emerald-400 focus:outline-none focus:border-blue-500"></textarea>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-gray-800">
+                <button id="modalPrimaryBtn" onclick="closeModal()" class="px-4 py-2 text-xs bg-gray-800 hover:bg-gray-700 text-white rounded font-bold transition">Close</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -298,40 +322,122 @@
             return false;
         }
 
+        // DUAL-ENGINE EXPORT: Tries standard file download + shows popup modal with iPad Data URI & Clipboard copy
         function exportData() {
-    const jsonStr = JSON.stringify(appData, null, 2);
+            const jsonStr = JSON.stringify(appData, null, 2);
+            const timestamp = new Date().toISOString().slice(0, 10);
+            const fileName = `forex_valuation_backup_${timestamp}.json`;
 
-    // Try copying directly to clipboard on iPad
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(jsonStr).then(() => {
-            alert("Data copied to clipboard! You can now paste it directly into our chat.");
-        }).catch(() => showBackupModal(jsonStr));
-    } else {
-        showBackupModal(jsonStr);
-    }
-}
+            // Standard Browser Blob Download
+            try {
+                const blob = new Blob([jsonStr], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 1000);
+            } catch (e) {
+                console.warn("Direct blob download restricted by browser, loading modal fallback.");
+            }
 
-function showBackupModal(text) {
-    let modal = document.getElementById('backupModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'backupModal';
-        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
-        modal.innerHTML = `
-            <div style="background:#151a23;padding:20px;border-radius:12px;max-width:600px;width:100%;color:white;display:flex;flex-direction:column;gap:12px;border:1px solid #242b38;">
-                <h3 style="font-weight:bold;font-size:16px;color:#38bdf8;">📋 Your Local Storage Backup</h3>
-                <p style="font-size:12px;color:#9ca3af;">Tap inside the box below, select all, copy the text, and paste it here:</p>
-                <textarea id="modalJsonText" style="width:100%;height:260px;background:#0b0e14;color:#34d399;border:1px solid #333;border-radius:8px;padding:10px;font-family:monospace;font-size:11px;" readonly></textarea>
-                <button onclick="document.getElementById('backupModal').remove()" style="padding:8px 16px;background:#ef5350;color:white;border:none;border-radius:6px;font-weight:bold;align-self:flex-end;cursor:pointer;">Close</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-    }
-    document.getElementById('modalJsonText').value = text;
-}
+            // Always open fallback modal with iPad Safari direct Data URI download link & clipboard button
+            showExportModal(jsonStr, fileName);
+        }
 
+        function showExportModal(jsonStr, fileName) {
+            const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(jsonStr);
+            
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-download text-blue-400"></i> Export Backup Data';
+            document.getElementById('modalDescription').innerText = 'If your browser blocked the file download, tap below to save the file or copy the text:';
+            
+            document.getElementById('modalActionArea').innerHTML = `
+                <a href="${dataUri}" download="${fileName}" class="px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold transition flex items-center gap-1">
+                    <i class="fa-solid fa-file-arrow-down"></i> Save File (iPad / iOS)
+                </a>
+                <button onclick="copyModalToClipboard()" class="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded font-bold transition flex items-center gap-1">
+                    <i class="fa-solid fa-copy"></i> Copy to Clipboard
+                </button>
+            `;
 
-        // Import JSON File with Strict Schema Validation
+            const textarea = document.getElementById('modalJsonText');
+            textarea.value = jsonStr;
+            textarea.readOnly = true;
+
+            document.getElementById('modalPrimaryBtn').innerText = 'Done';
+            document.getElementById('modalPrimaryBtn').onclick = closeModal;
+
+            document.getElementById('backupModal').classList.remove('hidden');
+        }
+
+        function copyModalToClipboard() {
+            const textarea = document.getElementById('modalJsonText');
+            textarea.select();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(textarea.value).then(() => {
+                    alert("Backup text copied to clipboard successfully!");
+                }).catch(() => {
+                    document.execCommand('copy');
+                    alert("Backup text copied to clipboard!");
+                });
+            } else {
+                document.execCommand('copy');
+                alert("Backup text copied to clipboard!");
+            }
+        }
+
+        // DUAL-ENGINE IMPORT: Triggers file picker + provides alternative text paste modal
+        function triggerImport() {
+            const chooseChoice = confirm("Tap 'OK' to select a .JSON file from your iPad/device.\n\nTap 'Cancel' if you prefer to PASTE JSON text directly.");
+            if (chooseChoice) {
+                document.getElementById('jsonFileInput').click();
+            } else {
+                showImportModal();
+            }
+        }
+
+        function showImportModal() {
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-upload text-blue-400"></i> Import Backup Data';
+            document.getElementById('modalDescription').innerText = 'Paste your backup JSON text into the box below and tap "Apply Backup":';
+            
+            document.getElementById('modalActionArea').innerHTML = `
+                <button onclick="document.getElementById('jsonFileInput').click()" class="px-3 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-dark transition">
+                    <i class="fa-solid fa-folder-open mr-1"></i> Browse Files Instead
+                </button>
+            `;
+
+            const textarea = document.getElementById('modalJsonText');
+            textarea.value = '';
+            textarea.placeholder = 'Paste JSON data text here...';
+            textarea.readOnly = false;
+
+            const primaryBtn = document.getElementById('modalPrimaryBtn');
+            primaryBtn.innerText = 'Apply Backup Data';
+            primaryBtn.onclick = function() {
+                try {
+                    const parsed = JSON.parse(textarea.value);
+                    if (validateAppData(parsed)) {
+                        appData = parsed;
+                        saveToLocalStorage();
+                        document.getElementById('lastUpdatedNotice').innerText = `Data Status: Loaded from Pasted Backup`;
+                        refreshApp();
+                        closeModal();
+                        alert('Backup restored successfully!');
+                    } else {
+                        alert('Invalid backup structure! The data must contain valid records for all 8 major currencies.');
+                    }
+                } catch (e) {
+                    alert('Invalid JSON text! Please check the copied content and try again.');
+                }
+            };
+
+            document.getElementById('backupModal').classList.remove('hidden');
+        }
+
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -343,7 +449,7 @@ function showBackupModal(text) {
                     if (validateAppData(imported)) {
                         appData = imported;
                         saveToLocalStorage();
-                        document.getElementById('lastUpdatedNotice').innerText = `Data Status: Loaded from Backup File`;
+                        document.getElementById('lastUpdatedNotice').innerText = `Data Status: Loaded from File (${file.name})`;
                         refreshApp();
                         alert('Backup restored successfully!');
                     } else {
@@ -355,6 +461,10 @@ function showBackupModal(text) {
             };
             reader.readAsText(file);
             event.target.value = '';
+        }
+
+        function closeModal() {
+            document.getElementById('backupModal').classList.add('hidden');
         }
 
         function resetToDefaults() {
@@ -578,7 +688,6 @@ function showBackupModal(text) {
                 `;
             });
         }
-        
 
         function updateValue(curr, index, field, val) {
             appData[curr][index][field] = parseInputValue(val, appData[curr][index].type);
@@ -610,7 +719,7 @@ function showBackupModal(text) {
             renderCurrencyBarChart(totals);
             renderSentimentBars(totals);
             if (activeTab !== 'dashboard') renderCurrencyTable(activeTab);
-            saveToLocalStorage(); // Auto-save all state changes locally
+            saveToLocalStorage();
         }
 
         // Initialize App on load
