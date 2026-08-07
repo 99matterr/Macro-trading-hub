@@ -53,9 +53,6 @@
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-  <!-- HEADER GLOBAL INYECTADO -->
-  <div id="global-header"></div>
-
   <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-grow w-full max-w-6xl mx-auto px-3 md:px-6 py-6">
     <div class="space-y-6 no-print">
@@ -66,7 +63,7 @@
           <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
             <span>⚡</span> Kairos Macro Hub
           </h1>
-          <p class="text-zinc-400 text-xs mt-1">Motor optimizado con mapeo exacto de Investing.com para las 8 divisas (72 indicadores)</p>
+          <p class="text-zinc-400 text-xs mt-1">Motor robusto sin errores de parsing para las 8 divisas (72 indicadores)</p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
           <button onclick="exportStateJSON()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs px-3 py-2 rounded-lg transition">
@@ -192,11 +189,7 @@
     <div id="outputContainer"></div>
   </main>
 
-  <!-- FOOTER GLOBAL Y ENGINE DE NAVEGACIÓN -->
-  <div id="global-footer"></div>
-  <script src="inject-engine.js"></script>
-
-  <!-- LÓGICA DE JS INTERNO DEL MOTOR (SISTEMA MULTI-DIVISA BLINDADO V8) -->
+  <!-- LÓGICA DE JS INTERNO DEL MOTOR -->
   <script>
     function escapeHtml(str) {
       if (!str) return '';
@@ -371,11 +364,11 @@
     });
 
     function saveToLocalStorage() {
-      localStorage.setItem('kairos_macro_engine_state_v8', JSON.stringify(globalState));
+      localStorage.setItem('kairos_macro_engine_state_v9', JSON.stringify(globalState));
     }
 
     function loadFromLocalStorage() {
-      const saved = localStorage.getItem('kairos_macro_engine_state_v8');
+      const saved = localStorage.getItem('kairos_macro_engine_state_v9');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
@@ -582,9 +575,12 @@
                   d = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
                 } else if (dateVal.includes('/')) {
                   const parts = dateVal.split('/');
-                  let y = parseInt(parts[2]);
-                  if (y < 100) y += 2000;
-                  d = new Date(Date.UTC(y, parseInt(parts[0]) - 1, parseInt(parts[1])));
+                  let p0 = parseInt(parts[0]), p1 = parseInt(parts[1]), p2 = parseInt(parts[2]);
+                  let year = p2 < 100 ? p2 + 2000 : p2;
+                  let month, day;
+                  if (p0 > 12) { day = p0; month = p1 - 1; }
+                  else { month = p0 - 1; day = p1; }
+                  d = new Date(Date.UTC(year, month, day));
                 }
               }
 
@@ -605,6 +601,7 @@
           return;
         }
 
+        // DETECCIÓN DINÁMICA DE COLUMNAS DE EXCEL (EVITA COLUMNAS DE IMPACTO / VOLATILIDAD)
         let time = "", ccy = "", event = "", actual = "", forecast = "", previous = "";
         let foundCcyIdx = -1;
 
@@ -619,21 +616,30 @@
 
         if (foundCcyIdx !== -1) {
           for (let i = 0; i < foundCcyIdx; i++) {
-            if (/^\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM)?$/i.test(cleanRow[i]) || /^\d{1,2}\.\d{2}/.test(cleanRow[i])) {
+            if (/^\d{1,2}:\d{2}/.test(cleanRow[i]) || /^\d{1,2}\.\d{2}/.test(cleanRow[i])) {
               time = cleanRow[i];
               break;
             }
           }
-          if (foundCcyIdx + 1 < cleanRow.length) event = cleanRow[foundCcyIdx + 1];
-          const postEvent = cleanRow.slice(foundCcyIdx + 2);
-          if (postEvent.length >= 3) {
-            actual = postEvent[0] === "" ? postEvent[1] : postEvent[0];
-            forecast = postEvent[0] === "" ? postEvent[2] : postEvent[1];
-            previous = postEvent[0] === "" ? postEvent[3] || "" : postEvent[2] || "";
-          } else if (postEvent.length === 2) {
-            actual = postEvent[0]; forecast = postEvent[1];
-          } else if (postEvent.length === 1) {
-            actual = postEvent[0];
+
+          let eventIdx = -1;
+          for (let i = foundCcyIdx + 1; i < cleanRow.length; i++) {
+            const val = cleanRow[i].trim();
+            if (/^(high|medium|low|vol\.|bull|\d|★|\s*)$/i.test(val)) continue;
+            eventIdx = i;
+            event = val;
+            break;
+          }
+
+          if (eventIdx !== -1) {
+            const postEvent = cleanRow.slice(eventIdx + 1).filter(cell => cell.trim() !== "");
+            if (postEvent.length >= 3) {
+              actual = postEvent[0]; forecast = postEvent[1]; previous = postEvent[2];
+            } else if (postEvent.length === 2) {
+              actual = postEvent[0]; forecast = postEvent[1];
+            } else if (postEvent.length === 1) {
+              actual = postEvent[0];
+            }
           }
         }
 
@@ -755,6 +761,16 @@
       renderInteractiveCalendar();
     }
 
+    function handleScoreBtnClick(btn) {
+      const catId = btn.getAttribute('data-catid');
+      const ccy = btn.getAttribute('data-ccy');
+      const scoreVal = parseInt(btn.getAttribute('data-score')) || 0;
+      const title = btn.getAttribute('data-title') || '';
+      const summary = btn.getAttribute('data-summary') || '';
+      
+      setCategoryScore(catId, ccy, scoreVal, title, summary, btn);
+    }
+
     function renderInteractiveCalendar() {
       const container = document.getElementById('interactiveCalendarContainer');
       container.innerHTML = '';
@@ -863,11 +879,11 @@
                     </div>
                     <div class="flex items-center gap-1.5 font-mono self-end sm:self-auto">
                       <span class="text-[10px] text-zinc-400 mr-1 uppercase">Puntuación:</span>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 2, '${escapeHtml(smartTitle)}', '${escapeHtml(eventsSummaryText)}', this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-500 transition ${currentScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 1, '${escapeHtml(smartTitle)}', '${escapeHtml(eventsSummaryText)}', this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-400 transition ${currentScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', 0, '${escapeHtml(smartTitle)}', '${escapeHtml(eventsSummaryText)}', this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-zinc-500 transition ${currentScore === 0 ? 'score-btn-active-0' : ''}">0</button>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', -1, '${escapeHtml(smartTitle)}', '${escapeHtml(eventsSummaryText)}', this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-400 transition ${currentScore === -1 ? 'score-btn-active-m1' : ''}">-1</button>
-                      <button onclick="setCategoryScore('${categoryId}', '${item.ccy}', -2, '${escapeHtml(smartTitle)}', '${escapeHtml(eventsSummaryText)}', this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-600 transition ${currentScore === -2 ? 'score-btn-active-m2' : ''}">-2</button>
+                      <button data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="2" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-500 transition ${currentScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
+                      <button data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="1" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-400 transition ${currentScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
+                      <button data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="0" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-zinc-500 transition ${currentScore === 0 ? 'score-btn-active-0' : ''}">0</button>
+                      <button data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="-1" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-400 transition ${currentScore === -1 ? 'score-btn-active-m1' : ''}">-1</button>
+                      <button data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="-2" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-600 transition ${currentScore === -2 ? 'score-btn-active-m2' : ''}">-2</button>
                     </div>
                   </div>
                 </td>
@@ -917,15 +933,18 @@
         eventsSummary: eventsSummary || ''
       };
 
-      const parent = btn.parentElement;
-      parent.querySelectorAll('.score-btn').forEach(b => {
-        b.className = "score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 transition";
-      });
-      if (scoreVal === 2) btn.classList.add('score-btn-active-p2');
-      if (scoreVal === 1) btn.classList.add('score-btn-active-p1');
-      if (scoreVal === 0) btn.classList.add('score-btn-active-0');
-      if (scoreVal === -1) btn.classList.add('score-btn-active-m1');
-      if (scoreVal === -2) btn.classList.add('score-btn-active-m2');
+      if (btn && btn.parentElement) {
+        const parent = btn.parentElement;
+        parent.querySelectorAll('.score-btn').forEach(b => {
+          b.className = "score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 transition";
+        });
+        if (scoreVal === 2) btn.classList.add('score-btn-active-p2');
+        if (scoreVal === 1) btn.classList.add('score-btn-active-p1');
+        if (scoreVal === 0) btn.classList.add('score-btn-active-0');
+        if (scoreVal === -1) btn.classList.add('score-btn-active-m1');
+        if (scoreVal === -2) btn.classList.add('score-btn-active-m2');
+      }
+
       saveToLocalStorage();
       recalculateMatrixAndDivergences();
     }
@@ -1161,7 +1180,7 @@
 
     function resetAllScores() {
       if (confirm('¿Reiniciar todo el tablero? Esto borrará los datos cargados y puntuaciones.')) {
-        localStorage.removeItem('kairos_macro_engine_state_v8');
+        localStorage.removeItem('kairos_macro_engine_state_v9');
         globalState = {
           daysData: {},
           categoryScores: {},
