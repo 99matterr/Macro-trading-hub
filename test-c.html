@@ -298,26 +298,38 @@
             return false;
         }
 
-        // Export Data State using modern Blob object
         function exportData() {
-            const jsonStr = JSON.stringify(appData, null, 2);
-            const blob = new Blob([jsonStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            
-            const downloadAnchor = document.createElement('a');
-            const timestamp = new Date().toISOString().slice(0, 10);
-            downloadAnchor.href = url;
-            downloadAnchor.download = `forex_valuation_backup_${timestamp}.json`;
-            
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            URL.revokeObjectURL(url);
-        }
+    const jsonStr = JSON.stringify(appData, null, 2);
 
-        function triggerImport() {
-            document.getElementById('jsonFileInput').click();
-        }
+    // Try copying directly to clipboard on iPad
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(jsonStr).then(() => {
+            alert("Data copied to clipboard! You can now paste it directly into our chat.");
+        }).catch(() => showBackupModal(jsonStr));
+    } else {
+        showBackupModal(jsonStr);
+    }
+}
+
+function showBackupModal(text) {
+    let modal = document.getElementById('backupModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'backupModal';
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+        modal.innerHTML = `
+            <div style="background:#151a23;padding:20px;border-radius:12px;max-width:600px;width:100%;color:white;display:flex;flex-direction:column;gap:12px;border:1px solid #242b38;">
+                <h3 style="font-weight:bold;font-size:16px;color:#38bdf8;">📋 Your Local Storage Backup</h3>
+                <p style="font-size:12px;color:#9ca3af;">Tap inside the box below, select all, copy the text, and paste it here:</p>
+                <textarea id="modalJsonText" style="width:100%;height:260px;background:#0b0e14;color:#34d399;border:1px solid #333;border-radius:8px;padding:10px;font-family:monospace;font-size:11px;" readonly></textarea>
+                <button onclick="document.getElementById('backupModal').remove()" style="padding:8px 16px;background:#ef5350;color:white;border:none;border-radius:6px;font-weight:bold;align-self:flex-end;cursor:pointer;">Close</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    document.getElementById('modalJsonText').value = text;
+}
+
 
         // Import JSON File with Strict Schema Validation
         function importData(event) {
