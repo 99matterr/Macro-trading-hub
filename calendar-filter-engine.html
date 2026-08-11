@@ -38,6 +38,17 @@
       border-left: 3px solid #f59e0b !important;
     }
 
+    /* BOTONES CON DIMENSIÓN RÍGIDA ANTI-LAYOUT SHIFT */
+    .score-btn {
+      width: 2rem !important;
+      height: 1.5rem !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-sizing: border-box !important;
+      flex-shrink: 0 !important;
+    }
+
     .score-btn-active-p2 { background-color: #059669 !important; color: white !important; border-color: #10b981 !important; font-weight: bold; }
     .score-btn-active-p1 { background-color: #10b981 !important; color: white !important; border-color: #34d399 !important; font-weight: bold; }
     .score-btn-active-0  { background-color: #3f3f46 !important; color: white !important; border-color: #71717a !important; font-weight: bold; }
@@ -63,21 +74,21 @@
           <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
             <span>⚡</span> Kairos Macro Hub
           </h1>
-          <p class="text-zinc-400 text-xs mt-1">Motor robusto sin errores de parsing para las 8 divisas (72 indicadores)</p>
+          <p class="text-zinc-400 text-xs mt-1">Motor robusto de análisis macro (Estructura Rígida Anti-Layout Shift)</p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-          <button onclick="exportStateJSON()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs px-3 py-2 rounded-lg transition">
+          <button type="button" onclick="exportStateJSON()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs px-3 py-2 rounded-lg transition">
             📥 Exportar Backup
           </button>
-          <button onclick="document.getElementById('jsonInput').click()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs px-3 py-2 rounded-lg transition">
+          <button type="button" onclick="document.getElementById('jsonInput').click()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs px-3 py-2 rounded-lg transition">
             📤 Cargar Backup
           </button>
           <input type="file" id="jsonInput" accept=".json" class="hidden" onchange="importStateJSON(event)" />
           
-          <button onclick="resetAllScores()" class="bg-rose-950/20 hover:bg-rose-900/40 text-rose-300 border border-rose-900/40 text-xs px-3 py-2 rounded-lg transition">
+          <button type="button" onclick="resetAllScores()" class="bg-rose-950/20 hover:bg-rose-900/40 text-rose-300 border border-rose-900/40 text-xs px-3 py-2 rounded-lg transition">
             🗑️ Reiniciar Todo
           </button>
-          <button onclick="triggerPrint()" class="bg-cyan-500 hover:bg-cyan-400 text-black text-xs px-4 py-2 rounded-lg font-bold shadow-md transition">
+          <button type="button" onclick="triggerPrint()" class="bg-cyan-500 hover:bg-cyan-400 text-black text-xs px-4 py-2 rounded-lg font-bold shadow-md transition">
             Exportar PDF &rarr;
           </button>
         </div>
@@ -91,20 +102,20 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <div class="text-xs font-medium text-zinc-300">
-            Arrastra tu archivo <span class="text-cyan-400 font-semibold">Excel (.xlsx) aquí</span> o haz clic para explorar
+            Arrastra tu archivo <span class="text-cyan-400 font-semibold">Excel de Investing.com (.xlsx) aquí</span> o haz clic para explorar
           </div>
         </div>
       </div>
 
-      <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS -->
-      <div id="divergenceAlertBox" class="hidden bg-cyan-950/20 border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3">
-        <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2">
+      <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS (ALTURA FIJA PARA EVITAR SALTO) -->
+      <div id="divergenceAlertBox" class="hidden bg-[#07080d] border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3 h-[240px] flex flex-col justify-between shadow-xl">
+        <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2.5 flex-shrink-0">
           <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
             <span>⚡</span> Escáner de Divergencias Macro Detectadas
           </span>
-          <span id="divergenceCountBadge" class="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded font-bold">0 Pares Aprobados</span>
+          <span id="divergenceCountBadge" class="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2.5 py-0.5 rounded font-bold">0 Pares Aprobados</span>
         </div>
-        <div id="divergenceList" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs"></div>
+        <div id="divergenceList" class="flex-grow overflow-y-auto pr-1 space-y-2.5 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs"></div>
       </div>
 
       <!-- MATRIZ VIVA DE FUERZA GLOBAL E INTERMERCADO -->
@@ -159,18 +170,18 @@
       <div id="calendarFilterBar" class="hidden bg-[#07080d] border border-zinc-800 p-3 rounded-2xl flex flex-col md:flex-row gap-3 justify-between items-center text-xs">
         <div class="flex items-center gap-1.5 flex-wrap" id="currencyFilterGroup">
           <span class="text-zinc-500 text-[10px] font-bold uppercase mr-1">Filtrar:</span>
-          <button onclick="filterByCurrency('ALL')" class="currency-filter-btn px-2 py-1 rounded font-bold bg-cyan-500 text-black">TODAS</button>
-          <button onclick="filterByCurrency('USD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">USD</button>
-          <button onclick="filterByCurrency('EUR')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">EUR</button>
-          <button onclick="filterByCurrency('GBP')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">GBP</button>
-          <button onclick="filterByCurrency('JPY')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">JPY</button>
-          <button onclick="filterByCurrency('CAD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">CAD</button>
-          <button onclick="filterByCurrency('AUD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">AUD</button>
-          <button onclick="filterByCurrency('NZD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">NZD</button>
-          <button onclick="filterByCurrency('CHF')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">CHF</button>
+          <button type="button" onclick="filterByCurrency('ALL')" class="currency-filter-btn px-2 py-1 rounded font-bold bg-cyan-500 text-black">TODAS</button>
+          <button type="button" onclick="filterByCurrency('USD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">USD</button>
+          <button type="button" onclick="filterByCurrency('EUR')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">EUR</button>
+          <button type="button" onclick="filterByCurrency('GBP')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">GBP</button>
+          <button type="button" onclick="filterByCurrency('JPY')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">JPY</button>
+          <button type="button" onclick="filterByCurrency('CAD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">CAD</button>
+          <button type="button" onclick="filterByCurrency('AUD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">AUD</button>
+          <button type="button" onclick="filterByCurrency('NZD')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">NZD</button>
+          <button type="button" onclick="filterByCurrency('CHF')" class="currency-filter-btn px-2 py-1 rounded bg-zinc-800 text-zinc-300">CHF</button>
           
           <span class="text-zinc-700 mx-1">|</span>
-          <button id="coreOnlyToggleBtn" onclick="toggleCoreFilter()" class="px-2.5 py-1 rounded bg-amber-950/40 text-amber-300 border border-amber-500/40 font-bold hover:bg-amber-900/60 transition flex items-center gap-1">
+          <button type="button" id="coreOnlyToggleBtn" onclick="toggleCoreFilter()" class="px-2.5 py-1 rounded bg-amber-950/40 text-amber-300 border border-amber-500/40 font-bold hover:bg-amber-900/60 transition flex items-center gap-1">
             <span>🎯</span> Solo Core Principal (72)
           </button>
         </div>
@@ -201,106 +212,122 @@
         .replace(/'/g, '&#039;');
     }
 
-    // MAPEO GLOBAL HARMONIZADO INVESTING.COM PARA LAS 8 DIVISAS (72 INDICADORES)
+    function normalizeText(str) {
+      if (!str) return '';
+      return str.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
     const CORE_INDICATOR_RULES = [
       // USD (9)
-      { id: 'USD_ISM_MFG', ccy: 'USD', match: ['ism manufacturing pmi', 'ism mfg pmi', 'ism manufacturing purchasing managers index', 'ism manufacturing', 'ism mfg'], avoid: ['prices', 'employment', 'orders', 'paying', 'new orders'] },
-      { id: 'USD_ISM_SERVICES', ccy: 'USD', match: ['ism non-manufacturing pmi', 'ism services pmi', 'ism non-manufacturing purchasing managers index', 'ism services', 'ism non-manufacturing', 'ism non mfg'], avoid: ['prices', 'employment', 'orders'] },
-      { id: 'USD_CPI_MOM', ccy: 'USD', match: ['cpi (mom)', 'cpi mom (headline)', 'cpi mom', 'consumer price index (mom)'], avoid: ['core', 'ex food', 'yoy'] },
-      { id: 'USD_UNEMP', ccy: 'USD', match: ['unemployment rate'], avoid: ['youth', 'underemployment', 'germany', 'german', 'french', 'spanish', 'swiss', 'chicago', 'philly', 'empire'] },
-      { id: 'USD_NFP', ccy: 'USD', match: ['nonfarm payrolls', 'non farm payrolls', 'nfp', 'united states nonfarm payrolls'], avoid: ['private', 'manufacturing'] },
-      { id: 'USD_RETAIL', ccy: 'USD', match: ['retail sales (mom)', 'retail sales mom'], avoid: ['ex autos', 'control', 'ex gas', 'yoy', 'group'] },
-      { id: 'USD_CB_CONF', ccy: 'USD', match: ['cb consumer confidence', 'cb consumer confidence index', 'consumer confidence index'], avoid: ['michigan'] },
-      { id: 'USD_NFIB', ccy: 'USD', match: ['nfib small business optimism', 'nfib small business index', 'nfib small business', 'nfib'], avoid: [] },
-      { id: 'USD_GDPNOW', ccy: 'USD', match: ['atlanta fed gdpnow', 'gdpnow', 'atlanta fed gdp'], avoid: [] },
+      { id: 'USD_ISM_MFG', ccy: 'USD', match: ['ism manufacturing pmi', 'ism mfg pmi', 'ism manufacturing purchasing managers index', 'ism manufacturing', 'ism mfg', 'pmi manufacturero del ism', 'pmi del sector manufacturero del ism'], avoid: ['prices', 'employment', 'orders', 'paying', 'new orders', 'precios', 'empleo', 'pedidos'] },
+      { id: 'USD_ISM_SERVICES', ccy: 'USD', match: ['ism non-manufacturing pmi', 'ism services pmi', 'ism non-manufacturing purchasing managers index', 'ism services', 'ism non-manufacturing', 'ism non mfg', 'pmi no manufacturero del ism', 'pmi del sector servicios del ism'], avoid: ['prices', 'employment', 'orders', 'precios', 'empleo'] },
+      { id: 'USD_CPI_MOM', ccy: 'USD', match: ['cpi (mom)', 'cpi mom (headline)', 'cpi mom', 'consumer price index (mom)', 'ipc (mensual)', 'ipc mensual'], avoid: ['core', 'ex food', 'yoy', 'subyacente', 'anual'] },
+      { id: 'USD_UNEMP', ccy: 'USD', match: ['unemployment rate', 'tasa de desempleo'], avoid: ['youth', 'underemployment', 'germany', 'german', 'french', 'spanish', 'swiss', 'chicago', 'philly', 'empire'] },
+      { id: 'USD_NFP', ccy: 'USD', match: ['nonfarm payrolls', 'non farm payrolls', 'nfp', 'united states nonfarm payrolls', 'nóminas no agrícolas', 'nominas no agricolas'], avoid: ['private', 'manufacturing', 'privadas'] },
+      { id: 'USD_RETAIL', ccy: 'USD', match: ['retail sales (mom)', 'retail sales mom', 'ventas minoristas (mensual)', 'ventas minoristas mensual'], avoid: ['ex autos', 'control', 'ex gas', 'yoy', 'group', 'anual'] },
+      { id: 'USD_CB_CONF', ccy: 'USD', match: ['cb consumer confidence', 'cb consumer confidence index', 'consumer confidence index', 'confianza del consumidor de the conference board', 'confianza del consumidor de cb'], avoid: ['michigan'] },
+      { id: 'USD_NFIB', ccy: 'USD', match: ['nfib small business optimism', 'nfib small business index', 'nfib small business', 'nfib', 'optimismo de las pequeñas empresas'], avoid: [] },
+      { id: 'USD_GDPNOW', ccy: 'USD', match: ['atlanta fed gdpnow', 'gdpnow', 'atlanta fed gdp', 'gdpnow de la fed de atlanta'], avoid: [] },
 
       // EUR (9)
-      { id: 'EUR_HCOB_MFG', ccy: 'EUR', match: ['hcob euro zone manufacturing pmi', 'hcob eurozone manufacturing pmi', 'euro zone manufacturing pmi', 'eurozone manufacturing pmi', 'hcob mfg pmi', 'hcob mfg', 'hcob manufacturing'], avoid: ['services', 'composite', 'construction', 'italy', 'france', 'spain'] },
-      { id: 'EUR_HCOB_SERV', ccy: 'EUR', match: ['hcob euro zone services pmi', 'hcob eurozone services pmi', 'euro zone services pmi', 'eurozone services pmi', 'hcob services pmi', 'hcob services'], avoid: ['mfg', 'manufacturing', 'composite', 'construction', 'italy', 'france', 'spain'] },
-      { id: 'EUR_CPI_MOM', ccy: 'EUR', match: ['euro zone cpi (mom)', 'eurozone cpi (mom)', 'cpi (mom)', 'cpi mom', 'hicp (mom)'], avoid: ['core', 'yoy', 'tokyo', 'german', 'french', 'spanish', 'italian'] },
-      { id: 'EUR_UNEMP', ccy: 'EUR', match: ['euro zone unemployment rate', 'eurozone unemployment rate', 'unemployment rate'], avoid: ['youth', 'germany', 'german', 'french', 'spanish', 'italian', 'change'] },
-      { id: 'EUR_GER_UNEMP_CHG', ccy: 'EUR', match: ['german unemployment change', 'germany unemployment change', 'germany unemp change', 'germany unemp'], avoid: [] },
-      { id: 'EUR_RETAIL', ccy: 'EUR', match: ['euro zone retail sales (mom)', 'eurozone retail sales (mom)', 'retail sales (mom)', 'retail sales mom'], avoid: ['yoy', 'german', 'french', 'spanish', 'italian'] },
-      { id: 'EUR_CONS_CONF', ccy: 'EUR', match: ['euro zone consumer confidence', 'eurozone consumer confidence', 'consumer confidence'], avoid: ['business', 'germany', 'german', 'french', 'spanish', 'cb', 'gfk', 'westpac', 'seco', 'anz', 'survey'] },
-      { id: 'EUR_IFO', ccy: 'EUR', match: ['german ifo business climate index', 'ifo business climate index', 'ifo business climate', 'ifo business', 'ifo'], avoid: ['current assessment', 'expectations'] },
-      { id: 'EUR_IND_PROD', ccy: 'EUR', match: ['euro zone industrial production (mom)', 'eurozone industrial production (mom)', 'industrial production (mom)', 'industrial production mom'], avoid: ['yoy', 'german', 'french', 'spanish', 'italian'] },
+      { id: 'EUR_HCOB_MFG', ccy: 'EUR', match: ['hcob euro zone manufacturing pmi', 'hcob eurozone manufacturing pmi', 'euro zone manufacturing pmi', 'eurozone manufacturing pmi', 'hcob mfg pmi', 'hcob mfg', 'hcob manufacturing', 'pmi del sector manufacturero de la zona euro de hcob', 'pmi manufacturero de la zona euro'], avoid: ['services', 'servicios', 'composite', 'construction', 'italy', 'france', 'spain'] },
+      { id: 'EUR_HCOB_SERV', ccy: 'EUR', match: ['hcob euro zone services pmi', 'hcob eurozone services pmi', 'euro zone services pmi', 'eurozone services pmi', 'hcob services pmi', 'hcob services', 'pmi del sector servicios de la zona euro de hcob', 'pmi servicios de la zona euro'], avoid: ['mfg', 'manufacturero', 'composite', 'construction', 'italy', 'france', 'spain'] },
+      { id: 'EUR_CPI_MOM', ccy: 'EUR', match: ['euro zone cpi (mom)', 'eurozone cpi (mom)', 'cpi (mom)', 'cpi mom', 'hicp (mom)', 'ipc (mensual)', 'ipc de la zona euro (mensual)'], avoid: ['core', 'subyacente', 'yoy', 'anual', 'tokyo', 'german', 'french', 'spanish', 'italian'] },
+      { id: 'EUR_UNEMP', ccy: 'EUR', match: ['euro zone unemployment rate', 'eurozone unemployment rate', 'unemployment rate', 'tasa de desempleo de la zona euro'], avoid: ['youth', 'germany', 'german', 'french', 'spanish', 'italian', 'change', 'cambio'] },
+      { id: 'EUR_GER_UNEMP_CHG', ccy: 'EUR', match: ['german unemployment change', 'germany unemployment change', 'germany unemp change', 'germany unemp', 'cambio del desempleo en alemania', 'variacion del desempleo en alemania'], avoid: [] },
+      { id: 'EUR_RETAIL', ccy: 'EUR', match: ['euro zone retail sales (mom)', 'eurozone retail sales (mom)', 'retail sales (mom)', 'retail sales mom', 'ventas minoristas de la zona euro (mensual)'], avoid: ['yoy', 'anual', 'german', 'french', 'spanish', 'italian'] },
+      { id: 'EUR_CONS_CONF', ccy: 'EUR', match: ['euro zone consumer confidence', 'eurozone consumer confidence', 'consumer confidence', 'confianza del consumidor en la zona euro'], avoid: ['business', 'germany', 'german', 'french', 'spanish', 'cb', 'gfk', 'westpac', 'seco', 'anz', 'survey'] },
+      { id: 'EUR_IFO', ccy: 'EUR', match: ['german ifo business climate index', 'ifo business climate index', 'ifo business climate', 'ifo business', 'ifo', 'indice ifo de confianza empresarial en alemania'], avoid: ['current assessment', 'expectations'] },
+      { id: 'EUR_IND_PROD', ccy: 'EUR', match: ['euro zone industrial production (mom)', 'eurozone industrial production (mom)', 'industrial production (mom)', 'industrial production mom', 'produccion industrial de la zona euro (mensual)'], avoid: ['yoy', 'anual', 'german', 'french', 'spanish', 'italian'] },
 
       // GBP (9)
-      { id: 'GBP_SP_MFG', ccy: 'GBP', match: ['s&p global uk manufacturing pmi', 's&p global manufacturing pmi', 's&p mfg pmi', 's&p mfg', 's&p global manufacturing'], avoid: ['services', 'composite', 'construction'] },
-      { id: 'GBP_SP_SERV', ccy: 'GBP', match: ['s&p global uk services pmi', 's&p global services pmi', 's&p services pmi', 's&p services', 's&p global services'], avoid: ['mfg', 'manufacturing', 'composite', 'construction'] },
-      { id: 'GBP_CPI_MOM', ccy: 'GBP', match: ['cpi (mom)', 'cpi mom', 'uk cpi (mom)'], avoid: ['core', 'yoy'] },
-      { id: 'GBP_UNEMP', ccy: 'GBP', match: ['unemployment rate'], avoid: ['youth', 'claimant'] },
-      { id: 'GBP_CLAIMANT', ccy: 'GBP', match: ['claimant count change', 'claimant count'], avoid: [] },
-      { id: 'GBP_RETAIL', ccy: 'GBP', match: ['retail sales (mom)', 'retail sales mom'], avoid: ['yoy', 'ex fuel'] },
-      { id: 'GBP_GFK', ccy: 'GBP', match: ['gfk consumer confidence'], avoid: [] },
-      { id: 'GBP_CBI', ccy: 'GBP', match: ['cbi industrial trends orders', 'cbi industrial trends', 'cbi industrial'], avoid: ['distributive'] },
-      { id: 'GBP_GDP', ccy: 'GBP', match: ['monthly gdp (mom)', 'monthly gdp', 'gdp (mom)', 'gdp mom'], avoid: ['3m/3m', 'yoy', 'quarterly'] },
+      { id: 'GBP_SP_MFG', ccy: 'GBP', match: ['s&p global/cips uk manufacturing pmi', 's&p global uk manufacturing pmi', 's&p global manufacturing pmi', 's&p mfg pmi', 's&p mfg', 's&p global manufacturing', 'pmi del sector manufacturero de gran bretaña', 'pmi manufacturero reino unido'], avoid: ['services', 'servicios', 'composite', 'construction'] },
+      { id: 'GBP_SP_SERV', ccy: 'GBP', match: ['s&p global/cips uk services pmi', 's&p global uk services pmi', 's&p global services pmi', 's&p services pmi', 's&p services', 's&p global services', 'pmi del sector servicios de gran bretaña', 'pmi servicios reino unido'], avoid: ['mfg', 'manufacturero', 'composite', 'construction'] },
+      { id: 'GBP_CPI_MOM', ccy: 'GBP', match: ['cpi (mom)', 'cpi mom', 'uk cpi (mom)', 'ipc (mensual)'], avoid: ['core', 'subyacente', 'yoy', 'anual'] },
+      { id: 'GBP_UNEMP', ccy: 'GBP', match: ['unemployment rate', 'tasa de desempleo'], avoid: ['youth', 'claimant'] },
+      { id: 'GBP_CLAIMANT', ccy: 'GBP', match: ['claimant count change', 'claimant count', 'evolucion del desempleo (claimant count)'], avoid: [] },
+      { id: 'GBP_RETAIL', ccy: 'GBP', match: ['retail sales (mom)', 'retail sales mom', 'ventas minoristas (mensual)'], avoid: ['yoy', 'ex fuel', 'anual'] },
+      { id: 'GBP_GFK', ccy: 'GBP', match: ['gfk consumer confidence', 'confianza del consumidor de gfk'], avoid: [] },
+      { id: 'GBP_CBI', ccy: 'GBP', match: ['cbi industrial trends orders', 'cbi industrial trends', 'cbi industrial', 'pedidos de tendencias industriales segun el cbi'], avoid: ['distributive'] },
+      { id: 'GBP_GDP', ccy: 'GBP', match: ['monthly gdp (mom)', 'monthly gdp', 'gdp (mom)', 'gdp mom', 'pib mensual', 'pib (mensual)'], avoid: ['3m/3m', 'yoy', 'quarterly', 'trimestral'] },
 
       // JPY (9)
-      { id: 'JPY_JIBUN_MFG', ccy: 'JPY', match: ['au jibun bank japan manufacturing pmi', 'jibun bank manufacturing pmi', 'jibun mfg pmi', 'jibun mfg'], avoid: ['services', 'composite', 'construction'] },
-      { id: 'JPY_JIBUN_SERV', ccy: 'JPY', match: ['au jibun bank japan services pmi', 'jibun bank services pmi', 'jibun services pmi', 'jibun services'], avoid: ['mfg', 'manufacturing', 'composite', 'construction'] },
-      { id: 'JPY_TOKYO_CPI', ccy: 'JPY', match: ['tokyo cpi (mom)', 'tokyo cpi mom', 'tokyo cpi'], avoid: ['ex fresh food', 'yoy', 'national'] },
-      { id: 'JPY_UNEMP', ccy: 'JPY', match: ['unemployment rate'], avoid: [] },
-      { id: 'JPY_EARNINGS', ccy: 'JPY', match: ['labor cash earnings (yoy)', 'cash earnings (mom)', 'cash earnings mom', 'cash earnings', 'labor cash earnings'], avoid: [] },
-      { id: 'JPY_RETAIL', ccy: 'JPY', match: ['retail sales (mom)', 'retail sales mom'], avoid: ['yoy'] },
-      { id: 'JPY_CONS_SURVEY', ccy: 'JPY', match: ['consumer survey', 'consumer confidence'], avoid: [] },
-      { id: 'JPY_TANKAN', ccy: 'JPY', match: ['reuters tankan index', 'reuters tankan', 'tankan index', 'tankan'], avoid: ['large manufacturers', 'non-manufacturers'] },
-      { id: 'JPY_JCER_GDP', ccy: 'JPY', match: ['jcer monthly gdp', 'jcer gdp'], avoid: [] },
+      { id: 'JPY_JIBUN_MFG', ccy: 'JPY', match: ['au jibun bank japan manufacturing pmi', 'jibun bank manufacturing pmi', 'jibun mfg pmi', 'jibun mfg', 'pmi del sector manufacturero de japon'], avoid: ['services', 'servicios', 'composite', 'construction'] },
+      { id: 'JPY_JIBUN_SERV', ccy: 'JPY', match: ['au jibun bank japan services pmi', 'jibun bank services pmi', 'jibun services pmi', 'jibun services', 'pmi del sector servicios de japon'], avoid: ['mfg', 'manufacturero', 'composite', 'construction'] },
+      { id: 'JPY_TOKYO_CPI', ccy: 'JPY', match: ['tokyo cpi (mom)', 'tokyo cpi mom', 'tokyo cpi', 'ipc de tokio (mensual)'], avoid: ['ex fresh food', 'yoy', 'anual', 'national'] },
+      { id: 'JPY_UNEMP', ccy: 'JPY', match: ['unemployment rate', 'tasa de desempleo'], avoid: [] },
+      { id: 'JPY_EARNINGS', ccy: 'JPY', match: ['labor cash earnings (yoy)', 'cash earnings (mom)', 'cash earnings mom', 'cash earnings', 'labor cash earnings', 'ingresos salariales en efectivo'], avoid: [] },
+      { id: 'JPY_RETAIL', ccy: 'JPY', match: ['retail sales (mom)', 'retail sales mom', 'ventas minoristas (mensual)'], avoid: ['yoy', 'anual'] },
+      { id: 'JPY_CONS_SURVEY', ccy: 'JPY', match: ['consumer survey', 'consumer confidence', 'confianza del consumidor'], avoid: [] },
+      { id: 'JPY_TANKAN', ccy: 'JPY', match: ['reuters tankan index', 'reuters tankan', 'tankan index', 'tankan', 'tankan large manufacturers index', 'indice tankan de grandes fabricantes'], avoid: ['non-manufacturers'] },
+      { id: 'JPY_JCER_GDP', ccy: 'JPY', match: ['jcer monthly gdp', 'jcer gdp', 'pib mensual de jcer'], avoid: [] },
 
       // AUD (9)
-      { id: 'AUD_JUDO_MFG', ccy: 'AUD', match: ['judo bank australia manufacturing pmi', 'judo bank manufacturing pmi', 'judo mfg pmi', 'judo mfg'], avoid: ['services', 'composite', 'construction'] },
-      { id: 'AUD_JUDO_SERV', ccy: 'AUD', match: ['judo bank australia services pmi', 'judo bank services pmi', 'judo services pmi', 'judo services'], avoid: ['mfg', 'manufacturing', 'composite', 'construction'] },
-      { id: 'AUD_CPI_IND', ccy: 'AUD', match: ['monthly cpi indicator', 'cpi indicator (mom)', 'cpi indicator mom', 'cpi indicator'], avoid: ['trimmed', 'yoy'] },
-      { id: 'AUD_UNEMP', ccy: 'AUD', match: ['unemployment rate'], avoid: [] },
-      { id: 'AUD_EMP_CHG', ccy: 'AUD', match: ['employment change'], avoid: ['full time', 'part time'] },
-      { id: 'AUD_RETAIL', ccy: 'AUD', match: ['retail sales (mom)', 'retail sales mom'], avoid: ['yoy'] },
-      { id: 'AUD_WESTPAC', ccy: 'AUD', match: ['westpac consumer sentiment', 'westpac sentiment'], avoid: [] },
-      { id: 'AUD_NAB', ccy: 'AUD', match: ['nab business confidence'], avoid: ['business conditions'] },
-      { id: 'AUD_AIG', ccy: 'AUD', match: ['ai group industry index', 'aig industry index', 'aig industry'], avoid: [] },
+      { id: 'AUD_JUDO_MFG', ccy: 'AUD', match: ['judo bank australia manufacturing pmi', 'judo bank manufacturing pmi', 'judo mfg pmi', 'judo mfg', 'pmi del sector manufacturero de australia de judo bank'], avoid: ['services', 'servicios', 'composite', 'construction'] },
+      { id: 'AUD_JUDO_SERV', ccy: 'AUD', match: ['judo bank australia services pmi', 'judo bank services pmi', 'judo services pmi', 'judo services', 'pmi del sector servicios de australia de judo bank'], avoid: ['mfg', 'manufacturero', 'composite', 'construction'] },
+      { id: 'AUD_CPI_IND', ccy: 'AUD', match: ['monthly cpi indicator', 'cpi indicator (mom)', 'cpi indicator mom', 'cpi indicator', 'indicador mensual del ipc'], avoid: ['trimmed', 'yoy', 'anual'] },
+      { id: 'AUD_UNEMP', ccy: 'AUD', match: ['unemployment rate', 'tasa de desempleo'], avoid: [] },
+      { id: 'AUD_EMP_CHG', ccy: 'AUD', match: ['employment change', 'variacion del empleo', 'cambio en el empleo'], avoid: ['full time', 'part time'] },
+      { id: 'AUD_RETAIL', ccy: 'AUD', match: ['retail sales (mom)', 'retail sales mom', 'ventas minoristas (mensual)'], avoid: ['yoy', 'anual'] },
+      { id: 'AUD_WESTPAC', ccy: 'AUD', match: ['westpac consumer sentiment', 'westpac sentiment', 'confianza del consumidor de westpac'], avoid: [] },
+      { id: 'AUD_NAB', ccy: 'AUD', match: ['nab business confidence', 'confianza empresarial de nab'], avoid: ['business conditions'] },
+      { id: 'AUD_AIG', ccy: 'AUD', match: ['ai group industry index', 'aig industry index', 'aig industry', 'indice de la industria de ai group'], avoid: [] },
 
       // NZD (9)
-      { id: 'NZD_BUSNZ_MFG', ccy: 'NZD', match: ['businessnz manufacturing pmi', 'busnz mfg pmi', 'busnz mfg', 'businessnz manufacturing'], avoid: ['services'] },
-      { id: 'NZD_BUSNZ_SERV', ccy: 'NZD', match: ['businessnz performance of services index', 'busnz services pmi', 'busnz services', 'businessnz services'], avoid: ['mfg', 'manufacturing'] },
-      { id: 'NZD_FOOD_PRICES', ccy: 'NZD', match: ['food price index (mom)', 'food prices (mom)', 'food prices mom', 'food prices'], avoid: ['yoy'] },
-      { id: 'NZD_UNEMP', ccy: 'NZD', match: ['unemployment rate'], avoid: [] },
-      { id: 'NZD_MEI_JOBS', ccy: 'NZD', match: ['mei filled jobs (mom)', 'mei jobs change', 'mei jobs', 'filled jobs'], avoid: [] },
-      { id: 'NZD_CARD', ccy: 'NZD', match: ['electronic card transactions (mom)', 'card transactions', 'electronic card transactions'], avoid: ['yoy'] },
-      { id: 'NZD_ANZ_CONS', ccy: 'NZD', match: ['anz consumer confidence'], avoid: [] },
-      { id: 'NZD_ANZ_BIZ', ccy: 'NZD', match: ['anz business confidence'], avoid: ['activity outlook'] },
-      { id: 'NZD_BUSNZ_ACT', ccy: 'NZD', match: ['businessnz activity index', 'busnz activity index', 'busnz activity'], avoid: [] },
+      { id: 'NZD_BUSNZ_MFG', ccy: 'NZD', match: ['businessnz manufacturing pmi', 'busnz mfg pmi', 'busnz mfg', 'businessnz manufacturing', 'pmi manufacturero de businessnz'], avoid: ['services', 'servicios'] },
+      { id: 'NZD_BUSNZ_SERV', ccy: 'NZD', match: ['businessnz performance of services index', 'busnz services pmi', 'busnz services', 'businessnz services', 'indice del sector servicios de businessnz'], avoid: ['mfg', 'manufacturero'] },
+      { id: 'NZD_FOOD_PRICES', ccy: 'NZD', match: ['food price index (mom)', 'food prices (mom)', 'food prices mom', 'food prices', 'indice de precios de los alimentos (mensual)'], avoid: ['yoy', 'anual'] },
+      { id: 'NZD_UNEMP', ccy: 'NZD', match: ['unemployment rate', 'tasa de desempleo'], avoid: [] },
+      { id: 'NZD_MEI_JOBS', ccy: 'NZD', match: ['mei filled jobs (mom)', 'mei jobs change', 'mei jobs', 'filled jobs', 'empleos cubiertos segun el mei'], avoid: [] },
+      { id: 'NZD_CARD', ccy: 'NZD', match: ['electronic card transactions (mom)', 'card transactions', 'electronic card transactions', 'transacciones con tarjeta electronica'], avoid: ['yoy', 'anual'] },
+      { id: 'NZD_ANZ_CONS', ccy: 'NZD', match: ['anz consumer confidence', 'confianza del consumidor de anz'], avoid: [] },
+      { id: 'NZD_ANZ_BIZ', ccy: 'NZD', match: ['anz business confidence', 'confianza empresarial de anz'], avoid: ['activity outlook'] },
+      { id: 'NZD_BUSNZ_ACT', ccy: 'NZD', match: ['businessnz activity index', 'busnz activity index', 'busnz activity', 'indice de actividad de businessnz'], avoid: [] },
 
       // CAD (9)
-      { id: 'CAD_SP_MFG', ccy: 'CAD', match: ['s&p global canada manufacturing pmi', 's&p mfg pmi', 's&p mfg', 's&p global manufacturing pmi'], avoid: ['services'] },
-      { id: 'CAD_IVEY', ccy: 'CAD', match: ['ivey pmi'], avoid: ['unadjusted', 'employment', 'prices'] },
-      { id: 'CAD_CPI_MOM', ccy: 'CAD', match: ['cpi (mom)', 'cpi mom'], avoid: ['core', 'yoy', 'median', 'trimmed'] },
-      { id: 'CAD_UNEMP', ccy: 'CAD', match: ['unemployment rate'], avoid: [] },
-      { id: 'CAD_NET_EMP', ccy: 'CAD', match: ['net change in employment', 'net employment change', 'employment change'], avoid: ['full time', 'part time'] },
-      { id: 'CAD_RETAIL', ccy: 'CAD', match: ['retail sales (mom)', 'retail sales mom'], avoid: ['ex autos', 'yoy'] },
-      { id: 'CAD_CB_CONS', ccy: 'CAD', match: ['cb consumer survey', 'cb consumer confidence', 'consumer survey'], avoid: [] },
-      { id: 'CAD_CFIB', ccy: 'CAD', match: ['cfib business barometer'], avoid: [] },
-      { id: 'CAD_GDP_MOM', ccy: 'CAD', match: ['monthly gdp (mom)', 'monthly gdp mom', 'gdp (mom)', 'gdp mom'], avoid: ['yoy', 'annualized'] },
+      { id: 'CAD_SP_MFG', ccy: 'CAD', match: ['s&p global canada manufacturing pmi', 's&p mfg pmi', 's&p mfg', 's&p global manufacturing pmi', 'pmi del sector manufacturero de canada de s&p global'], avoid: ['services', 'servicios'] },
+      { id: 'CAD_IVEY', ccy: 'CAD', match: ['ivey pmi', 'pmi del gestor de compras ivey'], avoid: ['unadjusted', 'employment', 'prices'] },
+      { id: 'CAD_CPI_MOM', ccy: 'CAD', match: ['cpi (mom)', 'cpi mom', 'ipc (mensual)'], avoid: ['core', 'subyacente', 'yoy', 'anual', 'median', 'trimmed'] },
+      { id: 'CAD_UNEMP', ccy: 'CAD', match: ['unemployment rate', 'tasa de desempleo'], avoid: [] },
+      { id: 'CAD_NET_EMP', ccy: 'CAD', match: ['net change in employment', 'net employment change', 'employment change', 'variacion neta del empleo'], avoid: ['full time', 'part time'] },
+      { id: 'CAD_RETAIL', ccy: 'CAD', match: ['retail sales (mom)', 'retail sales mom', 'ventas minoristas (mensual)'], avoid: ['ex autos', 'yoy', 'anual'] },
+      { id: 'CAD_CB_CONS', ccy: 'CAD', match: ['cb consumer survey', 'cb consumer confidence', 'consumer survey', 'encuesta de confianza del consumidor de cb'], avoid: [] },
+      { id: 'CAD_CFIB', ccy: 'CAD', match: ['cfib business barometer', 'barometro empresarial de la cfib'], avoid: [] },
+      { id: 'CAD_GDP_MOM', ccy: 'CAD', match: ['monthly gdp (mom)', 'monthly gdp mom', 'gdp (mom)', 'gdp mom', 'pib mensual'], avoid: ['yoy', 'anual', 'annualized'] },
 
       // CHF (9)
-      { id: 'CHF_PROCURE_MFG', ccy: 'CHF', match: ['procure.ch manufacturing pmi', 'procure mfg pmi', 'procure mfg', 'procure pmi', 'procure.ch pmi'], avoid: ['services'] },
-      { id: 'CHF_PROCURE_SERV', ccy: 'CHF', match: ['procure.ch services pmi', 'procure services pmi', 'procure services'], avoid: ['mfg', 'manufacturing'] },
-      { id: 'CHF_CPI_MOM', ccy: 'CHF', match: ['cpi (mom)', 'cpi mom'], avoid: ['core', 'yoy'] },
-      { id: 'CHF_UNEMP_RATE', ccy: 'CHF', match: ['unemployment rate', 'unemp rate'], avoid: ['non-seasonally', 'change'] },
-      { id: 'CHF_UNEMP_CHG', ccy: 'CHF', match: ['unemployment change', 'unemp change'], avoid: ['rate'] },
-      { id: 'CHF_RETAIL', ccy: 'CHF', match: ['real retail sales (mom)', 'retail sales (mom)', 'retail sales mom'], avoid: ['yoy'] },
-      { id: 'CHF_CONS_SENT', ccy: 'CHF', match: ['seco consumer sentiment', 'consumer sentiment'], avoid: [] },
-      { id: 'CHF_KOF', ccy: 'CHF', match: ['kof economic barometer', 'kof indicator'], avoid: [] },
-      { id: 'CHF_SECO', ccy: 'CHF', match: ['seco economic forecasts', 'seco economic indicators'], avoid: [] }
+      { id: 'CHF_PROCURE_MFG', ccy: 'CHF', match: ['procure.ch manufacturing pmi', 'procure mfg pmi', 'procure mfg', 'procure pmi', 'procure.ch pmi', 'pmi del sector manufacturero de procure.ch'], avoid: ['services', 'servicios'] },
+      { id: 'CHF_PROCURE_SERV', ccy: 'CHF', match: ['procure.ch services pmi', 'procure services pmi', 'procure services', 'pmi del sector servicios de procure.ch'], avoid: ['mfg', 'manufacturero'] },
+      { id: 'CHF_CPI_MOM', ccy: 'CHF', match: ['cpi (mom)', 'cpi mom', 'ipc (mensual)'], avoid: ['core', 'subyacente', 'yoy', 'anual'] },
+      { id: 'CHF_UNEMP_RATE', ccy: 'CHF', match: ['unemployment rate', 'unemp rate', 'tasa de desempleo'], avoid: ['non-seasonally', 'change', 'variacion'] },
+      { id: 'CHF_UNEMP_CHG', ccy: 'CHF', match: ['unemployment change', 'unemp change', 'variacion del desempleo'], avoid: ['rate', 'tasa'] },
+      { id: 'CHF_RETAIL', ccy: 'CHF', match: ['real retail sales (mom)', 'retail sales (mom)', 'retail sales mom', 'ventas minoristas reales (mensual)'], avoid: ['yoy', 'anual'] },
+      { id: 'CHF_CONS_SENT', ccy: 'CHF', match: ['seco consumer sentiment', 'consumer sentiment', 'clima de consumo de seco'], avoid: [] },
+      { id: 'CHF_KOF', ccy: 'CHF', match: ['kof economic barometer', 'kof indicator', 'barometro economico kof'], avoid: [] },
+      { id: 'CHF_SECO', ccy: 'CHF', match: ['seco economic forecasts', 'seco economic indicators', 'previsiones economicas de seco'], avoid: [] }
     ];
 
     function getCoreRuleId(ccy, eventName) {
       if (!eventName || !ccy) return null;
-      const lower = eventName.toLowerCase();
+      const cleanEvent = normalizeText(eventName);
       
       for (const rule of CORE_INDICATOR_RULES) {
         if (rule.ccy !== ccy) continue;
-        const matches = rule.match.some(m => lower.includes(m));
+        
+        const matches = rule.match.some(m => {
+          const cleanMatch = normalizeText(m);
+          return cleanEvent.includes(cleanMatch);
+        });
+
         if (matches) {
-          const avoids = rule.avoid.some(a => lower.includes(a));
+          const avoids = rule.avoid.some(a => {
+            const cleanAvoid = normalizeText(a);
+            return cleanEvent.includes(cleanAvoid);
+          });
           if (!avoids) return rule.id;
         }
       }
@@ -313,17 +340,18 @@
         'speaks', 'speech', 'president speaks', 'summary of opinions', 'fomc', 'ecb', 'boe', 'boc', 
         'rba', 'rbnz', 'snb', 'pboc', 'economic projections', 'dot plot', 'monetary policy assessment', 
         'financial stability report', 'testimony', 'budget', 'autumn statement', 'spring budget', 
-        'fiscal statement', 'statement', 'cash rate', 'overnight rate', 'policy rate', 'bank rate'
+        'fiscal statement', 'statement', 'cash rate', 'overnight rate', 'policy rate', 'bank rate',
+        'tasas de interes', 'politica monetaria', 'actas', 'rueda de prensa', 'discurso'
       ],
-      USD: ['ism', 'cpi', 'unemployment rate', 'nfp', 'retail sales', 'cb consumer confidence', 'nfib', 'gdpnow', 'atlanta fed', 'adp', 'average hourly earnings', 'jobless claims', 'pce', 'ppi', 'gdp', 'industrial production', 'building permits', 'home sales', 'trade balance', 'jolts', 'durable goods'],
-      CAD: ['s&p', 'ivey', 'cpi', 'unemployment rate', 'net employment change', 'employment change', 'retail sales', 'cb consumer survey', 'cfib', 'monthly gdp', 'gdp', 'monetary policy report', 'ppi', 'ippi', 'trade balance', 'boc business outlook', 'housing starts'],
-      EUR: ['hcob', 'cpi', 'unemployment', 'germany unemp', 'retail sales', 'consumer confidence', 'ifo', 'industrial production', 'ppi', 'gdp', 'zew', 'trade balance', 'hicp', 'negotiated wages', 'factory orders'],
-      CHF: ['procure', 'cpi', 'unemp', 'retail sales', 'consumer sentiment', 'kof', 'seco', 'ppi', 'gdp', 'industrial production', 'trade balance', 'svme'],
-      GBP: ['s&p', 'cpi', 'unemployment rate', 'claimant count', 'retail sales', 'gfk', 'cbi', 'monthly gdp', 'gdp', 'rpi', 'ppi', 'average earnings', 'public sector net borrowing'],
-      JPY: ['jibun', 'tokyo cpi', 'unemployment rate', 'cash earnings', 'retail sales', 'consumer survey', 'tankan', 'jcer', 'ppi', 'cgpi', 'national cpi', 'gdp', 'trade balance', 'household spending', 'machine orders'],
-      AUD: ['judo', 'cpi indicator', 'unemployment rate', 'employment change', 'retail sales', 'westpac', 'nab', 'aig', 'ppi', 'gdp', 'trade balance', 'building approvals', 'private capex', 'caixin'],
-      NZD: ['busnz', 'food prices', 'unemployment rate', 'mei jobs', 'card transactions', 'anz', 'ppi', 'gdt', 'gdp', 'trade balance', 'building consents'],
-      CNH: ['lpr', 'loan prime rate', 'cpi', 'ppi', 'gdp', 'pmi', 'industrial production', 'retail sales', 'trade balance', 'caixin']
+      USD: ['ism', 'cpi', 'unemployment rate', 'nfp', 'retail sales', 'cb consumer confidence', 'nfib', 'gdpnow', 'atlanta fed', 'adp', 'average hourly earnings', 'jobless claims', 'pce', 'ppi', 'gdp', 'industrial production', 'building permits', 'home sales', 'trade balance', 'jolts', 'durable goods', 'ipc', 'tasa de desempleo', 'nominas no agricolas', 'ventas minoristas'],
+      CAD: ['s&p', 'ivey', 'cpi', 'unemployment rate', 'net employment change', 'employment change', 'retail sales', 'cb consumer survey', 'cfib', 'monthly gdp', 'gdp', 'monetary policy report', 'ppi', 'ippi', 'trade balance', 'boc business outlook', 'housing starts', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib'],
+      EUR: ['hcob', 'cpi', 'unemployment', 'germany unemp', 'retail sales', 'consumer confidence', 'ifo', 'industrial production', 'ppi', 'gdp', 'zew', 'trade balance', 'hicp', 'negotiated wages', 'factory orders', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'produccion industrial', 'pib'],
+      CHF: ['procure', 'cpi', 'unemp', 'retail sales', 'consumer sentiment', 'kof', 'seco', 'ppi', 'gdp', 'industrial production', 'trade balance', 'svme', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib'],
+      GBP: ['s&p', 'cpi', 'unemployment rate', 'claimant count', 'retail sales', 'gfk', 'cbi', 'monthly gdp', 'gdp', 'rpi', 'ppi', 'average earnings', 'public sector net borrowing', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib'],
+      JPY: ['jibun', 'tokyo cpi', 'unemployment rate', 'cash earnings', 'retail sales', 'consumer survey', 'tankan', 'jcer', 'ppi', 'cgpi', 'national cpi', 'gdp', 'trade balance', 'household spending', 'machine orders', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib'],
+      AUD: ['judo', 'cpi indicator', 'unemployment rate', 'employment change', 'retail sales', 'westpac', 'nab', 'aig', 'ppi', 'gdp', 'trade balance', 'building approvals', 'private capex', 'caixin', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib'],
+      NZD: ['busnz', 'food prices', 'unemployment rate', 'mei jobs', 'card transactions', 'anz', 'ppi', 'gdt', 'gdp', 'trade balance', 'building consents', 'ipc', 'tasa de desempleo', 'pib'],
+      CNH: ['lpr', 'loan prime rate', 'cpi', 'ppi', 'gdp', 'pmi', 'industrial production', 'retail sales', 'trade balance', 'caixin', 'ipc', 'pib']
     };
 
     const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH', 'CNY', 'DE', 'FR', 'UK', 'EU', 'CH', 'CA', 'US', 'JP', 'JPN', 'AU', 'AUS', 'NZ', 'NZL', 'GB', 'GBR', 'CN', 'CHN'];
@@ -468,7 +496,6 @@
       if (!eventName) return false;
       const lower = String(eventName).toLowerCase();
 
-      // FILTRO GLOBAL MULTI-DIVISA CONTRA RUIDO Y SUB-COMPONENTES
       const blacklist = [
         'opec', 'crude oil', 'oil inventories', 'eia crude', 'gasoline inventories', 'distillate stocks', 
         'baker hughes', 'fed regional', 'mpc member', 'executive board member', 'construction pmi',
@@ -476,7 +503,6 @@
       ];
       if (blacklist.some(term => lower.includes(term))) return false;
 
-      // EXCLUSIÓN DE EVENTOS LOCALES DE PAÍSES SECUNDARIOS EN EL EUR
       if (ccy === 'EUR') {
         const regionalNoise = ['italy', 'italian', 'spain', 'spanish', 'france', 'french', 'belgium', 'austria', 'greece', 'portugal'];
         const isEurozoneOrGermany = lower.includes('euro zone') || lower.includes('eurozone') || lower.includes('german') || lower.includes('germany') || lower.includes('ifo');
@@ -492,27 +518,88 @@
 
     function getCategorySentimentTitle(ccy, eventName) {
       if (!eventName) return `SENTIMIENTO DE ${ccy}`;
-      const lower = eventName.toLowerCase();
+      const lower = normalizeText(eventName);
       
-      if (lower.includes('cpi') || lower.includes('pce') || lower.includes('rpi') || lower.includes('inflation') || lower.includes('tokyo') || lower.includes('consumer price') || lower.includes('hicp') || lower.includes('food prices')) return `${ccy} - INFLACIÓN (IPC)`;
-      if (lower.includes('ppi') || lower.includes('ippi') || lower.includes('producer price') || lower.includes('cgpi')) return `${ccy} - PRECIOS DE PRODUCTOR (IPP)`;
-      if (lower.includes('unemployment') || lower.includes('employment') || lower.includes('jobless') || lower.includes('nfp') || lower.includes('adp') || lower.includes('claimant') || lower.includes('earnings') || lower.includes('cash earnings') || lower.includes('household spending') || lower.includes('jolts') || lower.includes('job openings') || lower.includes('labor turnover') || lower.includes('employment cost') || lower.includes('eci') || lower.includes('challenger') || lower.includes('mei')) return `${ccy} - MERCADO LABORAL Y SALARIOS`;
-      
-      if (lower.includes('ism')) return `${ccy} - PMI ISM`;
-      if (lower.includes('s&p') || lower.includes('markit') || lower.includes('hcob') || lower.includes('caixin')) return `${ccy} - PMI S&P GLOBAL / CAIXIN`;
-      if (lower.includes('ivey')) return `${ccy} - PMI IVEY`;
-      if (lower.includes('tankan')) return `${ccy} - ENCUESTA TANKAN`;
-      if (lower.includes('pmi') || lower.includes('jibun') || lower.includes('judo') || lower.includes('procure') || lower.includes('busnz')) return `${ccy} - ÍNDICES PMI`;
+      // 1. FAMILIAS ESPECÍFICAS DE PMI
+      if (lower.includes('ism')) {
+        return `${ccy} - PMI ISM`;
+      }
+      if (lower.includes('s p') || lower.includes('markit') || lower.includes('hcob') || lower.includes('caixin') || lower.includes('cips')) {
+        return `${ccy} - PMI S&P GLOBAL / MARKIT`;
+      }
+      if (lower.includes('judo')) {
+        return `${ccy} - PMI JUDO BANK`;
+      }
+      if (lower.includes('jibun')) {
+        return `${ccy} - PMI JIBUN BANK`;
+      }
+      if (lower.includes('procure')) {
+        return `${ccy} - PMI PROCURE.CH`;
+      }
+      if (lower.includes('busnz') || lower.includes('businessnz')) {
+        return `${ccy} - PMI BUSINESSNZ`;
+      }
+      if (lower.includes('ivey')) {
+        return `${ccy} - PMI IVEY`;
+      }
+      if (lower.includes('chicago pmi')) {
+        return `${ccy} - PMI CHICAGO`;
+      }
+      if (lower.includes('pmi')) {
+        return `${ccy} - ÍNDICES PMI`;
+      }
 
-      if (lower.includes('interest rate') || lower.includes('monetary policy') || lower.includes('ecb press') || lower.includes('fomc') || lower.includes('rate decision') || lower.includes('loan prime') || lower.includes('boj') || lower.includes('bank of japan') || lower.includes('meeting minutes') || lower.includes('speaks') || lower.includes('speech') || lower.includes('dot plot') || lower.includes('projections') || lower.includes('cash rate') || lower.includes('overnight rate') || lower.includes('bank rate') || lower.includes('ocr')) return `${ccy} - POLÍTICA MONETARIA Y TASAS`;
-      if (lower.includes('retail sales') || lower.includes('card transactions')) return `${ccy} - VENTAS MINORISTAS Y CONSUMO`;
-      if (lower.includes('trade balance') || lower.includes('exports') || lower.includes('imports') || lower.includes('current account')) return `${ccy} - BALANZA COMERCIAL`;
-      if (lower.includes('gdp') || lower.includes('gdpnow') || lower.includes('activity index')) return `${ccy} - PRODUCTO INTERNO BRUTO Y ACTIVIDAD (PIB)`;
-      if (lower.includes('consumer confidence') || lower.includes('consumer sentiment') || lower.includes('consumer climate') || lower.includes('consumer survey') || lower.includes('michigan') || lower.includes('gfk') || lower.includes('westpac') || lower.includes('seco')) return `${ccy} - CONFIANZA DEL CONSUMIDOR`;
-      if (lower.includes('business confidence') || lower.includes('business sentiment') || lower.includes('business climate') || lower.includes('business barometer') || lower.includes('zew') || lower.includes('ifo') || lower.includes('cbi') || lower.includes('nfib') || lower.includes('cfib') || lower.includes('economy watchers') || lower.includes('sentix') || lower.includes('nab') || lower.includes('anz') || lower.includes('aig') || lower.includes('economic sentiment') || lower.includes('philly fed') || lower.includes('empire state') || lower.includes('kof')) return `${ccy} - CONFIANZA Y CLIMA DE NEGOCIOS`;
-      if (lower.includes('industrial production') || lower.includes('factory orders') || lower.includes('manufacturing production') || lower.includes('machine orders') || lower.includes('durable goods')) return `${ccy} - PRODUCCIÓN INDUSTRIAL`;
-      if (lower.includes('gdt') || lower.includes('dairy')) return `${ccy} - ÍNDICE DE PRECIOS LÁCTEOS (GDT)`;
-      if (lower.includes('building permit') || lower.includes('building approvals') || lower.includes('building consents') || lower.includes('home sales') || lower.includes('housing starts')) return `${ccy} - MERCADO INMOBILIARIO`;
+      // 2. POLÍTICA MONETARIA Y BANCOS CENTRALES
+      if (lower.includes('interest rate') || lower.includes('monetary policy') || lower.includes('press conference') || lower.includes('fomc') || lower.includes('rate decision') || lower.includes('loan prime') || lower.includes('boj') || lower.includes('bank of japan') || lower.includes('meeting minutes') || lower.includes('speaks') || lower.includes('speech') || lower.includes('dot plot') || lower.includes('projections') || lower.includes('cash rate') || lower.includes('overnight rate') || lower.includes('bank rate') || lower.includes('tasas de interes') || lower.includes('politica monetaria')) {
+        return `${ccy} - POLÍTICA MONETARIA Y TASAS`;
+      }
+
+      // 3. INFLACIÓN (IPC / PCE)
+      if (lower.includes('cpi') || lower.includes('ipc') || lower.includes('pce') || lower.includes('rpi') || lower.includes('inflation') || lower.includes('inflacion') || lower.includes('tokyo cpi') || lower.includes('consumer price') || lower.includes('hicp') || lower.includes('food prices')) {
+        return `${ccy} - INFLACIÓN (IPC)`;
+      }
+
+      // 4. PRECIOS DE PRODUCTOR (IPP)
+      if (lower.includes('ppi') || lower.includes('ipp') || lower.includes('ippi') || lower.includes('producer price') || lower.includes('cgpi')) {
+        return `${ccy} - PRECIOS DE PRODUCTOR (IPP)`;
+      }
+
+      // 5. MERCADO LABORAL Y SALARIOS
+      if (lower.includes('unemployment') || lower.includes('desempleo') || lower.includes('nfp') || lower.includes('adp') || lower.includes('nonfarm') || lower.includes('nominas') || lower.includes('claimant') || lower.includes('jobless') || lower.includes('employment change') || lower.includes('variacion del empleo') || lower.includes('cambio en el empleo') || lower.includes('earnings') || lower.includes('salarios') || lower.includes('cash earnings') || lower.includes('jolts') || lower.includes('employment cost') || lower.includes('eci') || lower.includes('challenger') || lower.includes('mei filled jobs')) {
+        return `${ccy} - MERCADO LABORAL Y SALARIOS`;
+      }
+
+      // 6. VENTAS MINORISTAS Y CONSUMO
+      if (lower.includes('retail sales') || lower.includes('ventas minoristas') || lower.includes('card transactions')) {
+        return `${ccy} - VENTAS MINORISTAS Y CONSUMO`;
+      }
+
+      // 7. PIB Y ACTIVIDAD ECONÓMICA
+      if (lower.includes('gdp') || lower.includes('pib') || lower.includes('gdpnow') || lower.includes('activity index')) {
+        return `${ccy} - PRODUCTO INTERNO BRUTO Y ACTIVIDAD (PIB)`;
+      }
+
+      // 8. CONFIANZA DEL CONSUMIDOR
+      if (lower.includes('consumer confidence') || lower.includes('consumer sentiment') || lower.includes('confianza del consumidor') || lower.includes('clima de consumo') || lower.includes('consumer survey') || lower.includes('michigan') || lower.includes('gfk') || lower.includes('westpac') || lower.includes('seco')) {
+        return `${ccy} - CONFIANZA DEL CONSUMIDOR`;
+      }
+
+      // 9. CONFIANZA EMPRESARIAL Y ENCUESTAS DE NEGOCIOS
+      if (lower.includes('tankan')) return `${ccy} - ENCUESTA TANKAN`;
+      if (lower.includes('ifo') || lower.includes('zew') || lower.includes('cbi') || lower.includes('nfib') || lower.includes('cfib') || lower.includes('nab') || lower.includes('anz') || lower.includes('aig') || lower.includes('kof') || lower.includes('philly fed') || lower.includes('empire state')) {
+        return `${ccy} - CONFIANZA Y CLIMA DE NEGOCIOS`;
+      }
+
+      // 10. PRODUCCIÓN INDUSTRIAL Y BALANZA
+      if (lower.includes('industrial production') || lower.includes('produccion industrial') || lower.includes('factory orders') || lower.includes('machine orders') || lower.includes('durable goods')) {
+        return `${ccy} - PRODUCCIÓN INDUSTRIAL`;
+      }
+      if (lower.includes('trade balance') || lower.includes('balanza comercial') || lower.includes('exports') || lower.includes('imports')) {
+        return `${ccy} - BALANZA COMERCIAL`;
+      }
+      if (lower.includes('building') || lower.includes('housing') || lower.includes('home sales')) {
+        return `${ccy} - MERCADO INMOBILIARIO`;
+      }
 
       const cleanName = eventName.replace(/^(French|German|Italian|Spanish|Eurozone|US|UK|Japanese|Australian|Canadian|Swiss|Chinese)\s+/i, '');
       const firstWord = cleanName.split(' ')[0].toUpperCase();
@@ -601,7 +688,6 @@
           return;
         }
 
-        // DETECCIÓN DINÁMICA DE COLUMNAS DE EXCEL (EVITA COLUMNAS DE IMPACTO / VOLATILIDAD)
         let time = "", ccy = "", event = "", actual = "", forecast = "", previous = "";
         let foundCcyIdx = -1;
 
@@ -672,15 +758,19 @@
         }
       });
 
-      // PASADA DE DEDUPLICACIÓN: SOLO EL PRIMER EVENTO PRINCIPAL OBTENGA EL RESALTE TARGET
-      const claimedCoreRules = new Set();
+      const claimedCoreRulesPerEvent = new Set();
+      
       Object.keys(daysData).forEach(day => {
         (daysData[day] || []).forEach(item => {
-          if (item.coreRuleId && !claimedCoreRules.has(item.coreRuleId)) {
-            item.isCore = true;
-            claimedCoreRules.add(item.coreRuleId);
-          } else {
-            item.isCore = false;
+          if (item.coreRuleId) {
+            const uniqueEventKey = `${day}_${item.time}_${item.coreRuleId}`;
+            
+            if (!claimedCoreRulesPerEvent.has(uniqueEventKey)) {
+              item.isCore = true;
+              claimedCoreRulesPerEvent.add(uniqueEventKey);
+            } else {
+              item.isCore = false;
+            }
           }
         });
       });
@@ -738,11 +828,11 @@
           </td>
           <td class="p-2 text-center font-mono">
             <div class="flex items-center justify-center gap-1">
-              <button onclick="setIntermarketScore('${asset}', 2)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-emerald-500 ${curScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
-              <button onclick="setIntermarketScore('${asset}', 1)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-emerald-400 ${curScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
-              <button onclick="setIntermarketScore('${asset}', 0)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-zinc-500 ${curScore === 0 ? 'score-btn-active-0' : ''}">0</button>
-              <button onclick="setIntermarketScore('${asset}', -1)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-rose-400 ${curScore === -1 ? 'score-btn-active-m1' : ''}">-1</button>
-              <button onclick="setIntermarketScore('${asset}', -2)" class="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] text-zinc-300 hover:border-rose-600 ${curScore === -2 ? 'score-btn-active-m2' : ''}">-2</button>
+              <button type="button" onclick="setIntermarketScore('${asset}', 2, event)" class="score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-500 ${curScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
+              <button type="button" onclick="setIntermarketScore('${asset}', 1, event)" class="score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-400 ${curScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
+              <button type="button" onclick="setIntermarketScore('${asset}', 0, event)" class="score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-zinc-500 ${curScore === 0 ? 'score-btn-active-0' : ''}">0</button>
+              <button type="button" onclick="setIntermarketScore('${asset}', -1, event)" class="score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-400 ${curScore === -1 ? 'score-btn-active-m1' : ''}">-1</button>
+              <button type="button" onclick="setIntermarketScore('${asset}', -2, event)" class="score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-600 ${curScore === -2 ? 'score-btn-active-m2' : ''}">-2</button>
             </div>
           </td>
           <td id="live-matrix-${asset}" class="p-2 text-center font-mono text-xs rounded transition-all">0</td>
@@ -761,7 +851,8 @@
       renderInteractiveCalendar();
     }
 
-    function handleScoreBtnClick(btn) {
+    function handleScoreBtnClick(btn, e) {
+      if (e) e.preventDefault();
       const catId = btn.getAttribute('data-catid');
       const ccy = btn.getAttribute('data-ccy');
       const scoreVal = parseInt(btn.getAttribute('data-score')) || 0;
@@ -879,11 +970,11 @@
                     </div>
                     <div class="flex items-center gap-1.5 font-mono self-end sm:self-auto">
                       <span class="text-[10px] text-zinc-400 mr-1 uppercase">Puntuación:</span>
-                      <button data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="2" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-500 transition ${currentScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
-                      <button data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="1" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-400 transition ${currentScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
-                      <button data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="0" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-zinc-500 transition ${currentScore === 0 ? 'score-btn-active-0' : ''}">0</button>
-                      <button data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="-1" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-400 transition ${currentScore === -1 ? 'score-btn-active-m1' : ''}">-1</button>
-                      <button data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="-2" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this)" class="score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-600 transition ${currentScore === -2 ? 'score-btn-active-m2' : ''}">-2</button>
+                      <button type="button" data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="2" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this, event)" class="score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-500 transition ${currentScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
+                      <button type="button" data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="1" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this, event)" class="score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-400 transition ${currentScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
+                      <button type="button" data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="0" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this, event)" class="score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-zinc-500 transition ${currentScore === 0 ? 'score-btn-active-0' : ''}">0</button>
+                      <button type="button" data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="-1" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this, event)" class="score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-400 transition ${currentScore === -1 ? 'score-btn-active-m1' : ''}">-1</button>
+                      <button type="button" data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="-2" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this, event)" class="score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-rose-600 transition ${currentScore === -2 ? 'score-btn-active-m2' : ''}">-2</button>
                     </div>
                   </div>
                 </td>
@@ -936,7 +1027,7 @@
       if (btn && btn.parentElement) {
         const parent = btn.parentElement;
         parent.querySelectorAll('.score-btn').forEach(b => {
-          b.className = "score-btn px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 transition";
+          b.className = "score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 transition-colors";
         });
         if (scoreVal === 2) btn.classList.add('score-btn-active-p2');
         if (scoreVal === 1) btn.classList.add('score-btn-active-p1');
@@ -949,7 +1040,9 @@
       recalculateMatrixAndDivergences();
     }
 
-    function setIntermarketScore(asset, scoreVal) {
+    function setIntermarketScore(asset, scoreVal, e) {
+      if (e) e.preventDefault();
+      
       globalState.intermarketScores[asset] = parseInt(scoreVal);
       saveToLocalStorage();
       renderMatrixTables();
@@ -1118,63 +1211,72 @@
 
       divergencesFound.sort((a, b) => b.diff - a.diff);
 
-      if (divergencesFound.length > 0) {
+      // Mantener recuadro con altura fija siempre que existan datos cargados
+      if (Object.keys(globalState.daysData).length > 0) {
         alertBox.classList.remove('hidden');
+      }
+
+      if (divergencesFound.length > 0) {
         badge.textContent = `${divergencesFound.length} Pares Aprobados`;
+        listContainer.className = "flex-grow overflow-y-auto pr-1 space-y-2.5 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs";
         listContainer.innerHTML = divergencesFound.map(d => {
           const strongBreakdown = getCurrencyScoreBreakdown(d.strong);
           const weakBreakdown = getCurrencyScoreBreakdown(d.weak);
 
           return `
-            <div class="bg-[#05060a] border border-zinc-800 hover:border-cyan-500/40 p-3.5 rounded-2xl space-y-3 transition shadow-lg">
-              <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
+            <div class="bg-[#05060a] border border-zinc-800 hover:border-cyan-500/40 p-3 rounded-xl space-y-2.5 transition shadow-lg flex flex-col justify-between">
+              <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2">
                 <div>
-                  <span class="text-[10px] text-zinc-500 uppercase font-mono block">Oportunidad Macro</span>
-                  <span class="font-black text-cyan-400 text-base font-mono tracking-tight">${escapeHtml(d.pair)}</span>
+                  <span class="text-[9px] text-zinc-500 uppercase font-mono block">Oportunidad Macro</span>
+                  <span class="font-black text-cyan-400 text-sm font-mono tracking-tight">${escapeHtml(d.pair)}</span>
                 </div>
                 <div class="text-right font-mono">
-                  <span class="${d.actionBadge.includes('COMPRA') ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40' : 'bg-rose-950/80 text-rose-400 border-rose-500/40'} border px-2.5 py-1 rounded-lg text-[11px] font-black block mb-1 shadow-sm">${escapeHtml(d.actionBadge)}</span>
-                  <span class="text-[10px] text-zinc-400">Diferencial: <strong class="text-white">${d.diff} pts</strong></span>
+                  <span class="${d.actionBadge.includes('COMPRA') ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40' : 'bg-rose-950/80 text-rose-400 border-rose-500/40'} border px-2 py-0.5 rounded text-[10px] font-black block mb-0.5 shadow-sm">${escapeHtml(d.actionBadge)}</span>
+                  <span class="text-[9px] text-zinc-400">Dif: <strong class="text-white">${d.diff} pts</strong></span>
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-sans">
-                <div class="bg-[#090b12] border border-emerald-500/20 rounded-xl p-2.5 space-y-1.5">
+              <div class="grid grid-cols-2 gap-2 text-xs font-sans">
+                <div class="bg-[#090b12] border border-emerald-500/20 rounded-lg p-2 space-y-1">
                   <div class="flex justify-between items-center border-b border-emerald-500/10 pb-1 font-mono">
-                    <span class="font-bold text-emerald-400 text-[11px]">${escapeHtml(d.strong)} (Fuerte)</span>
-                    <span class="bg-emerald-500/20 text-emerald-300 font-bold px-1.5 py-0.2 rounded text-[10px]">+${d.strongScore}</span>
+                    <span class="font-bold text-emerald-400 text-[10px]">${escapeHtml(d.strong)} (+${d.strongScore})</span>
                   </div>
-                  <div class="space-y-1">
+                  <div class="space-y-0.5 max-h-20 overflow-y-auto">
                     ${strongBreakdown.length > 0 ? strongBreakdown.map(b => `
-                      <div class="flex items-center justify-between text-[11px] text-zinc-300 bg-zinc-900/60 px-2 py-1 rounded border border-zinc-800/50">
+                      <div class="flex items-center justify-between text-[10px] text-zinc-300 bg-zinc-900/60 px-1.5 py-0.5 rounded">
                         <span class="truncate pr-1">${escapeHtml(b.label)}</span>
                         <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
                       </div>
-                    `).join('') : '<span class="text-[10px] text-zinc-500 block italic">Sin eventos</span>'}
+                    `).join('') : '<span class="text-[9px] text-zinc-500 block italic">Sin eventos</span>'}
                   </div>
                 </div>
 
-                <div class="bg-[#090b12] border border-rose-500/20 rounded-xl p-2.5 space-y-1.5">
+                <div class="bg-[#090b12] border border-rose-500/20 rounded-lg p-2 space-y-1">
                   <div class="flex justify-between items-center border-b border-rose-500/10 pb-1 font-mono">
-                    <span class="font-bold text-rose-400 text-[11px]">${escapeHtml(d.weak)} (Débil)</span>
-                    <span class="bg-rose-500/20 text-rose-300 font-bold px-1.5 py-0.2 rounded text-[10px]">${d.weakScore}</span>
+                    <span class="font-bold text-rose-400 text-[10px]">${escapeHtml(d.weak)} (${d.weakScore})</span>
                   </div>
-                  <div class="space-y-1">
+                  <div class="space-y-0.5 max-h-20 overflow-y-auto">
                     ${weakBreakdown.length > 0 ? weakBreakdown.map(b => `
-                      <div class="flex items-center justify-between text-[11px] text-zinc-300 bg-zinc-900/60 px-2 py-1 rounded border border-zinc-800/50">
+                      <div class="flex items-center justify-between text-[10px] text-zinc-300 bg-zinc-900/60 px-1.5 py-0.5 rounded">
                         <span class="truncate pr-1">${escapeHtml(b.label)}</span>
                         <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
                       </div>
-                    `).join('') : '<span class="text-[10px] text-zinc-500 block italic">Sin eventos</span>'}
+                    `).join('') : '<span class="text-[9px] text-zinc-500 block italic">Sin eventos</span>'}
                   </div>
                 </div>
-
               </div>
             </div>
           `;
         }).join('');
       } else {
-        alertBox.classList.add('hidden');
+        badge.textContent = `0 Pares Aprobados`;
+        listContainer.className = "flex-grow flex items-center justify-center text-center p-4 border border-dashed border-zinc-800 rounded-xl bg-[#040508]";
+        listContainer.innerHTML = `
+          <div class="text-zinc-500 text-xs font-mono space-y-1">
+            <span class="text-zinc-400 font-bold block">🔍 Escáner Activo — Esperando Divergencias</span>
+            <span>Oportunidades aparecerán aquí cuando exista un diferencial acumulado ≥ 3 pts entre dos divisas.</span>
+          </div>
+        `;
       }
     }
 
