@@ -38,7 +38,6 @@
       border-left: 3px solid #f59e0b !important;
     }
 
-    /* BOTONES CON DIMENSIÓN Y FUENTE RÍGIDA ANTI-LAYOUT SHIFT */
     .score-btn {
       width: 2rem !important;
       height: 1.5rem !important;
@@ -75,14 +74,14 @@
           <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
             <span>⚡</span> Kairos Macro Hub
           </h1>
-          <p class="text-zinc-400 text-xs mt-1">Motor robusto de análisis macro (Desglose Histórico de Semana Previa Integrado)</p>
+          <p class="text-zinc-400 text-xs mt-1">Motor de análisis macro con restauración inteligente de respaldos JSON y filtros rigurosos</p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
           <button type="button" onclick="lockCurrentAsPreviousWeek()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1.5 shadow-sm">
             📌 Fijar como Semana Previa
           </button>
           <button type="button" onclick="exportStateJSON()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs px-3 py-2 rounded-lg transition">
-            📥 Exportar Backup
+            📥 Exportar Backup Total
           </button>
           <button type="button" onclick="document.getElementById('jsonInput').click()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs px-3 py-2 rounded-lg transition">
             📤 Cargar Backup
@@ -98,7 +97,7 @@
         </div>
       </div>
 
-      <!-- Carga de Archivos -->
+      <!-- Carga de Archivos Excel -->
       <div id="dropZone" class="bg-[#07080d] border border-dashed border-zinc-800 hover:border-cyan-500/60 rounded-2xl p-6 text-center transition cursor-pointer group">
         <input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event)" />
         <div class="space-y-1.5">
@@ -111,7 +110,7 @@
         </div>
       </div>
 
-      <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS (TOP 2 POR DEFECTO + EXPANSIONAL) -->
+      <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS -->
       <div id="divergenceAlertBox" class="hidden bg-[#07080d] border border-cyan-500/30 p-5 rounded-2xl font-mono space-y-4 shadow-2xl transition-all duration-300">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-cyan-500/20 pb-3 gap-2">
           <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
@@ -125,10 +124,8 @@
           </div>
         </div>
         
-        <!-- CONTENEDOR DE TARJETAS FLUIDAS -->
         <div id="divergenceList" class="space-y-3"></div>
 
-        <!-- BOTÓN INFERIOR DE EXPANSION SECUNDARIO -->
         <div id="divergenceFooterExpand" class="hidden text-center pt-2 border-t border-zinc-800/80">
           <button type="button" onclick="toggleDivergenceExpand()" class="text-xs text-cyan-400 hover:text-cyan-300 font-bold tracking-wider uppercase font-mono transition inline-flex items-center gap-1">
             <span id="divergenceFooterText">Mostrar todos los pares aprobados ↓</span>
@@ -200,7 +197,7 @@
           
           <span class="text-zinc-700 mx-1">|</span>
           <button type="button" id="coreOnlyToggleBtn" onclick="toggleCoreFilter()" class="px-2.5 py-1 rounded bg-amber-950/40 text-amber-300 border border-amber-500/40 font-bold hover:bg-amber-900/60 transition flex items-center gap-1">
-            <span>🎯</span> Solo Core Principal (72)
+            <span>🎯</span> Solo Core Principal
           </button>
         </div>
         
@@ -218,10 +215,9 @@
     <div id="outputContainer"></div>
   </main>
 
-  <!-- LÓGICA DE JS INTERNO DEL MOTOR -->
   <script>
     function escapeHtml(str) {
-      if (!str) return '';
+      if (str === undefined || str === null) return '';
       return String(str)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -239,19 +235,17 @@
         .trim();
     }
 
+    /* REGLAS CORE DEL FILTRO (SE ELIMINÓ NFP SEGÚN TU SOLICITUD) */
     const CORE_INDICATOR_RULES = [
-      // USD (9)
       { id: 'USD_ISM_MFG', ccy: 'USD', match: ['ism manufacturing pmi', 'ism mfg pmi', 'ism manufacturing purchasing managers index', 'ism manufacturing', 'ism mfg', 'pmi manufacturero del ism', 'pmi del sector manufacturero del ism'], avoid: ['prices', 'employment', 'orders', 'paying', 'new orders', 'precios', 'empleo', 'pedidos'] },
       { id: 'USD_ISM_SERVICES', ccy: 'USD', match: ['ism non-manufacturing pmi', 'ism services pmi', 'ism non-manufacturing purchasing managers index', 'ism services', 'ism non-manufacturing', 'ism non mfg', 'pmi no manufacturero del ism', 'pmi del sector servicios del ism'], avoid: ['prices', 'employment', 'orders', 'precios', 'empleo'] },
       { id: 'USD_CPI_MOM', ccy: 'USD', match: ['cpi (mom)', 'cpi mom (headline)', 'cpi mom', 'consumer price index (mom)', 'ipc (mensual)', 'ipc mensual'], avoid: ['core', 'ex food', 'yoy', 'subyacente', 'anual'] },
       { id: 'USD_UNEMP', ccy: 'USD', match: ['unemployment rate', 'tasa de desempleo', 'unemployment'], avoid: ['youth', 'underemployment', 'germany', 'german', 'french', 'spanish', 'swiss', 'chicago', 'philly', 'empire', 'change'] },
-      { id: 'USD_NFP', ccy: 'USD', match: ['nonfarm payrolls', 'non farm payrolls', 'non-farm payrolls', 'nonfarm employment', 'non farm employment', 'nfp', 'united states nonfarm payrolls', 'nóminas no agrícolas', 'nominas no agricolas', 'empleo no agrícola', 'empleo no agricola'], avoid: ['private', 'manufacturing', 'privadas'] },
       { id: 'USD_RETAIL', ccy: 'USD', match: ['retail sales (mom)', 'retail sales mom', 'ventas minoristas (mensual)', 'ventas minoristas mensual'], avoid: ['ex autos', 'control', 'ex gas', 'yoy', 'group', 'anual'] },
       { id: 'USD_CB_CONF', ccy: 'USD', match: ['cb consumer confidence', 'cb consumer confidence index', 'consumer confidence index', 'confianza del consumidor de the conference board', 'confianza del consumidor de cb'], avoid: ['michigan'] },
       { id: 'USD_NFIB', ccy: 'USD', match: ['nfib small business optimism', 'nfib small business index', 'nfib small business', 'nfib', 'optimismo de las pequeñas empresas'], avoid: [] },
       { id: 'USD_GDPNOW', ccy: 'USD', match: ['atlanta fed gdpnow', 'gdpnow', 'atlanta fed gdp', 'gdpnow de la fed de atlanta'], avoid: [] },
 
-      // EUR (9)
       { id: 'EUR_HCOB_MFG', ccy: 'EUR', match: ['hcob euro zone manufacturing pmi', 'hcob eurozone manufacturing pmi', 'euro zone manufacturing pmi', 'eurozone manufacturing pmi', 'hcob mfg pmi', 'hcob mfg', 'hcob manufacturing', 'pmi del sector manufacturero de la zona euro de hcob', 'pmi manufacturero de la zona euro'], avoid: ['services', 'servicios', 'composite', 'construction', 'italy', 'france', 'spain'] },
       { id: 'EUR_HCOB_SERV', ccy: 'EUR', match: ['hcob euro zone services pmi', 'hcob eurozone services pmi', 'euro zone services pmi', 'eurozone services pmi', 'hcob services pmi', 'hcob services', 'pmi del sector servicios de la zona euro de hcob', 'pmi servicios de la zona euro'], avoid: ['mfg', 'manufacturero', 'composite', 'construction', 'italy', 'france', 'spain'] },
       { id: 'EUR_CPI_MOM', ccy: 'EUR', match: ['euro zone cpi (mom)', 'eurozone cpi (mom)', 'cpi (mom)', 'cpi mom', 'hicp (mom)', 'ipc (mensual)', 'ipc de la zona euro (mensual)'], avoid: ['core', 'subyacente', 'yoy', 'anual', 'tokyo', 'german', 'french', 'spanish', 'italian'] },
@@ -262,7 +256,6 @@
       { id: 'EUR_IFO', ccy: 'EUR', match: ['german ifo business climate index', 'ifo business climate index', 'ifo business climate', 'ifo business', 'ifo', 'indice ifo de confianza empresarial en alemania'], avoid: ['current assessment', 'expectations'] },
       { id: 'EUR_IND_PROD', ccy: 'EUR', match: ['euro zone industrial production (mom)', 'eurozone industrial production (mom)', 'industrial production (mom)', 'industrial production mom', 'produccion industrial de la zona euro (mensual)'], avoid: ['yoy', 'anual', 'german', 'french', 'spanish', 'italian'] },
 
-      // GBP (9)
       { id: 'GBP_SP_MFG', ccy: 'GBP', match: ['s&p global/cips uk manufacturing pmi', 's&p global uk manufacturing pmi', 's&p global manufacturing pmi', 's&p mfg pmi', 's&p mfg', 's&p global manufacturing', 'pmi del sector manufacturero de gran bretaña', 'pmi manufacturero reino unido'], avoid: ['services', 'servicios', 'composite', 'construction'] },
       { id: 'GBP_SP_SERV', ccy: 'GBP', match: ['s&p global/cips uk services pmi', 's&p global uk services pmi', 's&p global services pmi', 's&p services pmi', 's&p services', 's&p global services', 'pmi del sector servicios de gran bretaña', 'pmi servicios reino unido'], avoid: ['mfg', 'manufacturero', 'composite', 'construction'] },
       { id: 'GBP_CPI_MOM', ccy: 'GBP', match: ['cpi (mom)', 'cpi mom', 'uk cpi (mom)', 'ipc (mensual)'], avoid: ['core', 'subyacente', 'yoy', 'anual'] },
@@ -273,7 +266,6 @@
       { id: 'GBP_CBI', ccy: 'GBP', match: ['cbi industrial trends orders', 'cbi industrial trends', 'cbi industrial', 'pedidos de tendencias industriales segun el cbi'], avoid: ['distributive'] },
       { id: 'GBP_GDP', ccy: 'GBP', match: ['monthly gdp (mom)', 'monthly gdp', 'gdp (mom)', 'gdp mom', 'pib mensual', 'pib (mensual)'], avoid: ['3m/3m', 'yoy', 'quarterly', 'trimestral'] },
 
-      // JPY (9)
       { id: 'JPY_JIBUN_MFG', ccy: 'JPY', match: ['au jibun bank japan manufacturing pmi', 'jibun bank manufacturing pmi', 'jibun mfg pmi', 'jibun mfg', 'pmi del sector manufacturero de japon'], avoid: ['services', 'servicios', 'composite', 'construction'] },
       { id: 'JPY_JIBUN_SERV', ccy: 'JPY', match: ['au jibun bank japan services pmi', 'jibun bank services pmi', 'jibun services pmi', 'jibun services', 'pmi del sector servicios de japon'], avoid: ['mfg', 'manufacturero', 'composite', 'construction'] },
       { id: 'JPY_TOKYO_CPI', ccy: 'JPY', match: ['tokyo cpi (mom)', 'tokyo cpi mom', 'tokyo cpi', 'ipc de tokio (mensual)'], avoid: ['ex fresh food', 'yoy', 'anual', 'national'] },
@@ -284,7 +276,6 @@
       { id: 'JPY_TANKAN', ccy: 'JPY', match: ['reuters tankan index', 'reuters tankan', 'tankan index', 'tankan', 'tankan large manufacturers index', 'indice tankan de grandes fabricantes'], avoid: ['non-manufacturers'] },
       { id: 'JPY_JCER_GDP', ccy: 'JPY', match: ['jcer monthly gdp', 'jcer gdp', 'pib mensual de jcer'], avoid: [] },
 
-      // AUD (9)
       { id: 'AUD_JUDO_MFG', ccy: 'AUD', match: ['judo bank australia manufacturing pmi', 'judo bank manufacturing pmi', 'judo mfg pmi', 'judo mfg', 'pmi del sector manufacturero de australia de judo bank'], avoid: ['services', 'servicios', 'composite', 'construction'] },
       { id: 'AUD_JUDO_SERV', ccy: 'AUD', match: ['judo bank australia services pmi', 'judo bank services pmi', 'judo services pmi', 'judo services', 'pmi del sector servicios de australia de judo bank'], avoid: ['mfg', 'manufacturero', 'composite', 'construction'] },
       { id: 'AUD_CPI_IND', ccy: 'AUD', match: ['monthly cpi indicator', 'cpi indicator (mom)', 'cpi indicator mom', 'cpi indicator', 'indicador mensual del ipc'], avoid: ['trimmed', 'yoy', 'anual'] },
@@ -295,7 +286,6 @@
       { id: 'AUD_NAB', ccy: 'AUD', match: ['nab business confidence', 'confianza empresarial de nab'], avoid: ['business conditions'] },
       { id: 'AUD_AIG', ccy: 'AUD', match: ['ai group industry index', 'aig industry index', 'aig industry', 'indice de la industria de ai group'], avoid: [] },
 
-      // NZD (9)
       { id: 'NZD_BUSNZ_MFG', ccy: 'NZD', match: ['businessnz manufacturing pmi', 'busnz mfg pmi', 'busnz mfg', 'businessnz manufacturing', 'pmi manufacturero de businessnz'], avoid: ['services', 'servicios'] },
       { id: 'NZD_BUSNZ_SERV', ccy: 'NZD', match: ['businessnz performance of services index', 'busnz services pmi', 'busnz services', 'businessnz services', 'indice del sector servicios de businessnz'], avoid: ['mfg', 'manufacturero'] },
       { id: 'NZD_FOOD_PRICES', ccy: 'NZD', match: ['food price index (mom)', 'food prices (mom)', 'food prices mom', 'food prices', 'indice de precios de los alimentos (mensual)'], avoid: ['yoy', 'anual'] },
@@ -306,7 +296,6 @@
       { id: 'NZD_ANZ_BIZ', ccy: 'NZD', match: ['anz business confidence', 'confianza empresarial de anz'], avoid: ['activity outlook'] },
       { id: 'NZD_BUSNZ_ACT', ccy: 'NZD', match: ['businessnz activity index', 'busnz activity index', 'busnz activity', 'indice de actividad de businessnz'], avoid: [] },
 
-      // CAD (9)
       { id: 'CAD_SP_MFG', ccy: 'CAD', match: ['s&p global canada manufacturing pmi', 's&p mfg pmi', 's&p mfg', 's&p global manufacturing pmi', 'pmi del sector manufacturero de canada de s&p global'], avoid: ['services', 'servicios'] },
       { id: 'CAD_IVEY', ccy: 'CAD', match: ['ivey pmi', 'pmi del gestor de compras ivey'], avoid: ['unadjusted', 'employment', 'prices'] },
       { id: 'CAD_CPI_MOM', ccy: 'CAD', match: ['cpi (mom)', 'cpi mom', 'ipc (mensual)'], avoid: ['core', 'subyacente', 'yoy', 'anual', 'median', 'trimmed'] },
@@ -317,7 +306,6 @@
       { id: 'CAD_CFIB', ccy: 'CAD', match: ['cfib business barometer', 'barometro empresarial de la cfib'], avoid: [] },
       { id: 'CAD_GDP_MOM', ccy: 'CAD', match: ['monthly gdp (mom)', 'monthly gdp mom', 'gdp (mom)', 'gdp mom', 'pib mensual'], avoid: ['yoy', 'anual', 'annualized'] },
 
-      // CHF (9)
       { id: 'CHF_PROCURE_MFG', ccy: 'CHF', match: ['procure.ch manufacturing pmi', 'procure mfg pmi', 'procure mfg', 'procure pmi', 'procure.ch pmi', 'pmi del sector manufacturero de procure.ch'], avoid: ['services', 'servicios'] },
       { id: 'CHF_PROCURE_SERV', ccy: 'CHF', match: ['procure.ch services pmi', 'procure services pmi', 'procure services', 'pmi del sector servicios de procure.ch'], avoid: ['mfg', 'manufacturero'] },
       { id: 'CHF_CPI_MOM', ccy: 'CHF', match: ['cpi (mom)', 'cpi mom', 'ipc (mensual)'], avoid: ['core', 'subyacente', 'yoy', 'anual'] },
@@ -362,7 +350,7 @@
         'tasas de interes', 'politica monetaria', 'actas', 'rueda de prensa', 'discurso',
         's&p', 's&p global', 'pmi', 'purchasing managers', 'gestores de compras'
       ],
-      USD: ['ism', 's&p', 'pmi', 'cpi', 'unemployment rate', 'unemployment', 'nfp', 'nonfarm', 'non-farm', 'payrolls', 'nóminas no agrícolas', 'nominas no agricolas', 'empleo no agrícola', 'retail sales', 'cb consumer confidence', 'nfib', 'gdpnow', 'atlanta fed', 'adp', 'average hourly earnings', 'jobless claims', 'pce', 'ppi', 'gdp', 'industrial production', 'building permits', 'home sales', 'trade balance', 'jolts', 'durable goods', 'ipc', 'tasa de desempleo', 'nominas', 'nóminas', 'michigan', 'u-mich', 'philly fed', 'empire state', 'employment cost index', 'eci'],
+      USD: ['ism', 's&p', 'pmi', 'cpi', 'unemployment rate', 'unemployment', 'nfp', 'nonfarm payrolls', 'non-farm payrolls', 'retail sales', 'cb consumer confidence', 'nfib', 'gdpnow', 'atlanta fed', 'adp', 'average hourly earnings', 'jobless claims', 'pce', 'ppi', 'gdp', 'industrial production', 'building permits', 'home sales', 'trade balance', 'jolts', 'durable goods', 'ipc', 'tasa de desempleo', 'michigan', 'u-mich', 'philly fed', 'empire state', 'employment cost index', 'eci'],
       CAD: ['s&p', 'pmi', 'ivey', 'cpi', 'unemployment rate', 'unemployment', 'net employment change', 'employment change', 'retail sales', 'cb consumer survey', 'cfib', 'monthly gdp', 'gdp', 'monetary policy report', 'ppi', 'ippi', 'trade balance', 'boc business outlook', 'housing starts', 'ipc', 'tasa de desempleo', 'desempleo', 'empleo', 'ventas minoristas', 'pib', 'manufacturing sales', 'wholesale sales'],
       EUR: ['hcob', 's&p', 'pmi', 'cpi', 'unemployment', 'germany unemp', 'retail sales', 'consumer confidence', 'ifo', 'industrial production', 'ppi', 'gdp', 'zew', 'trade balance', 'hicp', 'negotiated wages', 'factory orders', 'ipc', 'tasa de desempleo', 'desempleo', 'ventas minoristas', 'produccion industrial', 'pib', 'gfk', 'french', 'france'],
       CHF: ['procure', 's&p', 'pmi', 'cpi', 'unemp', 'unemployment', 'retail sales', 'consumer sentiment', 'kof', 'seco', 'ppi', 'gdp', 'industrial production', 'trade balance', 'svme', 'ipc', 'tasa de desempleo', 'desempleo', 'ventas minoristas', 'pib'],
@@ -398,9 +386,7 @@
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); });
     dropZone.addEventListener('dragenter', (e) => { e.preventDefault(); dropZone.classList.add('border-cyan-500'); });
     dropZone.addEventListener('dragleave', (e) => {
-      if (!dropZone.contains(e.relatedTarget)) {
-        dropZone.classList.remove('border-cyan-500');
-      }
+      if (!dropZone.contains(e.relatedTarget)) dropZone.classList.remove('border-cyan-500');
     });
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
@@ -413,11 +399,11 @@
     });
 
     function saveToLocalStorage() {
-      localStorage.setItem('kairos_macro_engine_state_v10', JSON.stringify(globalState));
+      localStorage.setItem('kairos_macro_engine_state_v15', JSON.stringify(globalState));
     }
 
     function loadFromLocalStorage() {
-      const saved = localStorage.getItem('kairos_macro_engine_state_v10');
+      const saved = localStorage.getItem('kairos_macro_engine_state_v15');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
@@ -428,7 +414,7 @@
           globalState.intermarketScores = Object.assign({ VIX: 0, Oil: 0, Gold: 0 }, parsed.intermarketScores || {});
           globalState.dailyNotes = parsed.dailyNotes || {};
           
-          if (Object.keys(globalState.daysData).length > 0) {
+          if (Object.keys(globalState.daysData).length > 0 || Object.values(globalState.matrixPrev).some(v => v !== 0)) {
             renderLiveInteractiveApp();
           }
         } catch (e) {
@@ -445,15 +431,13 @@
         
         const downloadAnchor = document.createElement('a');
         downloadAnchor.href = url;
-        downloadAnchor.download = `kairos_macro_backup_${new Date().toISOString().slice(0,10)}.json`;
+        downloadAnchor.download = `kairos_backup_total_${new Date().toISOString().slice(0,10)}.json`;
         
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         
         setTimeout(() => {
-          if (document.body.contains(downloadAnchor)) {
-            document.body.removeChild(downloadAnchor);
-          }
+          if (document.body.contains(downloadAnchor)) document.body.removeChild(downloadAnchor);
           URL.revokeObjectURL(url);
         }, 2000);
       } catch (err) {
@@ -462,6 +446,7 @@
       }
     }
 
+    /* 📌 CARGA E IMPORTACIÓN DE BACKUP RIGUROSA Y RE-EVALUADA */
     function importStateJSON(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -471,26 +456,127 @@
         try {
           const parsed = JSON.parse(evt.target.result);
           if (parsed && typeof parsed === 'object') {
-            globalState = {
-              daysData: parsed.daysData || {},
-              categoryScores: parsed.categoryScores || {},
-              matrixEvents: parsed.matrixEvents || { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
-              matrixTotals: parsed.matrixTotals || { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
-              matrixPrev: Object.assign({ USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 }, parsed.matrixPrev || {}),
-              matrixPrevBreakdown: Object.assign({ USD: [], EUR: [], GBP: [], JPY: [], CAD: [], AUD: [], NZD: [], CHF: [], CNH: [], VIX: [], Oil: [], Gold: [] }, parsed.matrixPrevBreakdown || {}),
-              intermarketScores: Object.assign({ VIX: 0, Oil: 0, Gold: 0 }, parsed.intermarketScores || {}),
-              dailyNotes: parsed.dailyNotes || {}
-            };
+
+            // CASO A: Respaldo Nativo Completo (Guarda días/semanas y estado actual)
+            if (parsed.daysData && typeof parsed.daysData === 'object' && Object.keys(parsed.daysData).length > 0) {
+              
+              // Re-evaluación en tiempo real para descartar etiquetas Core obsoletas (p. ej. NFP)
+              const reevaluatedDaysData = {};
+              const claimedCoreRulesPerImport = new Set();
+
+              Object.keys(parsed.daysData).forEach(day => {
+                const events = parsed.daysData[day] || [];
+                reevaluatedDaysData[day] = events.map(item => {
+                  const ruleId = getCoreRuleId(item.ccy, item.event);
+                  let isCore = false;
+
+                  if (ruleId) {
+                    const uniqueKey = `${day}_${item.time}_${ruleId}`;
+                    if (!claimedCoreRulesPerImport.has(uniqueKey)) {
+                      isCore = true;
+                      claimedCoreRulesPerImport.add(uniqueKey);
+                    }
+                  }
+
+                  return {
+                    ...item,
+                    coreRuleId: ruleId,
+                    isCore: isCore
+                  };
+                });
+              });
+
+              globalState = {
+                daysData: reevaluatedDaysData,
+                categoryScores: parsed.categoryScores || {},
+                matrixEvents: parsed.matrixEvents || { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
+                matrixTotals: parsed.matrixTotals || { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
+                matrixPrev: Object.assign({ USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 }, parsed.matrixPrev || {}),
+                matrixPrevBreakdown: Object.assign({ USD: [], EUR: [], GBP: [], JPY: [], CAD: [], AUD: [], NZD: [], CHF: [], CNH: [], VIX: [], Oil: [], Gold: [] }, parsed.matrixPrevBreakdown || {}),
+                intermarketScores: Object.assign({ VIX: 0, Oil: 0, Gold: 0 }, parsed.intermarketScores || {}),
+                dailyNotes: parsed.dailyNotes || {}
+              };
+              alert('¡Respaldo cargado con éxito! Todos los eventos fueron re-evaluados con las reglas actuales.');
+            } 
+            // CASO B: Archivo JSON estructurado por divisas
+            else if (parsed.USD || parsed.EUR || parsed.GBP || parsed.JPY || parsed.CAD || parsed.AUD || parsed.NZD || parsed.CHF) {
+              const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'];
+              const importedPrevBreakdown = {};
+              const importedPrevTotals = {};
+              const claimedCoreRulesInImport = new Set();
+
+              const backupBlockName = "📌 EVENTOS RESPALDADOS (CARGADOS DESDE BACKUP)";
+              globalState.daysData[backupBlockName] = [];
+
+              currencies.forEach(ccy => {
+                const items = parsed[ccy] || [];
+                importedPrevBreakdown[ccy] = [];
+                let ccyTotal = 0;
+
+                items.forEach((item, idx) => {
+                  const evName = item.name || item.event || `Evento ${ccy} #${idx+1}`;
+                  const scoreVal = parseInt(item.score) || 0;
+                  const prevVal = item.previous !== undefined && item.previous !== null ? item.previous : "—";
+                  const fcstVal = item.forecast !== undefined && item.forecast !== null ? item.forecast : "—";
+                  const actVal = item.actual !== undefined && item.actual !== null ? item.actual : "—";
+
+                  let ruleId = getCoreRuleId(ccy, evName);
+                  let isCore = false;
+
+                  if (ruleId && !claimedCoreRulesInImport.has(`${ccy}_${ruleId}`)) {
+                    isCore = true;
+                    claimedCoreRulesInImport.add(`${ccy}_${ruleId}`);
+                  }
+
+                  // 1. Guardar en el desglose de la matriz previa
+                  importedPrevBreakdown[ccy].push({
+                    label: evName,
+                    score: scoreVal
+                  });
+                  ccyTotal += scoreVal;
+
+                  // 2. Reconstruir evento en las tablas inferiores respetando la regla exacta del filtro
+                  globalState.daysData[backupBlockName].push({
+                    time: item.time || "—",
+                    ccy: ccy,
+                    event: evName,
+                    actual: actVal,
+                    forecast: fcstVal,
+                    previous: prevVal,
+                    coreRuleId: ruleId,
+                    isCore: isCore
+                  });
+
+                  // 3. Registrar categoría y puntaje
+                  const categoryTitle = getCategorySentimentTitle(ccy, evName);
+                  const catId = `${backupBlockName}-${ccy}-${categoryTitle}`.replace(/[^a-zA-Z0-9]/g, '-');
+                  globalState.categoryScores[catId] = {
+                    ccy: ccy,
+                    score: scoreVal,
+                    title: `${ccy} - ${evName}`,
+                    eventsSummary: evName
+                  };
+                });
+
+                importedPrevTotals[ccy] = ccyTotal;
+              });
+
+              globalState.matrixPrevBreakdown = importedPrevBreakdown;
+              globalState.matrixPrev = importedPrevTotals;
+
+              alert('✅ Backup estructurado cargado correctamente. Los eventos se categorizaron rigurosamente.');
+            } else {
+              throw new Error("Formato de JSON no reconocido.");
+            }
 
             saveToLocalStorage();
             renderLiveInteractiveApp();
-            alert('¡Respaldo cargado correctamente!');
           } else {
-            throw new Error("Formato JSON no válido");
+            throw new Error("El archivo no es un JSON válido.");
           }
         } catch(err) {
           console.error("Import error:", err);
-          alert('Error al leer el archivo de respaldo JSON.');
+          alert('Error al leer el archivo JSON. Verifica que el archivo no esté corrupto.');
         } finally {
           e.target.value = '';
         }
@@ -500,11 +586,11 @@
 
     function lockCurrentAsPreviousWeek() {
       if (!globalState.daysData || Object.keys(globalState.daysData).length === 0) {
-        alert('Primero debes cargar el Excel de la semana pasada y calificar sus eventos para poder fijarla.');
+        alert('Primero debes cargar el Excel o JSON de la semana pasada para poder congelarla.');
         return;
       }
 
-      const confirmLock = confirm('¿Deseas fijar la semana actual como "Semana Previa"?\n\nEsto tomará los eventos calificados, congelará su desglose con nombres y puntajes como base histórica de la semana pasada, y limpiará el calendario para que cargues el Excel de la semana actual.');
+      const confirmLock = confirm('¿Deseas fijar la semana actual como "Semana Previa"?\n\nEsto tomará los eventos evaluados, congelará su desglose como base histórica de la matriz, y limpiará el calendario para que cargues el archivo de la SEMANA NUEVA.');
       if (!confirmLock) return;
 
       const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH', 'VIX', 'Oil', 'Gold'];
@@ -514,8 +600,7 @@
       currencies.forEach(ccy => {
         const eventsList = getCurrencyEvaluatedEventsList(ccy);
         newPrevBreakdown[ccy] = eventsList;
-        const totalSum = eventsList.reduce((acc, item) => acc + item.score, 0);
-        newPrevTotals[ccy] = totalSum;
+        newPrevTotals[ccy] = eventsList.reduce((acc, item) => acc + item.score, 0);
       });
 
       globalState.matrixPrevBreakdown = newPrevBreakdown;
@@ -536,9 +621,7 @@
 
       if (['VIX', 'Oil', 'Gold'].includes(ccy)) {
         const score = globalState.intermarketScores[ccy] || 0;
-        if (score !== 0) {
-          list.push({ label: `Evaluación de ${ccy}`, score: score });
-        }
+        if (score !== 0) list.push({ label: `Evaluación de ${ccy}`, score: score });
         return list;
       }
 
@@ -562,8 +645,7 @@
               if (scoreObj && scoreObj.score !== 0) {
                 matchedCatIds.add(categoryId);
                 const uniqueNames = Array.from(new Set(currentBlockEvents.map(e => e.event.trim())));
-                const label = uniqueNames.join(' / ');
-                list.push({ label: label, score: scoreObj.score });
+                list.push({ label: uniqueNames.join(' / '), score: scoreObj.score });
               }
               currentBlockEvents = [];
             }
@@ -602,15 +684,15 @@
       if (e.target.files.length) processExcelFile(e.target.files[0]);
     }
 
-    /* 📌 WHITELIST VINCULADA DIRECTAMENTE A REGLAS CORE PARA EVITAR DESCARTE DE EVENTOS CLAVE */
     function isWhitelisted(ccy, eventName) {
       if (!eventName) return false;
-      const lower = String(eventName).toLowerCase();
+      const lower = normalizeText(eventName);
 
       const blacklist = [
         'opec', 'crude oil', 'oil inventories', 'eia crude', 'gasoline inventories', 'distillate stocks', 
         'baker hughes', 'fed regional', 'mpc member', 'executive board member', 'construction pmi',
-        'car registration', 'auction', 'obligacion', 'bonos'
+        'car registration', 'auction', 'obligacion', 'bonos',
+        'private nonfarm payrolls', 'manufacturing payrolls', 'government payrolls'
       ];
       if (blacklist.some(term => lower.includes(term))) return false;
 
@@ -622,7 +704,6 @@
         }
       }
 
-      // 🔹 GARANTÍA ANTI-FILTRADO: Si el evento coincide con alguna regla Core, SE APRUEBA SIEMPRE
       const coreRuleId = getCoreRuleId(ccy, eventName);
       if (coreRuleId) return true;
 
@@ -635,77 +716,53 @@
       if (!eventName) return `SENTIMIENTO DE ${ccy}`;
       const lower = normalizeText(eventName);
       
-      // 1. FAMILIAS ESPECÍFICAS DE PMI
-      if (lower.includes('ism')) {
-        return `${ccy} - PMI ISM`;
-      }
-      if (lower.includes('s p') || lower.includes('markit') || lower.includes('hcob') || lower.includes('caixin') || lower.includes('cips')) {
-        return `${ccy} - PMI S&P GLOBAL / MARKIT`;
-      }
-      if (lower.includes('judo')) {
-        return `${ccy} - PMI JUDO BANK`;
-      }
-      if (lower.includes('jibun')) {
-        return `${ccy} - PMI JIBUN BANK`;
-      }
-      if (lower.includes('procure')) {
-        return `${ccy} - PMI PROCURE.CH`;
-      }
-      if (lower.includes('busnz') || lower.includes('businessnz')) {
-        return `${ccy} - PMI BUSINESSNZ`;
-      }
-      if (lower.includes('ivey')) {
-        return `${ccy} - PMI IVEY`;
-      }
-      if (lower.includes('chicago pmi')) {
-        return `${ccy} - PMI CHICAGO`;
-      }
-      if (lower.includes('pmi')) {
-        return `${ccy} - ÍNDICES PMI`;
+      if (lower.includes('nonfarm') || lower.includes('non farm') || lower.includes('nfp') || lower.includes('nominas no agricolas') || lower.includes('empleo no agricola')) {
+        return `${ccy} - NFP (NÓMINAS NO AGRÍCOLAS)`;
       }
 
-      // 2. POLÍTICA MONETARIA Y BANCOS CENTRALES
+      if (lower.includes('ism')) return `${ccy} - PMI ISM`;
+      if (lower.includes('s p') || lower.includes('markit') || lower.includes('hcob') || lower.includes('caixin') || lower.includes('cips')) return `${ccy} - PMI S&P GLOBAL / MARKIT`;
+      if (lower.includes('judo')) return `${ccy} - PMI JUDO BANK`;
+      if (lower.includes('jibun')) return `${ccy} - PMI JIBUN BANK`;
+      if (lower.includes('procure')) return `${ccy} - PMI PROCURE.CH`;
+      if (lower.includes('busnz') || lower.includes('businessnz')) return `${ccy} - PMI BUSINESSNZ`;
+      if (lower.includes('ivey')) return `${ccy} - PMI IVEY`;
+      if (lower.includes('chicago pmi')) return `${ccy} - PMI CHICAGO`;
+      if (lower.includes('pmi')) return `${ccy} - ÍNDICES PMI`;
+
       if (lower.includes('interest rate') || lower.includes('monetary policy') || lower.includes('press conference') || lower.includes('fomc') || lower.includes('rate decision') || lower.includes('loan prime') || lower.includes('boj') || lower.includes('bank of japan') || lower.includes('meeting minutes') || lower.includes('speaks') || lower.includes('speech') || lower.includes('dot plot') || lower.includes('projections') || lower.includes('cash rate') || lower.includes('overnight rate') || lower.includes('bank rate') || lower.includes('tasas de interes') || lower.includes('politica monetaria')) {
         return `${ccy} - POLÍTICA MONETARIA Y TASAS`;
       }
 
-      // 3. INFLACIÓN (IPC / PCE)
       if (lower.includes('cpi') || lower.includes('ipc') || lower.includes('pce') || lower.includes('rpi') || lower.includes('inflation') || lower.includes('inflacion') || lower.includes('tokyo cpi') || lower.includes('consumer price') || lower.includes('hicp') || lower.includes('food prices')) {
         return `${ccy} - INFLACIÓN (IPC)`;
       }
 
-      // 4. PRECIOS DE PRODUCTOR (IPP)
       if (lower.includes('ppi') || lower.includes('ipp') || lower.includes('ippi') || lower.includes('producer price') || lower.includes('cgpi')) {
         return `${ccy} - PRECIOS DE PRODUCTOR (IPP)`;
       }
 
-      // 5. MERCADO LABORAL Y SALARIOS
-      if (lower.includes('unemployment') || lower.includes('desempleo') || lower.includes('nfp') || lower.includes('nonfarm') || lower.includes('non farm') || lower.includes('adp') || lower.includes('nominas') || lower.includes('nóminas') || lower.includes('claimant') || lower.includes('jobless') || lower.includes('employment change') || lower.includes('variacion del empleo') || lower.includes('cambio en el empleo') || lower.includes('earnings') || lower.includes('salarios') || lower.includes('cash earnings') || lower.includes('jolts') || lower.includes('employment cost') || lower.includes('eci') || lower.includes('challenger') || lower.includes('mei filled jobs') || lower.includes('wage price index') || lower.includes('wpi')) {
+      if (lower.includes('unemployment') || lower.includes('desempleo') || lower.includes('adp') || lower.includes('nominas') || lower.includes('nóminas') || lower.includes('claimant') || lower.includes('jobless') || lower.includes('employment change') || lower.includes('variacion del empleo') || lower.includes('cambio en el empleo') || lower.includes('earnings') || lower.includes('salarios') || lower.includes('cash earnings') || lower.includes('jolts') || lower.includes('employment cost') || lower.includes('eci') || lower.includes('challenger') || lower.includes('mei filled jobs') || lower.includes('wage price index') || lower.includes('wpi')) {
         return `${ccy} - MERCADO LABORAL Y SALARIOS`;
       }
 
-      // 6. VENTAS MINORISTAS Y CONSUMO
       if (lower.includes('retail sales') || lower.includes('ventas minoristas') || lower.includes('card transactions')) {
         return `${ccy} - VENTAS MINORISTAS Y CONSUMO`;
       }
 
-      // 7. PIB Y ACTIVIDAD ECONÓMICA
       if (lower.includes('gdp') || lower.includes('pib') || lower.includes('gdpnow') || lower.includes('activity index')) {
         return `${ccy} - PRODUCTO INTERNO BRUTO Y ACTIVIDAD (PIB)`;
       }
 
-      // 8. CONFIANZA DEL CONSUMIDOR
       if (lower.includes('consumer confidence') || lower.includes('consumer sentiment') || lower.includes('confianza del consumidor') || lower.includes('clima de consumo') || lower.includes('consumer survey') || lower.includes('michigan') || lower.includes('gfk') || lower.includes('westpac') || lower.includes('seco')) {
         return `${ccy} - CONFIANZA DEL CONSUMIDOR`;
       }
 
-      // 9. CONFIANZA EMPRESARIAL Y ENCUESTAS DE NEGOCIOS
       if (lower.includes('tankan')) return `${ccy} - ENCUESTA TANKAN`;
       if (lower.includes('ifo') || lower.includes('zew') || lower.includes('cbi') || lower.includes('nfib') || lower.includes('cfib') || lower.includes('nab') || lower.includes('anz') || lower.includes('aig') || lower.includes('kof') || lower.includes('philly fed') || lower.includes('empire state')) {
         return `${ccy} - CONFIANZA Y CLIMA DE NEGOCIOS`;
       }
 
-      // 10. PRODUCCIÓN INDUSTRIAL Y BALANZA
       if (lower.includes('industrial production') || lower.includes('manufacturing production') || lower.includes('produccion industrial') || lower.includes('factory orders') || lower.includes('machine orders') || lower.includes('durable goods') || lower.includes('manufacturing sales') || lower.includes('wholesale sales')) {
         return `${ccy} - PRODUCCIÓN INDUSTRIAL`;
       }
@@ -723,16 +780,10 @@
 
     function getSmartGroupTitle(ccy, blockEvents) {
       if (!blockEvents || blockEvents.length === 0) return `${ccy} - EVENTO MACRO`;
-
       const uniqueNames = Array.from(new Set(blockEvents.map(e => e.event.trim())));
-
-      if (uniqueNames.length === 1) {
-        return `${ccy} - ${uniqueNames[0]}`;
-      } else if (uniqueNames.length === 2) {
-        return `${ccy} - ${uniqueNames[0]} / ${uniqueNames[1]}`;
-      } else {
-        return getCategorySentimentTitle(ccy, blockEvents[0].event);
-      }
+      if (uniqueNames.length === 1) return `${ccy} - ${uniqueNames[0]}`;
+      if (uniqueNames.length === 2) return `${ccy} - ${uniqueNames[0]} / ${uniqueNames[1]}`;
+      return getCategorySentimentTitle(ccy, blockEvents[0].event);
     }
 
     function processExcelFile(file) {
@@ -879,7 +930,6 @@
         (daysData[day] || []).forEach(item => {
           if (item.coreRuleId) {
             const uniqueEventKey = `${day}_${item.time}_${item.coreRuleId}`;
-            
             if (!claimedCoreRulesPerEvent.has(uniqueEventKey)) {
               item.isCore = true;
               claimedCoreRulesPerEvent.add(uniqueEventKey);
@@ -977,7 +1027,6 @@
       setCategoryScore(catId, ccy, scoreVal, title, summary, btn);
     }
 
-    /* 📌 RENDERIZADO CON TABLAS FIXED DE ANCHO PORCENTUAL RÍGIDO (SISTEMA ANTI-LAYOUT SHIFT) */
     function renderInteractiveCalendar() {
       const container = document.getElementById('interactiveCalendarContainer');
       container.innerHTML = '';
@@ -1160,7 +1209,6 @@
 
     function setIntermarketScore(asset, scoreVal, e) {
       if (e) e.preventDefault();
-      
       globalState.intermarketScores[asset] = parseInt(scoreVal);
       saveToLocalStorage();
       renderMatrixTables();
@@ -1350,14 +1398,12 @@
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-sans">
                 
-                <!-- DIVISA FUERTE -->
                 <div class="bg-[#090b12] border border-emerald-500/25 rounded-xl p-2.5 space-y-2">
                   <div class="flex justify-between items-center border-b border-emerald-500/15 pb-1 font-mono">
                     <span class="font-bold text-emerald-400 text-xs">${escapeHtml(d.strong)} (+${d.strongScore})</span>
                   </div>
                   
                   <div class="space-y-1.5">
-                    <!-- BLOQUE SEMANA PREVIA -->
                     <div class="space-y-1">
                       <span class="text-[9px] text-amber-300 font-mono font-bold uppercase tracking-wider block">📌 Sem. Previa (${strongData.prevTotal > 0 ? '+' : ''}${strongData.prevTotal}):</span>
                       ${strongData.prevList.length > 0 ? strongData.prevList.map(b => `
@@ -1368,7 +1414,6 @@
                       `).join('') : '<span class="text-[9px] text-zinc-600 italic block pl-1">Sin eventos previos</span>'}
                     </div>
 
-                    <!-- BLOQUE ESTA SEMANA -->
                     <div class="space-y-1 pt-1 border-t border-zinc-800/50">
                       <span class="text-[9px] text-cyan-300 font-mono font-bold uppercase tracking-wider block">⚡ Esta Semana:</span>
                       ${strongData.currList.length > 0 ? strongData.currList.map(b => `
@@ -1381,14 +1426,12 @@
                   </div>
                 </div>
 
-                <!-- DIVISA DÉBIL -->
                 <div class="bg-[#090b12] border border-rose-500/25 rounded-xl p-2.5 space-y-2">
                   <div class="flex justify-between items-center border-b border-rose-500/15 pb-1 font-mono">
                     <span class="font-bold text-rose-400 text-xs">${escapeHtml(d.weak)} (${d.weakScore})</span>
                   </div>
                   
                   <div class="space-y-1.5">
-                    <!-- BLOQUE SEMANA PREVIA -->
                     <div class="space-y-1">
                       <span class="text-[9px] text-amber-300 font-mono font-bold uppercase tracking-wider block">📌 Sem. Previa (${weakData.prevTotal > 0 ? '+' : ''}${weakData.prevTotal}):</span>
                       ${weakData.prevList.length > 0 ? weakData.prevList.map(b => `
@@ -1399,7 +1442,6 @@
                       `).join('') : '<span class="text-[9px] text-zinc-600 italic block pl-1">Sin eventos previos</span>'}
                     </div>
 
-                    <!-- BLOQUE ESTA SEMANA -->
                     <div class="space-y-1 pt-1 border-t border-zinc-800/50">
                       <span class="text-[9px] text-cyan-300 font-mono font-bold uppercase tracking-wider block">⚡ Esta Semana:</span>
                       ${weakData.currList.length > 0 ? weakData.currList.map(b => `
@@ -1432,7 +1474,7 @@
 
     function resetAllScores() {
       if (confirm('¿Reiniciar todo el tablero? Esto borrará los datos cargados y puntuaciones.')) {
-        localStorage.removeItem('kairos_macro_engine_state_v10');
+        localStorage.removeItem('kairos_macro_engine_state_v15');
         globalState = {
           daysData: {},
           categoryScores: {},
@@ -1481,7 +1523,7 @@
       };
 
       let html = `
-        <div class="report-card bg-white p-8 rounded-xl font-sans mb-12">
+        <div class="report-card bg-[#030305] text-white p-8 rounded-xl font-sans mb-12">
           <h1 style="font-size: 18px; font-weight: bold; color: #0F172A; margin: 0; border-bottom: 2px solid #0F172A; padding-bottom: 4px;">${text.title}</h1>
           <h2 style="font-size: 11px; color: #475569; margin: 4px 0 14px 0; font-style: italic;">${text.subtitle}</h2>
           <div style="background-color: #F8FAFC; border: 1px solid #CBD5E1; padding: 10px; border-radius: 4px; margin-bottom: 16px;">
