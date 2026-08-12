@@ -110,15 +110,29 @@
         </div>
       </div>
 
-      <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS -->
-      <div id="divergenceAlertBox" class="hidden bg-[#07080d] border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3 h-[280px] flex flex-col justify-between shadow-xl">
-        <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2.5 flex-shrink-0">
+      <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS (DESPLEGABLE / MUESTRA TOP 2 POR DEFECTO) -->
+      <div id="divergenceAlertBox" class="hidden bg-[#07080d] border border-cyan-500/30 p-5 rounded-2xl font-mono space-y-4 shadow-2xl transition-all duration-300">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-cyan-500/20 pb-3 gap-2">
           <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
             <span>⚡</span> Escáner de Divergencias Macro Detectadas
           </span>
-          <span id="divergenceCountBadge" class="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2.5 py-0.5 rounded font-bold">0 Pares Aprobados</span>
+          <div class="flex items-center gap-2">
+            <span id="divergenceCountBadge" class="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2.5 py-1 rounded-lg font-bold">0 Pares Aprobados</span>
+            <button type="button" id="toggleExpandDivergenceBtn" onclick="toggleDivergenceExpand()" class="hidden bg-cyan-950/80 hover:bg-cyan-900 text-cyan-300 border border-cyan-500/40 text-[11px] px-3 py-1 rounded-lg font-bold transition flex items-center gap-1 shadow-sm">
+              ↕️ Expandir Vista (Todos)
+            </button>
+          </div>
         </div>
-        <div id="divergenceList" class="flex-grow overflow-y-auto pr-1 space-y-2.5 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs"></div>
+        
+        <!-- CONTENEDOR DE TARJETAS FLUIDAS -->
+        <div id="divergenceList" class="space-y-3"></div>
+
+        <!-- BOTÓN INFERIOR DE EXPANSION SECUNDARIO -->
+        <div id="divergenceFooterExpand" class="hidden text-center pt-2 border-t border-zinc-800/80">
+          <button type="button" onclick="toggleDivergenceExpand()" class="text-xs text-cyan-400 hover:text-cyan-300 font-bold tracking-wider uppercase font-mono transition inline-flex items-center gap-1">
+            <span id="divergenceFooterText">Mostrar todos los pares aprobados ↓</span>
+          </button>
+        </div>
       </div>
 
       <!-- MATRIZ VIVA DE FUERZA GLOBAL E INTERMERCADO -->
@@ -337,7 +351,6 @@
       return null;
     }
 
-    /* 📌 WHITELIST COMPLETAMENTE ACTUALIZADA PARA INCLUIR TODOS LOS EVENTOS RELEVANTES (CON FRANCIA PERO SIN ESPAÑA/ITALIA) */
     const WHITELIST = {
       UNIVERSAL: [
         'interest rate decision', 'monetary policy statement', 'press conference', 'meeting minutes', 
@@ -364,6 +377,7 @@
 
     let activeCurrencyFilter = 'ALL';
     let filterCoreOnly = false;
+    let isDivergenceExpanded = false; // ESTADO DE EXPANSION DEL ESCÁNER
 
     let globalState = {
       daysData: {},
@@ -587,7 +601,6 @@
       if (e.target.files.length) processExcelFile(e.target.files[0]);
     }
 
-    /* 📌 LÓGICA DE FILTRADO REGIONAL ACTUALIZADA: PERMITE FRANCIA Y ALEMANIA, PERO FILTRA ESPAÑA E ITALIA */
     function isWhitelisted(ccy, eventName) {
       if (!eventName) return false;
       const lower = String(eventName).toLowerCase();
@@ -1239,10 +1252,20 @@
       };
     }
 
+    /* 📌 CONMUTADOR DE VISTA EXPANDIDA / COMPACTA DEL ESCÁNER */
+    function toggleDivergenceExpand() {
+      isDivergenceExpanded = !isDivergenceExpanded;
+      scanDivergences();
+    }
+
+    /* 📌 ESCÁNER RE-DISEÑADO CON ADAPTABILIDAD VISUAL (TOP 2 POR DEFECTO + EXPANSIONAL) */
     function scanDivergences() {
       const alertBox = document.getElementById('divergenceAlertBox');
       const listContainer = document.getElementById('divergenceList');
       const badge = document.getElementById('divergenceCountBadge');
+      const toggleBtn = document.getElementById('toggleExpandDivergenceBtn');
+      const footerExpand = document.getElementById('divergenceFooterExpand');
+      const footerText = document.getElementById('divergenceFooterText');
 
       const forexList = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF'];
       let divergencesFound = [];
@@ -1277,51 +1300,75 @@
       }
 
       if (divergencesFound.length > 0) {
-        badge.textContent = `${divergencesFound.length} Pares Aprobados`;
-        listContainer.className = "flex-grow overflow-y-auto pr-1 space-y-2.5 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs";
-        listContainer.innerHTML = divergencesFound.map(d => {
+        const totalCount = divergencesFound.length;
+        badge.textContent = `${totalCount} Pares Aprobados`;
+
+        // 🔹 MOSTRAR BOTONES DE EXPANSIÓN SOLO SI HAY MÁS DE 2 PARES
+        if (totalCount > 2) {
+          toggleBtn.classList.remove('hidden');
+          footerExpand.classList.remove('hidden');
+
+          if (isDivergenceExpanded) {
+            toggleBtn.textContent = '↑ Mostrar Menos (Top 2)';
+            footerText.textContent = '↑ Colapsar a Top 2 Oportunidades';
+          } else {
+            toggleBtn.textContent = `↕️ Ver todos (${totalCount} Pares)`;
+            footerText.textContent = `Ver los ${totalCount} pares aprobados completos ↓`;
+          }
+        } else {
+          toggleBtn.classList.add('hidden');
+          footerExpand.classList.add('hidden');
+        }
+
+        // 🔹 SI ESTÁ COLAPSADO, MUESTRA EXCLUSIVAMENTE LAS TOP 2 DIVERGENCIAS MÁS FUERTES
+        const visibleList = (!isDivergenceExpanded && totalCount > 2) 
+          ? divergencesFound.slice(0, 2) 
+          : divergencesFound;
+
+        listContainer.className = "grid grid-cols-1 md:grid-cols-2 gap-4 text-xs";
+        listContainer.innerHTML = visibleList.map(d => {
           const strongData = getFullCurrencyBreakdownGrouped(d.strong);
           const weakData = getFullCurrencyBreakdownGrouped(d.weak);
 
           return `
-            <div class="bg-[#05060a] border border-zinc-800 hover:border-cyan-500/40 p-3 rounded-xl space-y-2.5 transition shadow-lg flex flex-col justify-between">
-              <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2">
+            <div class="bg-[#05060a] border border-zinc-800 hover:border-cyan-500/50 p-4 rounded-xl space-y-3 transition shadow-lg flex flex-col justify-between">
+              <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
                 <div>
                   <span class="text-[9px] text-zinc-500 uppercase font-mono block">Oportunidad Macro</span>
-                  <span class="font-black text-cyan-400 text-sm font-mono tracking-tight">${escapeHtml(d.pair)}</span>
+                  <span class="font-black text-cyan-400 text-base font-mono tracking-tight">${escapeHtml(d.pair)}</span>
                 </div>
                 <div class="text-right font-mono">
-                  <span class="${d.actionBadge.includes('COMPRA') ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40' : 'bg-rose-950/80 text-rose-400 border-rose-500/40'} border px-2 py-0.5 rounded text-[10px] font-black block mb-0.5 shadow-sm">${escapeHtml(d.actionBadge)}</span>
-                  <span class="text-[9px] text-zinc-400">Dif: <strong class="text-white">${d.diff} pts</strong></span>
+                  <span class="${d.actionBadge.includes('COMPRA') ? 'bg-emerald-950/90 text-emerald-400 border-emerald-500/50' : 'bg-rose-950/90 text-rose-400 border-rose-500/50'} border px-2.5 py-1 rounded-lg text-xs font-black block mb-1 shadow-sm">${escapeHtml(d.actionBadge)}</span>
+                  <span class="text-[10px] text-zinc-400">Diferencial: <strong class="text-white">${d.diff} pts</strong></span>
                 </div>
               </div>
 
-              <div class="grid grid-cols-2 gap-2 text-xs font-sans">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-sans">
                 
                 <!-- DIVISA FUERTE -->
-                <div class="bg-[#090b12] border border-emerald-500/20 rounded-lg p-2 space-y-1.5">
-                  <div class="flex justify-between items-center border-b border-emerald-500/10 pb-1 font-mono">
-                    <span class="font-bold text-emerald-400 text-[10px]">${escapeHtml(d.strong)} (+${d.strongScore})</span>
+                <div class="bg-[#090b12] border border-emerald-500/25 rounded-xl p-2.5 space-y-2">
+                  <div class="flex justify-between items-center border-b border-emerald-500/15 pb-1 font-mono">
+                    <span class="font-bold text-emerald-400 text-xs">${escapeHtml(d.strong)} (+${d.strongScore})</span>
                   </div>
                   
-                  <div class="space-y-1 max-h-24 overflow-y-auto pr-0.5">
+                  <div class="space-y-1.5">
                     <!-- BLOQUE SEMANA PREVIA -->
-                    <div class="space-y-0.5">
+                    <div class="space-y-1">
                       <span class="text-[9px] text-amber-300 font-mono font-bold uppercase tracking-wider block">📌 Sem. Previa (${strongData.prevTotal > 0 ? '+' : ''}${strongData.prevTotal}):</span>
                       ${strongData.prevList.length > 0 ? strongData.prevList.map(b => `
-                        <div class="flex items-center justify-between text-[9px] text-zinc-400 bg-zinc-900/40 px-1.5 py-0.5 rounded border border-zinc-800/40">
-                          <span class="truncate pr-1">${escapeHtml(b.label)}</span>
+                        <div class="flex items-center justify-between text-[10px] text-zinc-300 bg-zinc-900/50 px-2 py-0.5 rounded border border-zinc-800/50">
+                          <span class="pr-1">${escapeHtml(b.label)}</span>
                           <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
                         </div>
                       `).join('') : '<span class="text-[9px] text-zinc-600 italic block pl-1">Sin eventos previos</span>'}
                     </div>
 
                     <!-- BLOQUE ESTA SEMANA -->
-                    <div class="space-y-0.5 pt-1 border-t border-zinc-800/50">
+                    <div class="space-y-1 pt-1 border-t border-zinc-800/50">
                       <span class="text-[9px] text-cyan-300 font-mono font-bold uppercase tracking-wider block">⚡ Esta Semana:</span>
                       ${strongData.currList.length > 0 ? strongData.currList.map(b => `
-                        <div class="flex items-center justify-between text-[9px] text-zinc-200 bg-zinc-900/80 px-1.5 py-0.5 rounded border border-zinc-700/50">
-                          <span class="truncate pr-1">${escapeHtml(b.label)}</span>
+                        <div class="flex items-center justify-between text-[10px] text-zinc-100 bg-zinc-900/90 px-2 py-0.5 rounded border border-zinc-700/60">
+                          <span class="pr-1">${escapeHtml(b.label)}</span>
                           <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
                         </div>
                       `).join('') : '<span class="text-[9px] text-zinc-600 italic block pl-1">Pendiente evaluar</span>'}
@@ -1330,29 +1377,29 @@
                 </div>
 
                 <!-- DIVISA DÉBIL -->
-                <div class="bg-[#090b12] border border-rose-500/20 rounded-lg p-2 space-y-1.5">
-                  <div class="flex justify-between items-center border-b border-rose-500/10 pb-1 font-mono">
-                    <span class="font-bold text-rose-400 text-[10px]">${escapeHtml(d.weak)} (${d.weakScore})</span>
+                <div class="bg-[#090b12] border border-rose-500/25 rounded-xl p-2.5 space-y-2">
+                  <div class="flex justify-between items-center border-b border-rose-500/15 pb-1 font-mono">
+                    <span class="font-bold text-rose-400 text-xs">${escapeHtml(d.weak)} (${d.weakScore})</span>
                   </div>
                   
-                  <div class="space-y-1 max-h-24 overflow-y-auto pr-0.5">
+                  <div class="space-y-1.5">
                     <!-- BLOQUE SEMANA PREVIA -->
-                    <div class="space-y-0.5">
+                    <div class="space-y-1">
                       <span class="text-[9px] text-amber-300 font-mono font-bold uppercase tracking-wider block">📌 Sem. Previa (${weakData.prevTotal > 0 ? '+' : ''}${weakData.prevTotal}):</span>
                       ${weakData.prevList.length > 0 ? weakData.prevList.map(b => `
-                        <div class="flex items-center justify-between text-[9px] text-zinc-400 bg-zinc-900/40 px-1.5 py-0.5 rounded border border-zinc-800/40">
-                          <span class="truncate pr-1">${escapeHtml(b.label)}</span>
+                        <div class="flex items-center justify-between text-[10px] text-zinc-300 bg-zinc-900/50 px-2 py-0.5 rounded border border-zinc-800/50">
+                          <span class="pr-1">${escapeHtml(b.label)}</span>
                           <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
                         </div>
                       `).join('') : '<span class="text-[9px] text-zinc-600 italic block pl-1">Sin eventos previos</span>'}
                     </div>
 
                     <!-- BLOQUE ESTA SEMANA -->
-                    <div class="space-y-0.5 pt-1 border-t border-zinc-800/50">
+                    <div class="space-y-1 pt-1 border-t border-zinc-800/50">
                       <span class="text-[9px] text-cyan-300 font-mono font-bold uppercase tracking-wider block">⚡ Esta Semana:</span>
                       ${weakData.currList.length > 0 ? weakData.currList.map(b => `
-                        <div class="flex items-center justify-between text-[9px] text-zinc-200 bg-zinc-900/80 px-1.5 py-0.5 rounded border border-zinc-700/50">
-                          <span class="truncate pr-1">${escapeHtml(b.label)}</span>
+                        <div class="flex items-center justify-between text-[10px] text-zinc-100 bg-zinc-900/90 px-2 py-0.5 rounded border border-zinc-700/60">
+                          <span class="pr-1">${escapeHtml(b.label)}</span>
                           <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
                         </div>
                       `).join('') : '<span class="text-[9px] text-zinc-600 italic block pl-1">Pendiente evaluar</span>'}
@@ -1366,7 +1413,9 @@
         }).join('');
       } else {
         badge.textContent = `0 Pares Aprobados`;
-        listContainer.className = "flex-grow flex items-center justify-center text-center p-4 border border-dashed border-zinc-800 rounded-xl bg-[#040508]";
+        toggleBtn.classList.add('hidden');
+        footerExpand.classList.add('hidden');
+        listContainer.className = "flex items-center justify-center text-center p-6 border border-dashed border-zinc-800 rounded-xl bg-[#040508]";
         listContainer.innerHTML = `
           <div class="text-zinc-500 text-xs font-mono space-y-1">
             <span class="text-zinc-400 font-bold block">🔍 Escáner Activo — Esperando Divergencias</span>
