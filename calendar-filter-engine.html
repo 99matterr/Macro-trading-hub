@@ -74,9 +74,12 @@
           <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
             <span>⚡</span> Kairos Macro Hub
           </h1>
-          <p class="text-zinc-400 text-xs mt-1">Motor robusto de análisis macro (Estructura Rígida Anti-Layout Shift)</p>
+          <p class="text-zinc-400 text-xs mt-1">Motor robusto de análisis macro (Desglose Histórico de Semana Previa Integrado)</p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
+          <button type="button" onclick="lockCurrentAsPreviousWeek()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1.5 shadow-sm">
+            📌 Fijar como Semana Previa
+          </button>
           <button type="button" onclick="exportStateJSON()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs px-3 py-2 rounded-lg transition">
             📥 Exportar Backup
           </button>
@@ -108,7 +111,7 @@
       </div>
 
       <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS (ALTURA FIJA PARA EVITAR SALTO) -->
-      <div id="divergenceAlertBox" class="hidden bg-[#07080d] border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3 h-[240px] flex flex-col justify-between shadow-xl">
+      <div id="divergenceAlertBox" class="hidden bg-[#07080d] border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3 h-[280px] flex flex-col justify-between shadow-xl">
         <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2.5 flex-shrink-0">
           <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
             <span>⚡</span> Escáner de Divergencias Macro Detectadas
@@ -139,7 +142,7 @@
                 <thead>
                   <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
                     <th class="p-2">Divisa</th>
-                    <th class="p-2 text-center">Previo (Manual)</th>
+                    <th class="p-2 text-center">Previo (Manual/Fijo)</th>
                     <th class="p-2 text-center">Eventos (Auto)</th>
                     <th class="p-2 text-center">Total Combinado</th>
                   </tr>
@@ -154,7 +157,7 @@
                 <thead>
                   <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 font-mono uppercase">
                     <th class="p-2">Activo</th>
-                    <th class="p-2 text-center">Previo (Manual)</th>
+                    <th class="p-2 text-center">Previo (Manual/Fijo)</th>
                     <th class="p-2 text-center">Evaluación</th>
                     <th class="p-2 text-center">Total Combinado</th>
                   </tr>
@@ -365,7 +368,8 @@
       categoryScores: {},
       matrixEvents: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
       matrixTotals: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
-      matrixPrev: { USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 },
+      matrixPrev: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
+      matrixPrevBreakdown: { USD: [], EUR: [], GBP: [], JPY: [], CAD: [], AUD: [], NZD: [], CHF: [], CNH: [], VIX: [], Oil: [], Gold: [] },
       intermarketScores: { VIX: 0, Oil: 0, Gold: 0 },
       dailyNotes: {}
     };
@@ -392,17 +396,18 @@
     });
 
     function saveToLocalStorage() {
-      localStorage.setItem('kairos_macro_engine_state_v9', JSON.stringify(globalState));
+      localStorage.setItem('kairos_macro_engine_state_v10', JSON.stringify(globalState));
     }
 
     function loadFromLocalStorage() {
-      const saved = localStorage.getItem('kairos_macro_engine_state_v9');
+      const saved = localStorage.getItem('kairos_macro_engine_state_v10');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           globalState.daysData = parsed.daysData || {};
           globalState.categoryScores = parsed.categoryScores || {};
-          globalState.matrixPrev = Object.assign({ USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 }, parsed.matrixPrev || {});
+          globalState.matrixPrev = Object.assign({ USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 }, parsed.matrixPrev || {});
+          globalState.matrixPrevBreakdown = Object.assign({ USD: [], EUR: [], GBP: [], JPY: [], CAD: [], AUD: [], NZD: [], CHF: [], CNH: [], VIX: [], Oil: [], Gold: [] }, parsed.matrixPrevBreakdown || {});
           globalState.intermarketScores = Object.assign({ VIX: 0, Oil: 0, Gold: 0 }, parsed.intermarketScores || {});
           globalState.dailyNotes = parsed.dailyNotes || {};
           
@@ -454,7 +459,8 @@
               categoryScores: parsed.categoryScores || {},
               matrixEvents: parsed.matrixEvents || { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
               matrixTotals: parsed.matrixTotals || { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
-              matrixPrev: Object.assign({ USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 }, parsed.matrixPrev || {}),
+              matrixPrev: Object.assign({ USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 }, parsed.matrixPrev || {}),
+              matrixPrevBreakdown: Object.assign({ USD: [], EUR: [], GBP: [], JPY: [], CAD: [], AUD: [], NZD: [], CHF: [], CNH: [], VIX: [], Oil: [], Gold: [] }, parsed.matrixPrevBreakdown || {}),
               intermarketScores: Object.assign({ VIX: 0, Oil: 0, Gold: 0 }, parsed.intermarketScores || {}),
               dailyNotes: parsed.dailyNotes || {}
             };
@@ -473,6 +479,95 @@
         }
       };
       reader.readAsText(file);
+    }
+
+    /* 📌 NUEVA FUNCIÓN: FIJAR LA SEMANA CARGADA COMO SEMANA PREVIA HISTÓRICA */
+    function lockCurrentAsPreviousWeek() {
+      if (!globalState.daysData || Object.keys(globalState.daysData).length === 0) {
+        alert('Primero debes cargar el Excel de la semana pasada y calificar sus eventos para poder fijarla.');
+        return;
+      }
+
+      const confirmLock = confirm('¿Deseas fijar la semana actual como "Semana Previa"?\n\nEsto tomará los eventos calificados, congelará su desglose con nombres y puntajes como base histórica de la semana pasada, y limpiará el calendario para que cargues el Excel de la semana actual.');
+      if (!confirmLock) return;
+
+      const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH', 'VIX', 'Oil', 'Gold'];
+      const newPrevBreakdown = {};
+      const newPrevTotals = {};
+
+      currencies.forEach(ccy => {
+        const eventsList = getCurrencyEvaluatedEventsList(ccy);
+        newPrevBreakdown[ccy] = eventsList;
+        const totalSum = eventsList.reduce((acc, item) => acc + item.score, 0);
+        newPrevTotals[ccy] = totalSum;
+      });
+
+      globalState.matrixPrevBreakdown = newPrevBreakdown;
+      globalState.matrixPrev = newPrevTotals;
+
+      // Limpiar datos del calendario activo para recibir la semana actual
+      globalState.daysData = {};
+      globalState.categoryScores = {};
+      globalState.dailyNotes = {};
+
+      saveToLocalStorage();
+      renderLiveInteractiveApp();
+      alert('📌 ¡Semana anterior congelada con éxito como Base Previa!\n\nAhora puedes arrastrar o seleccionar el archivo Excel de la SEMANA ACTUAL.');
+    }
+
+    function getCurrencyEvaluatedEventsList(ccy) {
+      const list = [];
+      const matchedCatIds = new Set();
+
+      if (['VIX', 'Oil', 'Gold'].includes(ccy)) {
+        const score = globalState.intermarketScores[ccy] || 0;
+        if (score !== 0) {
+          list.push({ label: `Evaluación de ${ccy}`, score: score });
+        }
+        return list;
+      }
+
+      if (globalState.daysData) {
+        Object.keys(globalState.daysData).forEach(day => {
+          let rawEv = globalState.daysData[day] || [];
+          let events = rawEv.filter(e => isWhitelisted(e.ccy, e.event) && e.ccy === ccy);
+          if (!events || events.length === 0) return;
+
+          let currentBlockEvents = [];
+          events.forEach((item, idx) => {
+            currentBlockEvents.push(item);
+            const nextItem = events[idx + 1];
+            const currentCategory = getCategorySentimentTitle(item.ccy, item.event);
+            const nextCategory = nextItem ? getCategorySentimentTitle(nextItem.ccy, nextItem.event) : null;
+
+            if (!nextItem || nextCategory !== currentCategory) {
+              const categoryId = `${day}-${item.ccy}-${currentCategory}`.replace(/[^a-zA-Z0-9]/g, '-');
+              const scoreObj = globalState.categoryScores[categoryId];
+
+              if (scoreObj && scoreObj.score !== 0) {
+                matchedCatIds.add(categoryId);
+                const uniqueNames = Array.from(new Set(currentBlockEvents.map(e => e.event.trim())));
+                const label = uniqueNames.join(' / ');
+                list.push({ label: label, score: scoreObj.score });
+              }
+              currentBlockEvents = [];
+            }
+          });
+        });
+      }
+
+      if (globalState.categoryScores) {
+        Object.keys(globalState.categoryScores).forEach(catId => {
+          const item = globalState.categoryScores[catId];
+          if (item && item.ccy === ccy && item.score !== 0 && !matchedCatIds.has(catId)) {
+            let label = item.title || item.eventsSummary || 'Evento Macro';
+            label = label.replace(new RegExp(`^${ccy}\\s*-\\s*`, 'i'), '');
+            list.push({ label: label, score: item.score });
+          }
+        });
+      }
+
+      return list;
     }
 
     function translateDayToSpanish(dayStr) {
@@ -1126,56 +1221,25 @@
       return { pairName: `${base}/${quote}`, actionBadge: actionText, strong: strong, weak: weak };
     }
 
-    function getCurrencyScoreBreakdown(ccy) {
-      const breakdown = [];
-      const prev = parseInt(globalState.matrixPrev[ccy]) || 0;
-      if (prev !== 0) {
-        breakdown.push({ label: 'Fuerza Previa (Manual)', score: prev });
+    /* OBTENER DESGLOSE DIVIDIDO EN: SEMANA PREVIA Y ESTA SEMANA */
+    function getFullCurrencyBreakdownGrouped(ccy) {
+      // 1. SEMANA PREVIA
+      let prevList = globalState.matrixPrevBreakdown ? (globalState.matrixPrevBreakdown[ccy] || []) : [];
+      const prevTotal = parseInt(globalState.matrixPrev[ccy]) || 0;
+
+      // Si no hay lista detallada guardada pero sí hay un valor manual en matrixPrev
+      if (prevList.length === 0 && prevTotal !== 0) {
+        prevList = [{ label: 'Fuerza Previa Manual', score: prevTotal }];
       }
 
-      const matchedCatIds = new Set();
+      // 2. ESTA SEMANA
+      const currList = getCurrencyEvaluatedEventsList(ccy);
 
-      if (globalState.daysData) {
-        Object.keys(globalState.daysData).forEach(day => {
-          let rawEv = globalState.daysData[day] || [];
-          let events = rawEv.filter(e => isWhitelisted(e.ccy, e.event) && e.ccy === ccy);
-          if (!events || events.length === 0) return;
-
-          let currentBlockEvents = [];
-          events.forEach((item, idx) => {
-            currentBlockEvents.push(item);
-            const nextItem = events[idx + 1];
-            const currentCategory = getCategorySentimentTitle(item.ccy, item.event);
-            const nextCategory = nextItem ? getCategorySentimentTitle(nextItem.ccy, nextItem.event) : null;
-
-            if (!nextItem || nextCategory !== currentCategory) {
-              const categoryId = `${day}-${item.ccy}-${currentCategory}`.replace(/[^a-zA-Z0-9]/g, '-');
-              const scoreObj = globalState.categoryScores[categoryId];
-
-              if (scoreObj && scoreObj.score !== 0) {
-                matchedCatIds.add(categoryId);
-                const uniqueNames = Array.from(new Set(currentBlockEvents.map(e => e.event.trim())));
-                const label = uniqueNames.join(' / ');
-                breakdown.push({ label: label, score: scoreObj.score });
-              }
-              currentBlockEvents = [];
-            }
-          });
-        });
-      }
-
-      if (globalState.categoryScores) {
-        Object.keys(globalState.categoryScores).forEach(catId => {
-          const item = globalState.categoryScores[catId];
-          if (item && item.ccy === ccy && item.score !== 0 && !matchedCatIds.has(catId)) {
-            let label = item.title || item.eventsSummary || 'Evento Macro';
-            label = label.replace(new RegExp(`^${ccy}\\s*-\\s*`, 'i'), '');
-            breakdown.push({ label: label, score: item.score });
-          }
-        });
-      }
-
-      return breakdown;
+      return {
+        prevList,
+        prevTotal,
+        currList
+      };
     }
 
     function scanDivergences() {
@@ -1211,8 +1275,7 @@
 
       divergencesFound.sort((a, b) => b.diff - a.diff);
 
-      // Mantener recuadro con altura fija siempre que existan datos cargados
-      if (Object.keys(globalState.daysData).length > 0) {
+      if (Object.keys(globalState.daysData).length > 0 || divergencesFound.length > 0) {
         alertBox.classList.remove('hidden');
       }
 
@@ -1220,8 +1283,8 @@
         badge.textContent = `${divergencesFound.length} Pares Aprobados`;
         listContainer.className = "flex-grow overflow-y-auto pr-1 space-y-2.5 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs";
         listContainer.innerHTML = divergencesFound.map(d => {
-          const strongBreakdown = getCurrencyScoreBreakdown(d.strong);
-          const weakBreakdown = getCurrencyScoreBreakdown(d.weak);
+          const strongData = getFullCurrencyBreakdownGrouped(d.strong);
+          const weakData = getFullCurrencyBreakdownGrouped(d.weak);
 
           return `
             <div class="bg-[#05060a] border border-zinc-800 hover:border-cyan-500/40 p-3 rounded-xl space-y-2.5 transition shadow-lg flex flex-col justify-between">
@@ -1237,33 +1300,69 @@
               </div>
 
               <div class="grid grid-cols-2 gap-2 text-xs font-sans">
-                <div class="bg-[#090b12] border border-emerald-500/20 rounded-lg p-2 space-y-1">
+                
+                <!-- DIVISA FUERTE -->
+                <div class="bg-[#090b12] border border-emerald-500/20 rounded-lg p-2 space-y-1.5">
                   <div class="flex justify-between items-center border-b border-emerald-500/10 pb-1 font-mono">
                     <span class="font-bold text-emerald-400 text-[10px]">${escapeHtml(d.strong)} (+${d.strongScore})</span>
                   </div>
-                  <div class="space-y-0.5 max-h-20 overflow-y-auto">
-                    ${strongBreakdown.length > 0 ? strongBreakdown.map(b => `
-                      <div class="flex items-center justify-between text-[10px] text-zinc-300 bg-zinc-900/60 px-1.5 py-0.5 rounded">
-                        <span class="truncate pr-1">${escapeHtml(b.label)}</span>
-                        <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
-                      </div>
-                    `).join('') : '<span class="text-[9px] text-zinc-500 block italic">Sin eventos</span>'}
+                  
+                  <div class="space-y-1 max-h-24 overflow-y-auto pr-0.5">
+                    <!-- BLOQUE SEMANA PREVIA -->
+                    <div class="space-y-0.5">
+                      <span class="text-[9px] text-amber-300 font-mono font-bold uppercase tracking-wider block">📌 Sem. Previa (${strongData.prevTotal > 0 ? '+' : ''}${strongData.prevTotal}):</span>
+                      ${strongData.prevList.length > 0 ? strongData.prevList.map(b => `
+                        <div class="flex items-center justify-between text-[9px] text-zinc-400 bg-zinc-900/40 px-1.5 py-0.5 rounded border border-zinc-800/40">
+                          <span class="truncate pr-1">${escapeHtml(b.label)}</span>
+                          <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
+                        </div>
+                      `).join('') : '<span class="text-[9px] text-zinc-600 italic block pl-1">Sin eventos previos</span>'}
+                    </div>
+
+                    <!-- BLOQUE ESTA SEMANA -->
+                    <div class="space-y-0.5 pt-1 border-t border-zinc-800/50">
+                      <span class="text-[9px] text-cyan-300 font-mono font-bold uppercase tracking-wider block">⚡ Esta Semana:</span>
+                      ${strongData.currList.length > 0 ? strongData.currList.map(b => `
+                        <div class="flex items-center justify-between text-[9px] text-zinc-200 bg-zinc-900/80 px-1.5 py-0.5 rounded border border-zinc-700/50">
+                          <span class="truncate pr-1">${escapeHtml(b.label)}</span>
+                          <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
+                        </div>
+                      `).join('') : '<span class="text-[9px] text-zinc-600 italic block pl-1">Pendiente evaluar</span>'}
+                    </div>
                   </div>
                 </div>
 
-                <div class="bg-[#090b12] border border-rose-500/20 rounded-lg p-2 space-y-1">
+                <!-- DIVISA DÉBIL -->
+                <div class="bg-[#090b12] border border-rose-500/20 rounded-lg p-2 space-y-1.5">
                   <div class="flex justify-between items-center border-b border-rose-500/10 pb-1 font-mono">
                     <span class="font-bold text-rose-400 text-[10px]">${escapeHtml(d.weak)} (${d.weakScore})</span>
                   </div>
-                  <div class="space-y-0.5 max-h-20 overflow-y-auto">
-                    ${weakBreakdown.length > 0 ? weakBreakdown.map(b => `
-                      <div class="flex items-center justify-between text-[10px] text-zinc-300 bg-zinc-900/60 px-1.5 py-0.5 rounded">
-                        <span class="truncate pr-1">${escapeHtml(b.label)}</span>
-                        <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
-                      </div>
-                    `).join('') : '<span class="text-[9px] text-zinc-500 block italic">Sin eventos</span>'}
+                  
+                  <div class="space-y-1 max-h-24 overflow-y-auto pr-0.5">
+                    <!-- BLOQUE SEMANA PREVIA -->
+                    <div class="space-y-0.5">
+                      <span class="text-[9px] text-amber-300 font-mono font-bold uppercase tracking-wider block">📌 Sem. Previa (${weakData.prevTotal > 0 ? '+' : ''}${weakData.prevTotal}):</span>
+                      ${weakData.prevList.length > 0 ? weakData.prevList.map(b => `
+                        <div class="flex items-center justify-between text-[9px] text-zinc-400 bg-zinc-900/40 px-1.5 py-0.5 rounded border border-zinc-800/40">
+                          <span class="truncate pr-1">${escapeHtml(b.label)}</span>
+                          <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
+                        </div>
+                      `).join('') : '<span class="text-[9px] text-zinc-600 italic block pl-1">Sin eventos previos</span>'}
+                    </div>
+
+                    <!-- BLOQUE ESTA SEMANA -->
+                    <div class="space-y-0.5 pt-1 border-t border-zinc-800/50">
+                      <span class="text-[9px] text-cyan-300 font-mono font-bold uppercase tracking-wider block">⚡ Esta Semana:</span>
+                      ${weakData.currList.length > 0 ? weakData.currList.map(b => `
+                        <div class="flex items-center justify-between text-[9px] text-zinc-200 bg-zinc-900/80 px-1.5 py-0.5 rounded border border-zinc-700/50">
+                          <span class="truncate pr-1">${escapeHtml(b.label)}</span>
+                          <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
+                        </div>
+                      `).join('') : '<span class="text-[9px] text-zinc-600 italic block pl-1">Pendiente evaluar</span>'}
+                    </div>
                   </div>
                 </div>
+
               </div>
             </div>
           `;
@@ -1282,13 +1381,14 @@
 
     function resetAllScores() {
       if (confirm('¿Reiniciar todo el tablero? Esto borrará los datos cargados y puntuaciones.')) {
-        localStorage.removeItem('kairos_macro_engine_state_v9');
+        localStorage.removeItem('kairos_macro_engine_state_v10');
         globalState = {
           daysData: {},
           categoryScores: {},
           matrixEvents: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
           matrixTotals: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
-          matrixPrev: { USD: 2, EUR: 2, GBP: 2, JPY: 0, CAD: -2, AUD: 2, NZD: 0, CHF: 0, CNH: 2, VIX: 0, Oil: 0, Gold: 0 },
+          matrixPrev: { USD: 0, EUR: 0, GBP: 0, JPY: 0, CAD: 0, AUD: 0, NZD: 0, CHF: 0, CNH: 0, VIX: 0, Oil: 0, Gold: 0 },
+          matrixPrevBreakdown: { USD: [], EUR: [], GBP: [], JPY: [], CAD: [], AUD: [], NZD: [], CHF: [], CNH: [], VIX: [], Oil: [], Gold: [] },
           intermarketScores: { VIX: 0, Oil: 0, Gold: 0 },
           dailyNotes: {}
         };
