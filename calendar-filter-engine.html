@@ -38,7 +38,7 @@
       border-left: 3px solid #f59e0b !important;
     }
 
-    /* BOTONES CON DIMENSIÓN RÍGIDA ANTI-LAYOUT SHIFT */
+    /* BOTONES CON DIMENSIÓN Y FUENTE RÍGIDA ANTI-LAYOUT SHIFT */
     .score-btn {
       width: 2rem !important;
       height: 1.5rem !important;
@@ -47,13 +47,14 @@
       justify-content: center !important;
       box-sizing: border-box !important;
       flex-shrink: 0 !important;
+      font-weight: 700 !important;
     }
 
-    .score-btn-active-p2 { background-color: #059669 !important; color: white !important; border-color: #10b981 !important; font-weight: bold; }
-    .score-btn-active-p1 { background-color: #10b981 !important; color: white !important; border-color: #34d399 !important; font-weight: bold; }
-    .score-btn-active-0  { background-color: #3f3f46 !important; color: white !important; border-color: #71717a !important; font-weight: bold; }
-    .score-btn-active-m1 { background-color: #f43f5e !important; color: white !important; border-color: #fb7185 !important; font-weight: bold; }
-    .score-btn-active-m2 { background-color: #be123c !important; color: white !important; border-color: #e11d48 !important; font-weight: bold; }
+    .score-btn-active-p2 { background-color: #059669 !important; color: white !important; border-color: #10b981 !important; }
+    .score-btn-active-p1 { background-color: #10b981 !important; color: white !important; border-color: #34d399 !important; }
+    .score-btn-active-0  { background-color: #3f3f46 !important; color: white !important; border-color: #71717a !important; }
+    .score-btn-active-m1 { background-color: #f43f5e !important; color: white !important; border-color: #fb7185 !important; }
+    .score-btn-active-m2 { background-color: #be123c !important; color: white !important; border-color: #e11d48 !important; }
 
     .score-scale-strong-bullish { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; border: 1px solid rgba(16, 185, 129, 0.4) !important; }
     .score-scale-bullish { background-color: rgba(234, 179, 8, 0.15) !important; color: #facc15 !important; border: 1px solid rgba(234, 179, 8, 0.4) !important; }
@@ -110,7 +111,7 @@
         </div>
       </div>
 
-      <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS (DESPLEGABLE / MUESTRA TOP 2 POR DEFECTO) -->
+      <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS (TOP 2 POR DEFECTO + EXPANSIONAL) -->
       <div id="divergenceAlertBox" class="hidden bg-[#07080d] border border-cyan-500/30 p-5 rounded-2xl font-mono space-y-4 shadow-2xl transition-all duration-300">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-cyan-500/20 pb-3 gap-2">
           <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
@@ -243,8 +244,8 @@
       { id: 'USD_ISM_MFG', ccy: 'USD', match: ['ism manufacturing pmi', 'ism mfg pmi', 'ism manufacturing purchasing managers index', 'ism manufacturing', 'ism mfg', 'pmi manufacturero del ism', 'pmi del sector manufacturero del ism'], avoid: ['prices', 'employment', 'orders', 'paying', 'new orders', 'precios', 'empleo', 'pedidos'] },
       { id: 'USD_ISM_SERVICES', ccy: 'USD', match: ['ism non-manufacturing pmi', 'ism services pmi', 'ism non-manufacturing purchasing managers index', 'ism services', 'ism non-manufacturing', 'ism non mfg', 'pmi no manufacturero del ism', 'pmi del sector servicios del ism'], avoid: ['prices', 'employment', 'orders', 'precios', 'empleo'] },
       { id: 'USD_CPI_MOM', ccy: 'USD', match: ['cpi (mom)', 'cpi mom (headline)', 'cpi mom', 'consumer price index (mom)', 'ipc (mensual)', 'ipc mensual'], avoid: ['core', 'ex food', 'yoy', 'subyacente', 'anual'] },
-      { id: 'USD_UNEMP', ccy: 'USD', match: ['unemployment rate', 'tasa de desempleo'], avoid: ['youth', 'underemployment', 'germany', 'german', 'french', 'spanish', 'swiss', 'chicago', 'philly', 'empire'] },
-      { id: 'USD_NFP', ccy: 'USD', match: ['nonfarm payrolls', 'non farm payrolls', 'nfp', 'united states nonfarm payrolls', 'nóminas no agrícolas', 'nominas no agricolas'], avoid: ['private', 'manufacturing', 'privadas'] },
+      { id: 'USD_UNEMP', ccy: 'USD', match: ['unemployment rate', 'tasa de desempleo', 'unemployment'], avoid: ['youth', 'underemployment', 'germany', 'german', 'french', 'spanish', 'swiss', 'chicago', 'philly', 'empire', 'change'] },
+      { id: 'USD_NFP', ccy: 'USD', match: ['nonfarm payrolls', 'non farm payrolls', 'non-farm payrolls', 'nonfarm employment', 'non farm employment', 'nfp', 'united states nonfarm payrolls', 'nóminas no agrícolas', 'nominas no agricolas', 'empleo no agrícola', 'empleo no agricola'], avoid: ['private', 'manufacturing', 'privadas'] },
       { id: 'USD_RETAIL', ccy: 'USD', match: ['retail sales (mom)', 'retail sales mom', 'ventas minoristas (mensual)', 'ventas minoristas mensual'], avoid: ['ex autos', 'control', 'ex gas', 'yoy', 'group', 'anual'] },
       { id: 'USD_CB_CONF', ccy: 'USD', match: ['cb consumer confidence', 'cb consumer confidence index', 'consumer confidence index', 'confianza del consumidor de the conference board', 'confianza del consumidor de cb'], avoid: ['michigan'] },
       { id: 'USD_NFIB', ccy: 'USD', match: ['nfib small business optimism', 'nfib small business index', 'nfib small business', 'nfib', 'optimismo de las pequeñas empresas'], avoid: [] },
@@ -361,14 +362,14 @@
         'tasas de interes', 'politica monetaria', 'actas', 'rueda de prensa', 'discurso',
         's&p', 's&p global', 'pmi', 'purchasing managers', 'gestores de compras'
       ],
-      USD: ['ism', 's&p', 'pmi', 'cpi', 'unemployment rate', 'nfp', 'retail sales', 'cb consumer confidence', 'nfib', 'gdpnow', 'atlanta fed', 'adp', 'average hourly earnings', 'jobless claims', 'pce', 'ppi', 'gdp', 'industrial production', 'building permits', 'home sales', 'trade balance', 'jolts', 'durable goods', 'ipc', 'tasa de desempleo', 'nominas no agricolas', 'ventas minoristas', 'michigan', 'u-mich', 'philly fed', 'empire state', 'employment cost index', 'eci'],
-      CAD: ['s&p', 'pmi', 'ivey', 'cpi', 'unemployment rate', 'net employment change', 'employment change', 'retail sales', 'cb consumer survey', 'cfib', 'monthly gdp', 'gdp', 'monetary policy report', 'ppi', 'ippi', 'trade balance', 'boc business outlook', 'housing starts', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib', 'manufacturing sales', 'wholesale sales'],
-      EUR: ['hcob', 's&p', 'pmi', 'cpi', 'unemployment', 'germany unemp', 'retail sales', 'consumer confidence', 'ifo', 'industrial production', 'ppi', 'gdp', 'zew', 'trade balance', 'hicp', 'negotiated wages', 'factory orders', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'produccion industrial', 'pib', 'gfk', 'french', 'france'],
-      CHF: ['procure', 's&p', 'pmi', 'cpi', 'unemp', 'retail sales', 'consumer sentiment', 'kof', 'seco', 'ppi', 'gdp', 'industrial production', 'trade balance', 'svme', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib'],
-      GBP: ['s&p', 'pmi', 'cpi', 'unemployment rate', 'claimant count', 'retail sales', 'gfk', 'cbi', 'monthly gdp', 'gdp', 'rpi', 'ppi', 'average earnings', 'public sector net borrowing', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib', 'industrial production', 'manufacturing production', 'halifax', 'nationwide'],
-      JPY: ['jibun', 's&p', 'pmi', 'tokyo cpi', 'unemployment rate', 'cash earnings', 'retail sales', 'consumer survey', 'tankan', 'jcer', 'ppi', 'cgpi', 'national cpi', 'gdp', 'trade balance', 'household spending', 'machine orders', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib', 'industrial production', 'current account'],
-      AUD: ['judo', 's&p', 'pmi', 'cpi indicator', 'cpi', 'unemployment rate', 'employment change', 'retail sales', 'westpac', 'nab', 'aig', 'ppi', 'gdp', 'trade balance', 'building approvals', 'private capex', 'caixin', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib', 'wage price index', 'wpi'],
-      NZD: ['busnz', 's&p', 'pmi', 'cpi', 'food prices', 'unemployment rate', 'mei jobs', 'card transactions', 'anz', 'ppi', 'gdt', 'gdp', 'trade balance', 'building consents', 'ipc', 'tasa de desempleo', 'pib'],
+      USD: ['ism', 's&p', 'pmi', 'cpi', 'unemployment rate', 'unemployment', 'nfp', 'nonfarm', 'non-farm', 'payrolls', 'nóminas no agrícolas', 'nominas no agricolas', 'empleo no agrícola', 'retail sales', 'cb consumer confidence', 'nfib', 'gdpnow', 'atlanta fed', 'adp', 'average hourly earnings', 'jobless claims', 'pce', 'ppi', 'gdp', 'industrial production', 'building permits', 'home sales', 'trade balance', 'jolts', 'durable goods', 'ipc', 'tasa de desempleo', 'nominas', 'nóminas', 'michigan', 'u-mich', 'philly fed', 'empire state', 'employment cost index', 'eci'],
+      CAD: ['s&p', 'pmi', 'ivey', 'cpi', 'unemployment rate', 'unemployment', 'net employment change', 'employment change', 'retail sales', 'cb consumer survey', 'cfib', 'monthly gdp', 'gdp', 'monetary policy report', 'ppi', 'ippi', 'trade balance', 'boc business outlook', 'housing starts', 'ipc', 'tasa de desempleo', 'desempleo', 'empleo', 'ventas minoristas', 'pib', 'manufacturing sales', 'wholesale sales'],
+      EUR: ['hcob', 's&p', 'pmi', 'cpi', 'unemployment', 'germany unemp', 'retail sales', 'consumer confidence', 'ifo', 'industrial production', 'ppi', 'gdp', 'zew', 'trade balance', 'hicp', 'negotiated wages', 'factory orders', 'ipc', 'tasa de desempleo', 'desempleo', 'ventas minoristas', 'produccion industrial', 'pib', 'gfk', 'french', 'france'],
+      CHF: ['procure', 's&p', 'pmi', 'cpi', 'unemp', 'unemployment', 'retail sales', 'consumer sentiment', 'kof', 'seco', 'ppi', 'gdp', 'industrial production', 'trade balance', 'svme', 'ipc', 'tasa de desempleo', 'desempleo', 'ventas minoristas', 'pib'],
+      GBP: ['s&p', 'pmi', 'cpi', 'unemployment rate', 'unemployment', 'claimant count', 'retail sales', 'gfk', 'cbi', 'monthly gdp', 'gdp', 'rpi', 'ppi', 'average earnings', 'public sector net borrowing', 'ipc', 'tasa de desempleo', 'desempleo', 'ventas minoristas', 'pib', 'industrial production', 'manufacturing production', 'halifax', 'nationwide'],
+      JPY: ['jibun', 's&p', 'pmi', 'tokyo cpi', 'unemployment rate', 'unemployment', 'cash earnings', 'retail sales', 'consumer survey', 'tankan', 'jcer', 'ppi', 'cgpi', 'national cpi', 'gdp', 'trade balance', 'household spending', 'machine orders', 'ipc', 'tasa de desempleo', 'desempleo', 'ventas minoristas', 'pib', 'industrial production', 'current account'],
+      AUD: ['judo', 's&p', 'pmi', 'cpi indicator', 'cpi', 'unemployment rate', 'unemployment', 'employment change', 'retail sales', 'westpac', 'nab', 'aig', 'ppi', 'gdp', 'trade balance', 'building approvals', 'private capex', 'caixin', 'ipc', 'tasa de desempleo', 'desempleo', 'empleo', 'ventas minoristas', 'pib', 'wage price index', 'wpi'],
+      NZD: ['busnz', 's&p', 'pmi', 'psi', 'cpi', 'food prices', 'unemployment rate', 'unemployment', 'mei jobs', 'filled jobs', 'card transactions', 'anz', 'ppi', 'gdt', 'gdp', 'trade balance', 'building consents', 'ipc', 'tasa de desempleo', 'desempleo', 'pib'],
       CNH: ['lpr', 'loan prime rate', 'cpi', 'ppi', 'gdp', 'pmi', 's&p', 'industrial production', 'retail sales', 'trade balance', 'caixin', 'ipc', 'pib']
     };
 
@@ -377,7 +378,7 @@
 
     let activeCurrencyFilter = 'ALL';
     let filterCoreOnly = false;
-    let isDivergenceExpanded = false; // ESTADO DE EXPANSION DEL ESCÁNER
+    let isDivergenceExpanded = false;
 
     let globalState = {
       daysData: {},
@@ -601,6 +602,7 @@
       if (e.target.files.length) processExcelFile(e.target.files[0]);
     }
 
+    /* 📌 WHITELIST VINCULADA DIRECTAMENTE A REGLAS CORE PARA EVITAR DESCARTE DE EVENTOS CLAVE */
     function isWhitelisted(ccy, eventName) {
       if (!eventName) return false;
       const lower = String(eventName).toLowerCase();
@@ -619,6 +621,10 @@
           return false;
         }
       }
+
+      // 🔹 GARANTÍA ANTI-FILTRADO: Si el evento coincide con alguna regla Core, SE APRUEBA SIEMPRE
+      const coreRuleId = getCoreRuleId(ccy, eventName);
+      if (coreRuleId) return true;
 
       if (WHITELIST.UNIVERSAL.some(term => lower.includes(term))) return true;
       const terms = WHITELIST[ccy] || [];
@@ -674,7 +680,7 @@
       }
 
       // 5. MERCADO LABORAL Y SALARIOS
-      if (lower.includes('unemployment') || lower.includes('desempleo') || lower.includes('nfp') || lower.includes('adp') || lower.includes('nonfarm') || lower.includes('nominas') || lower.includes('claimant') || lower.includes('jobless') || lower.includes('employment change') || lower.includes('variacion del empleo') || lower.includes('cambio en el empleo') || lower.includes('earnings') || lower.includes('salarios') || lower.includes('cash earnings') || lower.includes('jolts') || lower.includes('employment cost') || lower.includes('eci') || lower.includes('challenger') || lower.includes('mei filled jobs') || lower.includes('wage price index') || lower.includes('wpi')) {
+      if (lower.includes('unemployment') || lower.includes('desempleo') || lower.includes('nfp') || lower.includes('nonfarm') || lower.includes('non farm') || lower.includes('adp') || lower.includes('nominas') || lower.includes('nóminas') || lower.includes('claimant') || lower.includes('jobless') || lower.includes('employment change') || lower.includes('variacion del empleo') || lower.includes('cambio en el empleo') || lower.includes('earnings') || lower.includes('salarios') || lower.includes('cash earnings') || lower.includes('jolts') || lower.includes('employment cost') || lower.includes('eci') || lower.includes('challenger') || lower.includes('mei filled jobs') || lower.includes('wage price index') || lower.includes('wpi')) {
         return `${ccy} - MERCADO LABORAL Y SALARIOS`;
       }
 
@@ -971,6 +977,7 @@
       setCategoryScore(catId, ccy, scoreVal, title, summary, btn);
     }
 
+    /* 📌 RENDERIZADO CON TABLAS FIXED DE ANCHO PORCENTUAL RÍGIDO (SISTEMA ANTI-LAYOUT SHIFT) */
     function renderInteractiveCalendar() {
       const container = document.getElementById('interactiveCalendarContainer');
       container.innerHTML = '';
@@ -1017,15 +1024,15 @@
 
         let tableHTML = `
           <div class="px-4 overflow-x-auto">
-            <table class="w-full text-left text-xs font-mono border-collapse">
+            <table class="w-full text-left text-xs font-mono border-collapse table-fixed">
               <thead>
                 <tr class="text-zinc-500 text-[10px] border-b border-zinc-800 uppercase tracking-wider">
-                  <th class="p-2.5">Hora</th>
-                  <th class="p-2.5">Divisa</th>
-                  <th class="p-2.5">Evento Económico</th>
-                  <th class="p-2.5">Actual</th>
-                  <th class="p-2.5">Pronóstico</th>
-                  <th class="p-2.5">Previo</th>
+                  <th class="p-2.5 w-[10%]">Hora</th>
+                  <th class="p-2.5 w-[10%]">Divisa</th>
+                  <th class="p-2.5 w-[44%]">Evento Económico</th>
+                  <th class="p-2.5 w-[12%]">Actual</th>
+                  <th class="p-2.5 w-[12%]">Pronóstico</th>
+                  <th class="p-2.5 w-[12%]">Previo</th>
                 </tr>
               </thead>
               <tbody>
@@ -1045,15 +1052,17 @@
 
           tableHTML += `
             <tr class="${rowClass} hover:bg-zinc-800/40 transition">
-              <td class="p-2.5 text-zinc-400 font-mono text-[11px]">${escapeHtml(item.time)}</td>
+              <td class="p-2.5 text-zinc-400 font-mono text-[11px] font-bold">${escapeHtml(item.time)}</td>
               <td class="p-2.5"><span class="${badgeClass} px-2 py-0.5 rounded font-bold text-[9px] tracking-wide">${escapeHtml(item.ccy)}</span></td>
-              <td class="p-2.5 font-sans text-xs font-medium flex items-center justify-between gap-2">
-                <span class="${isCore ? 'text-amber-200 font-bold' : 'text-zinc-200'}">${escapeHtml(item.event)}</span>
-                ${isCore ? '<span class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] px-1.5 py-0.5 rounded font-bold font-mono tracking-wider">🎯 CORE</span>' : ''}
+              <td class="p-2.5 font-sans text-xs font-medium truncate pr-2">
+                <div class="flex items-center justify-between gap-2 overflow-hidden">
+                  <span class="${isCore ? 'text-amber-200 font-bold' : 'text-zinc-200'} truncate">${escapeHtml(item.event)}</span>
+                  ${isCore ? '<span class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] px-1.5 py-0.5 rounded font-bold font-mono tracking-wider flex-shrink-0">🎯 CORE</span>' : ''}
+                </div>
               </td>
-              <td class="p-2.5 font-bold text-white font-mono">${escapeHtml(item.actual) || '—'}</td>
-              <td class="p-2.5 text-zinc-400 font-mono">${escapeHtml(item.forecast) || '—'}</td>
-              <td class="p-2.5 text-zinc-500 font-mono">${escapeHtml(item.previous) || '—'}</td>
+              <td class="p-2.5 font-bold text-white font-mono truncate">${escapeHtml(item.actual) || '—'}</td>
+              <td class="p-2.5 text-zinc-400 font-mono truncate">${escapeHtml(item.forecast) || '—'}</td>
+              <td class="p-2.5 text-zinc-500 font-mono truncate">${escapeHtml(item.previous) || '—'}</td>
             </tr>
           `;
 
@@ -1073,11 +1082,11 @@
               <tr>
                 <td colspan="6" class="py-2.5 px-1">
                   <div class="bg-gradient-to-r from-amber-950/20 via-zinc-900/40 to-zinc-900/20 border border-amber-500/30 rounded-xl p-2.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 my-1">
-                    <div class="flex items-center gap-2">
-                      <span class="text-amber-400 text-xs">📊</span>
-                      <span class="text-xs font-bold text-amber-200 tracking-wide">${escapeHtml(smartTitle)}</span>
+                    <div class="flex items-center gap-2 overflow-hidden">
+                      <span class="text-amber-400 text-xs flex-shrink-0">📊</span>
+                      <span class="text-xs font-bold text-amber-200 tracking-wide truncate">${escapeHtml(smartTitle)}</span>
                     </div>
-                    <div class="flex items-center gap-1.5 font-mono self-end sm:self-auto">
+                    <div class="flex items-center gap-1.5 font-mono flex-shrink-0 self-end sm:self-auto">
                       <span class="text-[10px] text-zinc-400 mr-1 uppercase">Puntuación:</span>
                       <button type="button" data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="2" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this, event)" class="score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-500 transition ${currentScore === 2 ? 'score-btn-active-p2' : ''}">+2</button>
                       <button type="button" data-catid="${escapeHtml(categoryId)}" data-ccy="${escapeHtml(item.ccy)}" data-score="1" data-title="${escapeHtml(smartTitle)}" data-summary="${escapeHtml(eventsSummaryText)}" onclick="handleScoreBtnClick(this, event)" class="score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 hover:border-emerald-400 transition ${currentScore === 1 ? 'score-btn-active-p1' : ''}">+1</button>
@@ -1252,13 +1261,11 @@
       };
     }
 
-    /* 📌 CONMUTADOR DE VISTA EXPANDIDA / COMPACTA DEL ESCÁNER */
     function toggleDivergenceExpand() {
       isDivergenceExpanded = !isDivergenceExpanded;
       scanDivergences();
     }
 
-    /* 📌 ESCÁNER RE-DISEÑADO CON ADAPTABILIDAD VISUAL (TOP 2 POR DEFECTO + EXPANSIONAL) */
     function scanDivergences() {
       const alertBox = document.getElementById('divergenceAlertBox');
       const listContainer = document.getElementById('divergenceList');
@@ -1303,7 +1310,6 @@
         const totalCount = divergencesFound.length;
         badge.textContent = `${totalCount} Pares Aprobados`;
 
-        // 🔹 MOSTRAR BOTONES DE EXPANSIÓN SOLO SI HAY MÁS DE 2 PARES
         if (totalCount > 2) {
           toggleBtn.classList.remove('hidden');
           footerExpand.classList.remove('hidden');
@@ -1320,7 +1326,6 @@
           footerExpand.classList.add('hidden');
         }
 
-        // 🔹 SI ESTÁ COLAPSADO, MUESTRA EXCLUSIVAMENTE LAS TOP 2 DIVERGENCIAS MÁS FUERTES
         const visibleList = (!isDivergenceExpanded && totalCount > 2) 
           ? divergencesFound.slice(0, 2) 
           : divergencesFound;
