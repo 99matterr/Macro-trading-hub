@@ -110,7 +110,7 @@
         </div>
       </div>
 
-      <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS (ALTURA FIJA PARA EVITAR SALTO) -->
+      <!-- ESCÁNER DE DIVERGENCIAS MACRO DETECTADAS -->
       <div id="divergenceAlertBox" class="hidden bg-[#07080d] border border-cyan-500/30 p-4 rounded-2xl font-mono space-y-3 h-[280px] flex flex-col justify-between shadow-xl">
         <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2.5 flex-shrink-0">
           <span class="text-cyan-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
@@ -337,6 +337,7 @@
       return null;
     }
 
+    /* 📌 WHITELIST COMPLETAMENTE ACTUALIZADA PARA INCLUIR TODOS LOS EVENTOS RELEVANTES (CON FRANCIA PERO SIN ESPAÑA/ITALIA) */
     const WHITELIST = {
       UNIVERSAL: [
         'interest rate decision', 'monetary policy statement', 'press conference', 'meeting minutes', 
@@ -344,17 +345,18 @@
         'rba', 'rbnz', 'snb', 'pboc', 'economic projections', 'dot plot', 'monetary policy assessment', 
         'financial stability report', 'testimony', 'budget', 'autumn statement', 'spring budget', 
         'fiscal statement', 'statement', 'cash rate', 'overnight rate', 'policy rate', 'bank rate',
-        'tasas de interes', 'politica monetaria', 'actas', 'rueda de prensa', 'discurso'
+        'tasas de interes', 'politica monetaria', 'actas', 'rueda de prensa', 'discurso',
+        's&p', 's&p global', 'pmi', 'purchasing managers', 'gestores de compras'
       ],
-      USD: ['ism', 'cpi', 'unemployment rate', 'nfp', 'retail sales', 'cb consumer confidence', 'nfib', 'gdpnow', 'atlanta fed', 'adp', 'average hourly earnings', 'jobless claims', 'pce', 'ppi', 'gdp', 'industrial production', 'building permits', 'home sales', 'trade balance', 'jolts', 'durable goods', 'ipc', 'tasa de desempleo', 'nominas no agricolas', 'ventas minoristas'],
-      CAD: ['s&p', 'ivey', 'cpi', 'unemployment rate', 'net employment change', 'employment change', 'retail sales', 'cb consumer survey', 'cfib', 'monthly gdp', 'gdp', 'monetary policy report', 'ppi', 'ippi', 'trade balance', 'boc business outlook', 'housing starts', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib'],
-      EUR: ['hcob', 'cpi', 'unemployment', 'germany unemp', 'retail sales', 'consumer confidence', 'ifo', 'industrial production', 'ppi', 'gdp', 'zew', 'trade balance', 'hicp', 'negotiated wages', 'factory orders', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'produccion industrial', 'pib'],
-      CHF: ['procure', 'cpi', 'unemp', 'retail sales', 'consumer sentiment', 'kof', 'seco', 'ppi', 'gdp', 'industrial production', 'trade balance', 'svme', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib'],
-      GBP: ['s&p', 'cpi', 'unemployment rate', 'claimant count', 'retail sales', 'gfk', 'cbi', 'monthly gdp', 'gdp', 'rpi', 'ppi', 'average earnings', 'public sector net borrowing', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib'],
-      JPY: ['jibun', 'tokyo cpi', 'unemployment rate', 'cash earnings', 'retail sales', 'consumer survey', 'tankan', 'jcer', 'ppi', 'cgpi', 'national cpi', 'gdp', 'trade balance', 'household spending', 'machine orders', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib'],
-      AUD: ['judo', 'cpi indicator', 'unemployment rate', 'employment change', 'retail sales', 'westpac', 'nab', 'aig', 'ppi', 'gdp', 'trade balance', 'building approvals', 'private capex', 'caixin', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib'],
-      NZD: ['busnz', 'food prices', 'unemployment rate', 'mei jobs', 'card transactions', 'anz', 'ppi', 'gdt', 'gdp', 'trade balance', 'building consents', 'ipc', 'tasa de desempleo', 'pib'],
-      CNH: ['lpr', 'loan prime rate', 'cpi', 'ppi', 'gdp', 'pmi', 'industrial production', 'retail sales', 'trade balance', 'caixin', 'ipc', 'pib']
+      USD: ['ism', 's&p', 'pmi', 'cpi', 'unemployment rate', 'nfp', 'retail sales', 'cb consumer confidence', 'nfib', 'gdpnow', 'atlanta fed', 'adp', 'average hourly earnings', 'jobless claims', 'pce', 'ppi', 'gdp', 'industrial production', 'building permits', 'home sales', 'trade balance', 'jolts', 'durable goods', 'ipc', 'tasa de desempleo', 'nominas no agricolas', 'ventas minoristas', 'michigan', 'u-mich', 'philly fed', 'empire state', 'employment cost index', 'eci'],
+      CAD: ['s&p', 'pmi', 'ivey', 'cpi', 'unemployment rate', 'net employment change', 'employment change', 'retail sales', 'cb consumer survey', 'cfib', 'monthly gdp', 'gdp', 'monetary policy report', 'ppi', 'ippi', 'trade balance', 'boc business outlook', 'housing starts', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib', 'manufacturing sales', 'wholesale sales'],
+      EUR: ['hcob', 's&p', 'pmi', 'cpi', 'unemployment', 'germany unemp', 'retail sales', 'consumer confidence', 'ifo', 'industrial production', 'ppi', 'gdp', 'zew', 'trade balance', 'hicp', 'negotiated wages', 'factory orders', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'produccion industrial', 'pib', 'gfk', 'french', 'france'],
+      CHF: ['procure', 's&p', 'pmi', 'cpi', 'unemp', 'retail sales', 'consumer sentiment', 'kof', 'seco', 'ppi', 'gdp', 'industrial production', 'trade balance', 'svme', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib'],
+      GBP: ['s&p', 'pmi', 'cpi', 'unemployment rate', 'claimant count', 'retail sales', 'gfk', 'cbi', 'monthly gdp', 'gdp', 'rpi', 'ppi', 'average earnings', 'public sector net borrowing', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib', 'industrial production', 'manufacturing production', 'halifax', 'nationwide'],
+      JPY: ['jibun', 's&p', 'pmi', 'tokyo cpi', 'unemployment rate', 'cash earnings', 'retail sales', 'consumer survey', 'tankan', 'jcer', 'ppi', 'cgpi', 'national cpi', 'gdp', 'trade balance', 'household spending', 'machine orders', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib', 'industrial production', 'current account'],
+      AUD: ['judo', 's&p', 'pmi', 'cpi indicator', 'cpi', 'unemployment rate', 'employment change', 'retail sales', 'westpac', 'nab', 'aig', 'ppi', 'gdp', 'trade balance', 'building approvals', 'private capex', 'caixin', 'ipc', 'tasa de desempleo', 'ventas minoristas', 'pib', 'wage price index', 'wpi'],
+      NZD: ['busnz', 's&p', 'pmi', 'cpi', 'food prices', 'unemployment rate', 'mei jobs', 'card transactions', 'anz', 'ppi', 'gdt', 'gdp', 'trade balance', 'building consents', 'ipc', 'tasa de desempleo', 'pib'],
+      CNH: ['lpr', 'loan prime rate', 'cpi', 'ppi', 'gdp', 'pmi', 's&p', 'industrial production', 'retail sales', 'trade balance', 'caixin', 'ipc', 'pib']
     };
 
     const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH', 'CNY', 'DE', 'FR', 'UK', 'EU', 'CH', 'CA', 'US', 'JP', 'JPN', 'AU', 'AUS', 'NZ', 'NZL', 'GB', 'GBR', 'CN', 'CHN'];
@@ -481,7 +483,6 @@
       reader.readAsText(file);
     }
 
-    /* 📌 NUEVA FUNCIÓN: FIJAR LA SEMANA CARGADA COMO SEMANA PREVIA HISTÓRICA */
     function lockCurrentAsPreviousWeek() {
       if (!globalState.daysData || Object.keys(globalState.daysData).length === 0) {
         alert('Primero debes cargar el Excel de la semana pasada y calificar sus eventos para poder fijarla.');
@@ -505,7 +506,6 @@
       globalState.matrixPrevBreakdown = newPrevBreakdown;
       globalState.matrixPrev = newPrevTotals;
 
-      // Limpiar datos del calendario activo para recibir la semana actual
       globalState.daysData = {};
       globalState.categoryScores = {};
       globalState.dailyNotes = {};
@@ -587,6 +587,7 @@
       if (e.target.files.length) processExcelFile(e.target.files[0]);
     }
 
+    /* 📌 LÓGICA DE FILTRADO REGIONAL ACTUALIZADA: PERMITE FRANCIA Y ALEMANIA, PERO FILTRA ESPAÑA E ITALIA */
     function isWhitelisted(ccy, eventName) {
       if (!eventName) return false;
       const lower = String(eventName).toLowerCase();
@@ -599,9 +600,9 @@
       if (blacklist.some(term => lower.includes(term))) return false;
 
       if (ccy === 'EUR') {
-        const regionalNoise = ['italy', 'italian', 'spain', 'spanish', 'france', 'french', 'belgium', 'austria', 'greece', 'portugal'];
-        const isEurozoneOrGermany = lower.includes('euro zone') || lower.includes('eurozone') || lower.includes('german') || lower.includes('germany') || lower.includes('ifo');
-        if (regionalNoise.some(term => lower.includes(term)) && !isEurozoneOrGermany) {
+        const regionalNoise = ['italy', 'italian', 'spain', 'spanish', 'belgium', 'austria', 'greece', 'portugal'];
+        const isEurozoneGermanyFrance = lower.includes('euro zone') || lower.includes('eurozone') || lower.includes('german') || lower.includes('germany') || lower.includes('french') || lower.includes('france') || lower.includes('ifo');
+        if (regionalNoise.some(term => lower.includes(term)) && !isEurozoneGermanyFrance) {
           return false;
         }
       }
@@ -660,7 +661,7 @@
       }
 
       // 5. MERCADO LABORAL Y SALARIOS
-      if (lower.includes('unemployment') || lower.includes('desempleo') || lower.includes('nfp') || lower.includes('adp') || lower.includes('nonfarm') || lower.includes('nominas') || lower.includes('claimant') || lower.includes('jobless') || lower.includes('employment change') || lower.includes('variacion del empleo') || lower.includes('cambio en el empleo') || lower.includes('earnings') || lower.includes('salarios') || lower.includes('cash earnings') || lower.includes('jolts') || lower.includes('employment cost') || lower.includes('eci') || lower.includes('challenger') || lower.includes('mei filled jobs')) {
+      if (lower.includes('unemployment') || lower.includes('desempleo') || lower.includes('nfp') || lower.includes('adp') || lower.includes('nonfarm') || lower.includes('nominas') || lower.includes('claimant') || lower.includes('jobless') || lower.includes('employment change') || lower.includes('variacion del empleo') || lower.includes('cambio en el empleo') || lower.includes('earnings') || lower.includes('salarios') || lower.includes('cash earnings') || lower.includes('jolts') || lower.includes('employment cost') || lower.includes('eci') || lower.includes('challenger') || lower.includes('mei filled jobs') || lower.includes('wage price index') || lower.includes('wpi')) {
         return `${ccy} - MERCADO LABORAL Y SALARIOS`;
       }
 
@@ -686,13 +687,13 @@
       }
 
       // 10. PRODUCCIÓN INDUSTRIAL Y BALANZA
-      if (lower.includes('industrial production') || lower.includes('produccion industrial') || lower.includes('factory orders') || lower.includes('machine orders') || lower.includes('durable goods')) {
+      if (lower.includes('industrial production') || lower.includes('manufacturing production') || lower.includes('produccion industrial') || lower.includes('factory orders') || lower.includes('machine orders') || lower.includes('durable goods') || lower.includes('manufacturing sales') || lower.includes('wholesale sales')) {
         return `${ccy} - PRODUCCIÓN INDUSTRIAL`;
       }
-      if (lower.includes('trade balance') || lower.includes('balanza comercial') || lower.includes('exports') || lower.includes('imports')) {
-        return `${ccy} - BALANZA COMERCIAL`;
+      if (lower.includes('trade balance') || lower.includes('balanza comercial') || lower.includes('exports') || lower.includes('imports') || lower.includes('current account')) {
+        return `${ccy} - BALANZA COMERCIAL Y CUENTA CORRIENTE`;
       }
-      if (lower.includes('building') || lower.includes('housing') || lower.includes('home sales')) {
+      if (lower.includes('building') || lower.includes('housing') || lower.includes('home sales') || lower.includes('halifax') || lower.includes('nationwide')) {
         return `${ccy} - MERCADO INMOBILIARIO`;
       }
 
@@ -1221,18 +1222,14 @@
       return { pairName: `${base}/${quote}`, actionBadge: actionText, strong: strong, weak: weak };
     }
 
-    /* OBTENER DESGLOSE DIVIDIDO EN: SEMANA PREVIA Y ESTA SEMANA */
     function getFullCurrencyBreakdownGrouped(ccy) {
-      // 1. SEMANA PREVIA
       let prevList = globalState.matrixPrevBreakdown ? (globalState.matrixPrevBreakdown[ccy] || []) : [];
       const prevTotal = parseInt(globalState.matrixPrev[ccy]) || 0;
 
-      // Si no hay lista detallada guardada pero sí hay un valor manual en matrixPrev
       if (prevList.length === 0 && prevTotal !== 0) {
         prevList = [{ label: 'Fuerza Previa Manual', score: prevTotal }];
       }
 
-      // 2. ESTA SEMANA
       const currList = getCurrencyEvaluatedEventsList(ccy);
 
       return {
