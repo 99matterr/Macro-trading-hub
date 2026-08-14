@@ -12,11 +12,12 @@
     ::-webkit-scrollbar-track { background: #030305; }
     ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 3px; }
 
+    /* ESTILOS DE IMPRESIÓN RIGUROSOS */
     @media screen { #outputContainer { display: none !important; } }
     @media print {
       .no-print { display: none !important; }
-      body, html { background: white !important; color: #0f172a !important; padding: 0 !important; margin: 0 !important; }
-      #outputContainer { display: block !important; width: 100% !important; background: white !important; color: #0f172a !important; }
+      body, html { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
+      #outputContainer { display: block !important; width: 100% !important; background: white !important; color: black !important; }
       .page-break { page-break-before: always; }
       table, tr, .report-card, .day-card { break-inside: avoid !important; page-break-inside: avoid !important; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -235,7 +236,6 @@
         .trim();
     }
 
-    /* REGLAS CORE DEL FILTRO (SE ELIMINÓ NFP SEGÚN TU SOLICITUD) */
     const CORE_INDICATOR_RULES = [
       { id: 'USD_ISM_MFG', ccy: 'USD', match: ['ism manufacturing pmi', 'ism mfg pmi', 'ism manufacturing purchasing managers index', 'ism manufacturing', 'ism mfg', 'pmi manufacturero del ism', 'pmi del sector manufacturero del ism'], avoid: ['prices', 'employment', 'orders', 'paying', 'new orders', 'precios', 'empleo', 'pedidos'] },
       { id: 'USD_ISM_SERVICES', ccy: 'USD', match: ['ism non-manufacturing pmi', 'ism services pmi', 'ism non-manufacturing purchasing managers index', 'ism services', 'ism non-manufacturing', 'ism non mfg', 'pmi no manufacturero del ism', 'pmi del sector servicios del ism'], avoid: ['prices', 'employment', 'orders', 'precios', 'empleo'] },
@@ -446,7 +446,6 @@
       }
     }
 
-    /* 📌 CARGA E IMPORTACIÓN DE BACKUP RIGUROSA Y RE-EVALUADA */
     function importStateJSON(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -457,10 +456,7 @@
           const parsed = JSON.parse(evt.target.result);
           if (parsed && typeof parsed === 'object') {
 
-            // CASO A: Respaldo Nativo Completo (Guarda días/semanas y estado actual)
             if (parsed.daysData && typeof parsed.daysData === 'object' && Object.keys(parsed.daysData).length > 0) {
-              
-              // Re-evaluación en tiempo real para descartar etiquetas Core obsoletas (p. ej. NFP)
               const reevaluatedDaysData = {};
               const claimedCoreRulesPerImport = new Set();
 
@@ -498,7 +494,6 @@
               };
               alert('¡Respaldo cargado con éxito! Todos los eventos fueron re-evaluados con las reglas actuales.');
             } 
-            // CASO B: Archivo JSON estructurado por divisas
             else if (parsed.USD || parsed.EUR || parsed.GBP || parsed.JPY || parsed.CAD || parsed.AUD || parsed.NZD || parsed.CHF) {
               const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'];
               const importedPrevBreakdown = {};
@@ -528,14 +523,12 @@
                     claimedCoreRulesInImport.add(`${ccy}_${ruleId}`);
                   }
 
-                  // 1. Guardar en el desglose de la matriz previa
                   importedPrevBreakdown[ccy].push({
                     label: evName,
                     score: scoreVal
                   });
                   ccyTotal += scoreVal;
 
-                  // 2. Reconstruir evento en las tablas inferiores respetando la regla exacta del filtro
                   globalState.daysData[backupBlockName].push({
                     time: item.time || "—",
                     ccy: ccy,
@@ -547,7 +540,6 @@
                     isCore: isCore
                   });
 
-                  // 3. Registrar categoría y puntaje
                   const categoryTitle = getCategorySentimentTitle(ccy, evName);
                   const catId = `${backupBlockName}-${ccy}-${categoryTitle}`.replace(/[^a-zA-Z0-9]/g, '-');
                   globalState.categoryScores[catId] = {
@@ -1016,8 +1008,11 @@
       renderInteractiveCalendar();
     }
 
+    /* 👇 SECCIÓN CON LA SOLUCIÓN DEL GLITCH (SCROLL ANCHORING) 👇 */
     function handleScoreBtnClick(btn, e) {
       if (e) e.preventDefault();
+      const rectBefore = btn.getBoundingClientRect();
+      
       const catId = btn.getAttribute('data-catid');
       const ccy = btn.getAttribute('data-ccy');
       const scoreVal = parseInt(btn.getAttribute('data-score')) || 0;
@@ -1025,7 +1020,64 @@
       const summary = btn.getAttribute('data-summary') || '';
       
       setCategoryScore(catId, ccy, scoreVal, title, summary, btn);
+
+      const rectAfter = btn.getBoundingClientRect();
+      const diff = rectAfter.top - rectBefore.top;
+      if (diff !== 0) window.scrollBy({ top: diff, behavior: 'instant' });
     }
+
+    function setCategoryScore(categoryId, ccy, scoreVal, title, eventsSummary, btn) {
+      globalState.categoryScores[categoryId] = { 
+        ccy: ccy, 
+        score: parseInt(scoreVal),
+        title: title || '',
+        eventsSummary: eventsSummary || ''
+      };
+
+      if (btn && btn.parentElement) {
+        const parent = btn.parentElement;
+        parent.querySelectorAll('.score-btn').forEach(b => {
+          b.classList.remove('score-btn-active-p2', 'score-btn-active-p1', 'score-btn-active-0', 'score-btn-active-m1', 'score-btn-active-m2');
+        });
+        
+        if (scoreVal === 2) btn.classList.add('score-btn-active-p2');
+        if (scoreVal === 1) btn.classList.add('score-btn-active-p1');
+        if (scoreVal === 0) btn.classList.add('score-btn-active-0');
+        if (scoreVal === -1) btn.classList.add('score-btn-active-m1');
+        if (scoreVal === -2) btn.classList.add('score-btn-active-m2');
+      }
+
+      saveToLocalStorage();
+      recalculateMatrixAndDivergences();
+    }
+
+    function setIntermarketScore(asset, scoreVal, e) {
+      if (e) e.preventDefault();
+      const container = document.getElementById('liveMatrixContainer');
+      const rectBefore = container.getBoundingClientRect();
+
+      globalState.intermarketScores[asset] = parseInt(scoreVal);
+      saveToLocalStorage();
+      renderMatrixTables();
+      recalculateMatrixAndDivergences();
+
+      const rectAfter = container.getBoundingClientRect();
+      const diff = rectAfter.top - rectBefore.top;
+      if (diff !== 0) window.scrollBy({ top: diff, behavior: 'instant' });
+    }
+
+    function toggleDivergenceExpand() {
+      const alertBox = document.getElementById('divergenceAlertBox');
+      const rectBefore = alertBox.getBoundingClientRect();
+      
+      isDivergenceExpanded = !isDivergenceExpanded;
+      scanDivergences();
+      
+      const rectAfter = alertBox.getBoundingClientRect();
+      const diff = rectAfter.top - rectBefore.top;
+      if (diff !== 0) window.scrollBy({ top: diff, behavior: 'instant' });
+    }
+    /* 👆 FIN DE LA SOLUCIÓN DEL GLITCH 👆 */
 
     function renderInteractiveCalendar() {
       const container = document.getElementById('interactiveCalendarContainer');
@@ -1183,38 +1235,6 @@
       renderInteractiveCalendar();
     }
 
-    function setCategoryScore(categoryId, ccy, scoreVal, title, eventsSummary, btn) {
-      globalState.categoryScores[categoryId] = { 
-        ccy: ccy, 
-        score: parseInt(scoreVal),
-        title: title || '',
-        eventsSummary: eventsSummary || ''
-      };
-
-      if (btn && btn.parentElement) {
-        const parent = btn.parentElement;
-        parent.querySelectorAll('.score-btn').forEach(b => {
-          b.className = "score-btn bg-zinc-900 border border-zinc-800 rounded text-[10px] text-zinc-300 transition-colors";
-        });
-        if (scoreVal === 2) btn.classList.add('score-btn-active-p2');
-        if (scoreVal === 1) btn.classList.add('score-btn-active-p1');
-        if (scoreVal === 0) btn.classList.add('score-btn-active-0');
-        if (scoreVal === -1) btn.classList.add('score-btn-active-m1');
-        if (scoreVal === -2) btn.classList.add('score-btn-active-m2');
-      }
-
-      saveToLocalStorage();
-      recalculateMatrixAndDivergences();
-    }
-
-    function setIntermarketScore(asset, scoreVal, e) {
-      if (e) e.preventDefault();
-      globalState.intermarketScores[asset] = parseInt(scoreVal);
-      saveToLocalStorage();
-      renderMatrixTables();
-      recalculateMatrixAndDivergences();
-    }
-
     function saveDailyNote(day, noteText) {
       globalState.dailyNotes[day] = noteText;
       saveToLocalStorage();
@@ -1307,11 +1327,6 @@
         prevTotal,
         currList
       };
-    }
-
-    function toggleDivergenceExpand() {
-      isDivergenceExpanded = !isDivergenceExpanded;
-      scanDivergences();
     }
 
     function scanDivergences() {
@@ -1492,6 +1507,7 @@
       }
     }
 
+    /* 👇 RECONSTRUCCIÓN DEL REPORTE PARA IMPRESIÓN PDF BLANCO/NEGRO 👇 */
     function triggerPrint() {
       renderPDFPrintPreview();
       setTimeout(() => { window.print(); }, 200);
@@ -1522,8 +1538,9 @@
         footer: "Inteligencia Institucional de Riesgo Forex · Kairos Integrated Risk Engine"
       };
 
+      // Se eliminó la clase de fondo oscuro (bg-[#030305]) y el texto blanco. Se inyectó CSS limpio para impresión.
       let html = `
-        <div class="report-card bg-[#030305] text-white p-8 rounded-xl font-sans mb-12">
+        <div class="report-card" style="background-color: #ffffff; color: #0f172a; padding: 2rem; border-radius: 0.75rem; font-family: sans-serif; margin-bottom: 3rem;">
           <h1 style="font-size: 18px; font-weight: bold; color: #0F172A; margin: 0; border-bottom: 2px solid #0F172A; padding-bottom: 4px;">${text.title}</h1>
           <h2 style="font-size: 11px; color: #475569; margin: 4px 0 14px 0; font-style: italic;">${text.subtitle}</h2>
           <div style="background-color: #F8FAFC; border: 1px solid #CBD5E1; padding: 10px; border-radius: 4px; margin-bottom: 16px;">
@@ -1540,26 +1557,26 @@
                 </tr>
               </thead>
               <tbody>
-                <tr style="background-color: #CBD5E1; font-weight: bold;"><td colspan="3" style="padding: 3px 5px;">${text.secA}</td></tr>
+                <tr style="background-color: #CBD5E1; font-weight: bold;"><td colspan="3" style="padding: 3px 5px; color: #0F172A;">${text.secA}</td></tr>
                 ${['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNH'].map(asset => {
                   const tot = globalState.matrixTotals[asset] || 0;
                   const prev = globalState.matrixPrev[asset] || 0;
                   return `
-                  <tr style="border-bottom: 1px solid #E2E8F0;">
+                  <tr style="border-bottom: 1px solid #E2E8F0; color: #0F172A;">
                     <td style="padding: 3px 5px; font-weight: bold;">${asset}</td>
                     <td style="border-left: 1px solid #E2E8F0; text-align: center;">${prev > 0 ? '+' : ''}${prev}</td>
-                    <td style="border-left: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #0F172A;">${tot > 0 ? '+' : ''}${tot}</td>
+                    <td style="border-left: 1px solid #E2E8F0; text-align: center; font-weight: bold;">${tot > 0 ? '+' : ''}${tot}</td>
                   </tr>
                 `}).join('')}
-                <tr style="background-color: #CBD5E1; font-weight: bold;"><td colspan="3" style="padding: 3px 5px;">${text.secB}</td></tr>
+                <tr style="background-color: #CBD5E1; font-weight: bold;"><td colspan="3" style="padding: 3px 5px; color: #0F172A;">${text.secB}</td></tr>
                 ${[['VIX', text.vix], ['Oil', text.oil], ['Gold', text.gold]].map(asset => {
                   const tot = globalState.matrixTotals[asset[0]] || 0;
                   const prev = globalState.matrixPrev[asset[0]] || 0;
                   return `
-                  <tr style="border-bottom: 1px solid #E2E8F0;">
+                  <tr style="border-bottom: 1px solid #E2E8F0; color: #0F172A;">
                     <td style="padding: 3px 5px; font-weight: bold;">${asset[1]}</td>
                     <td style="border-left: 1px solid #E2E8F0; text-align: center;">${prev > 0 ? '+' : ''}${prev}</td>
-                    <td style="border-left: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #0F172A;">${tot > 0 ? '+' : ''}${tot}</td>
+                    <td style="border-left: 1px solid #E2E8F0; text-align: center; font-weight: bold;">${tot > 0 ? '+' : ''}${tot}</td>
                   </tr>
                 `}).join('')}
               </tbody>
@@ -1580,7 +1597,7 @@
           </div>
           <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 4px;">
             <thead>
-              <tr style="border-bottom: 2px solid #1F385C; text-align: left; background-color: #F1F5F9;">
+              <tr style="border-bottom: 2px solid #1F385C; text-align: left; background-color: #F1F5F9; color: #0F172A;">
                 <th style="padding: 5px; width: 9%;">${text.time}</th>
                 <th style="padding: 5px; width: 8%;">${text.ccy}</th>
                 <th style="padding: 5px; width: 39%;">${text.event}</th>
@@ -1601,11 +1618,11 @@
           const isCore = item.isCore;
 
           html += `
-            <tr style="border-bottom: 1px solid #E2E8F0; ${isCore ? 'background-color: #FEF3C7;' : ''}">
+            <tr style="border-bottom: 1px solid #E2E8F0; ${isCore ? 'background-color: #FEF3C7;' : ''} color: #0F172A;">
               <td style="padding: 4px 5px; font-family: monospace;">${escapeHtml(item.time)}</td>
-              <td style="padding: 4px 5px;"><span class="${badgeClass}" style="padding: 1px 4px; border-radius: 3px; font-weight: bold; font-size: 9px;">${escapeHtml(item.ccy)}</span></td>
+              <td style="padding: 4px 5px;"><span class="${badgeClass}" style="padding: 1px 4px; border-radius: 3px; font-weight: bold; font-size: 9px; color: #1E293B;">${escapeHtml(item.ccy)}</span></td>
               <td style="padding: 4px 5px; ${isCore ? 'font-weight: bold; color: #92400E;' : ''}">${escapeHtml(item.event)} ${isCore ? '🎯' : ''}</td>
-              <td style="padding: 4px 5px;">${escapeHtml(item.actual)}</td>
+              <td style="padding: 4px 5px; font-weight: bold;">${escapeHtml(item.actual)}</td>
               <td style="padding: 4px 5px;">${escapeHtml(item.forecast)}</td>
               <td style="padding: 4px 5px;">${escapeHtml(item.previous)}</td>
               <td style="padding: 4px 5px; border-left: 1px solid #E2E8F0;"></td>
@@ -1623,13 +1640,17 @@
             const scoreVal = scoreItem ? scoreItem.score : 0;
             const formattedVal = scoreVal > 0 ? `+${scoreVal}` : scoreVal;
 
+            // Se agregaron colores para que los valores de puntuación destaquen claramente en papel
+            const scoreColor = scoreVal > 0 ? '#166534' : (scoreVal < 0 ? '#991B1B' : '#475569');
+            const scoreBg = scoreVal > 0 ? '#DCFCE7' : (scoreVal < 0 ? '#FEE2E2' : '#F1F5F9');
+
             html += `
               <tr style="background-color: #FDF8E7; border-top: 1px solid #D9D9D9; border-bottom: 1px solid #D9D9D9;">
                 <td colspan="6" style="padding: 5px 8px; font-style: italic; font-weight: bold; color: #854D0E; font-size: 9px;">
                   ${escapeHtml(smartTitle)}
                 </td>
                 <td style="padding: 4px; text-align: center; border-left: 1px solid #CBD5E1;">
-                  <span style="display: inline-block; padding: 1px 6px; border-radius: 3px; font-weight: bold; font-size: 9px; font-family: monospace;">
+                  <span style="display: inline-block; padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 9px; font-family: monospace; color: ${scoreColor}; background-color: ${scoreBg};">
                     ${formattedVal}
                   </span>
                 </td>
@@ -1648,7 +1669,7 @@
             <span style="font-size: 9px; font-weight: bold; color: #64748B;">
               ${text.notes}
             </span>
-            <p style="font-size: 10px; color: #334155; margin-top: 4px; font-family: monospace;">${escapeHtml(globalState.dailyNotes[day] || '—')}</p>
+            <p style="font-size: 10px; color: #0F172A; margin-top: 4px; font-family: monospace; font-weight: 500;">${escapeHtml(globalState.dailyNotes[day] || '—')}</p>
           </div>
         `;
       });
