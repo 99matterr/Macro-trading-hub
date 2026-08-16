@@ -240,6 +240,7 @@
       { id: 'USD_ISM_MFG', ccy: 'USD', match: ['ism manufacturing pmi', 'ism mfg pmi', 'ism manufacturing purchasing managers index', 'ism manufacturing', 'ism mfg', 'pmi manufacturero del ism', 'pmi del sector manufacturero del ism'], avoid: ['prices', 'employment', 'orders', 'paying', 'new orders', 'precios', 'empleo', 'pedidos'] },
       { id: 'USD_ISM_SERVICES', ccy: 'USD', match: ['ism non-manufacturing pmi', 'ism services pmi', 'ism non-manufacturing purchasing managers index', 'ism services', 'ism non-manufacturing', 'ism non mfg', 'pmi no manufacturero del ism', 'pmi del sector servicios del ism'], avoid: ['prices', 'employment', 'orders', 'precios', 'empleo'] },
       { id: 'USD_CPI_MOM', ccy: 'USD', match: ['cpi (mom)', 'cpi mom (headline)', 'cpi mom', 'consumer price index (mom)', 'ipc (mensual)', 'ipc mensual'], avoid: ['core', 'ex food', 'yoy', 'subyacente', 'anual'] },
+      { id: 'USD_NFP', ccy: 'USD', match: ['nonfarm payrolls', 'non-farm payrolls', 'non farm payrolls', 'nfp', 'nonfarm employment change', 'nominas no agricolas', 'empleo no agricola'], avoid: ['private', 'manufacturing', 'government'] },
       { id: 'USD_UNEMP', ccy: 'USD', match: ['unemployment rate', 'tasa de desempleo', 'unemployment'], avoid: ['youth', 'underemployment', 'germany', 'german', 'french', 'spanish', 'swiss', 'chicago', 'philly', 'empire', 'change'] },
       { id: 'USD_RETAIL', ccy: 'USD', match: ['retail sales (mom)', 'retail sales mom', 'ventas minoristas (mensual)', 'ventas minoristas mensual'], avoid: ['ex autos', 'control', 'ex gas', 'yoy', 'group', 'anual'] },
       { id: 'USD_CB_CONF', ccy: 'USD', match: ['cb consumer confidence', 'cb consumer confidence index', 'consumer confidence index', 'confianza del consumidor de the conference board', 'confianza del consumidor de cb'], avoid: ['michigan'] },
@@ -1457,7 +1458,7 @@
 
                     <div class="space-y-1 pt-1 border-t border-zinc-800/50">
                       <span class="text-[9px] text-cyan-300 font-mono font-bold uppercase tracking-wider block">⚡ Esta Semana:</span>
-                      ${weakData.currList.length > 0 ? weakData.currList.map(b => `
+                      ${strongData.currList.length > 0 ? strongData.currList.map(b => `
                         <div class="flex items-center justify-between text-[10px] text-zinc-100 bg-zinc-900/90 px-2 py-0.5 rounded border border-zinc-700/60">
                           <span class="pr-1">${escapeHtml(b.label)}</span>
                           <span class="font-mono font-bold ${b.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${b.score > 0 ? '+' : ''}${b.score}</span>
