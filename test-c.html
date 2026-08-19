@@ -328,7 +328,6 @@
             const timestamp = new Date().toISOString().slice(0, 10);
             const fileName = `forex_valuation_backup_${timestamp}.json`;
 
-            // Standard Browser Blob Download
             try {
                 const blob = new Blob([jsonStr], { type: "application/json" });
                 const url = URL.createObjectURL(blob);
@@ -345,7 +344,6 @@
                 console.warn("Direct blob download restricted by browser, loading modal fallback.");
             }
 
-            // Always open fallback modal with iPad Safari direct Data URI download link & clipboard button
             showExportModal(jsonStr, fileName);
         }
 
@@ -495,12 +493,11 @@
             return num;
         }
 
+        // Updated evaluation logic standardizing baseline comparisons and inverse metrics
         function evaluateIndicator(ind) {
             let netChange = 0;
-            if (ind.type === "GBP_CLAIMANT" || ind.type === "GBP_RETAIL" || ind.type === "CAD_JOBS") {
-                netChange = (ind.actual !== null && ind.forecast !== null) ? (ind.actual - ind.forecast) : 0;
-            } else {
-                netChange = (ind.actual !== null && ind.previous !== null) ? (ind.actual - ind.previous) : 0;
+            if (ind.actual !== null && ind.previous !== null) {
+                netChange = ind.actual - ind.previous;
             }
             netChange = parseFloat(netChange.toFixed(4));
 
@@ -513,6 +510,7 @@
                     else if (netChange > -2) score = -1;
                     else score = -2;
                     break;
+
                 case "CPI":
                     if (netChange >= 0.003) score = 2;
                     else if (netChange >= 0.001) score = 1;
@@ -520,13 +518,24 @@
                     else if (netChange > -0.003) score = -1;
                     else score = -2;
                     break;
+
                 case "UNEMP_RATE":
+                case "EUR_UNEMP_FIXED":
+                    // Lower unemployment rate is positive (+score), higher is negative (-score)
                     if (netChange <= -0.002) score = 2;
                     else if (netChange <= -0.001) score = 1;
                     else if (netChange === 0) score = 0;
                     else if (netChange < 0.002) score = -1;
                     else score = -2;
                     break;
+
+                case "GBP_CLAIMANT":
+                case "GER_UNEMP_CHANGE":
+                case "CHF_UNEMP_CHANGE":
+                    // Lower jobless headcounts are positive (+score), higher headcounts are negative (-score)
+                    score = netChange < 0 ? 1 : netChange > 0 ? -1 : 0;
+                    break;
+
                 case "NFP":
                     if (netChange >= 50) score = 2;
                     else if (netChange >= 15) score = 1;
@@ -534,7 +543,9 @@
                     else if (netChange > -50) score = -1;
                     else score = -2;
                     break;
+
                 default:
+                    // Standard positive indicator (higher is better)
                     score = netChange > 0 ? 1 : netChange < 0 ? -1 : 0;
             }
             return { netChange, score };
