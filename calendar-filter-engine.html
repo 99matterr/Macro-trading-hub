@@ -78,6 +78,9 @@
           <p class="text-zinc-400 text-xs mt-1">Motor de análisis macro con restauración inteligente de respaldos JSON y filtros rigurosos</p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
+          <button type="button" id="adminLoginBtn" onclick="promptAdminLogin()" class="bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs px-3 py-2 rounded-lg font-bold transition">
+            🔑 Admin Login
+          </button>
           <button type="button" onclick="lockCurrentAsPreviousWeek()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1.5 shadow-sm">
             📌 Fijar como Semana Previa
           </button>
@@ -217,6 +220,45 @@
   </main>
 
   <script>
+    let adminToken = sessionStorage.getItem('kairos_admin_token') || null;
+
+    async function promptAdminLogin() {
+      const pwd = prompt("Ingrese la contraseña de Administrador:");
+      if (!pwd) return;
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pwd })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          adminToken = data.token;
+          sessionStorage.setItem('kairos_admin_token', adminToken);
+          alert("🔑 ¡Sesión de Administrador iniciada correctamente!");
+          updateAdminUI();
+        } else {
+          alert("❌ Contraseña incorrecta.");
+        }
+      } catch (err) {
+        alert("Error de conexión al servidor.");
+      }
+    }
+
+    function updateAdminUI() {
+      const btn = document.getElementById('adminLoginBtn');
+      if (btn) {
+        if (adminToken) {
+          btn.textContent = '🔓 Admin Activo';
+          btn.className = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs px-3 py-2 rounded-lg font-bold';
+        } else {
+          btn.textContent = '🔑 Admin Login';
+          btn.className = 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs px-3 py-2 rounded-lg font-bold transition';
+        }
+      }
+    }
+
     function escapeHtml(str) {
       if (str === undefined || str === null) return '';
       return String(str)
@@ -396,11 +438,45 @@
     });
 
     window.addEventListener('DOMContentLoaded', () => {
-      loadFromLocalStorage();
+      updateAdminUI();
+      loadFromCloud();
+      setInterval(loadFromCloud, 10000);
     });
 
-    function saveToLocalStorage() {
+    async function saveToLocalStorage() {
       localStorage.setItem('kairos_macro_engine_state_v15', JSON.stringify(globalState));
+
+      if (adminToken) {
+        try {
+          await fetch('/api/state', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Admin-Token': adminToken
+            },
+            body: JSON.stringify(globalState)
+          });
+        } catch (err) {
+          console.error("Error sincronizando con la nube:", err);
+        }
+      }
+    }
+
+    async function loadFromCloud() {
+      try {
+        const res = await fetch('/api/state');
+        if (res.ok) {
+          const cloudData = await res.json();
+          if (cloudData && (Object.keys(cloudData.daysData || {}).length > 0 || Object.values(cloudData.matrixPrev || {}).some(v => v !== 0))) {
+            globalState = cloudData;
+            renderLiveInteractiveApp();
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("Nube inaccesible, cargando memoria local:", err);
+      }
+      loadFromLocalStorage();
     }
 
     function loadFromLocalStorage() {
@@ -1441,7 +1517,7 @@
                   </div>
                 </div>
 
-                <!-- WEAK CURRENCY CARD (FIXED) -->
+                <!-- WEAK CURRENCY CARD -->
                 <div class="bg-[#090b12] border border-rose-500/25 rounded-xl p-2.5 space-y-2">
                   <div class="flex justify-between items-center border-b border-rose-500/15 pb-1 font-mono">
                     <span class="font-bold text-rose-400 text-xs">${escapeHtml(d.weak)} (${d.weakScore})</span>
