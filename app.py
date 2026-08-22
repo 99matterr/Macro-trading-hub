@@ -75,7 +75,7 @@ def update_state(new_state: dict, x_admin_token: str = Header(None)):
 # --- AUTOMATED CALENDAR DATA ENDPOINT ---
 @app.get("/api/live-dashboard-data")
 def get_live_dashboard_data():
-    """Fetches live economic releases and maps them to dashboard indicators."""
+    """Fetches live economic releases and maps them to dashboard indicators across all 8 major currencies."""
     try:
         res = requests.get(CALENDAR_URL, timeout=10)
         events = res.json() if res.status_code == 200 else []
@@ -96,12 +96,39 @@ def get_live_dashboard_data():
             "HCOB Manufacturing PMI": "HCOB Mfg PMI",
             "HCOB Services PMI": "HCOB Services PMI",
             "CPI m/m": "CPI MoM",
-            "Unemployment Rate": "Unemployment Rate"
+            "Unemployment Rate": "Unemployment Rate",
+            "German ifo Business Climate": "IFO Business Climate"
         },
         "GBP": {
             "Manufacturing PMI": "S&P Mfg PMI",
             "Services PMI": "S&P Services PMI",
             "CPI m/m": "CPI MoM",
+            "Unemployment Rate": "Unemployment Rate",
+            "GDP m/m": "Monthly GDP"
+        },
+        "JPY": {
+            "Flash Manufacturing PMI": "Jibun Mfg PMI",
+            "Tokyo Core CPI y/y": "Tokyo CPI MoM",
+            "Unemployment Rate": "Unemployment Rate"
+        },
+        "AUD": {
+            "Flash Manufacturing PMI": "Judo Mfg PMI",
+            "Unemployment Rate": "Unemployment Rate",
+            "Employment Change": "Employment Change"
+        },
+        "CAD": {
+            "Ivey PMI": "Ivey PMI",
+            "CPI m/m": "CPI MoM",
+            "Unemployment Rate": "Unemployment Rate",
+            "Net Change in Employment": "Net Employment Change",
+            "GDP m/m": "Monthly GDP MoM"
+        },
+        "CHF": {
+            "procure.ch PMI": "Procure Mfg PMI",
+            "CPI m/m": "CPI MoM",
+            "Unemployment Rate": "Unemp Rate"
+        },
+        "NZD": {
             "Unemployment Rate": "Unemployment Rate"
         }
     }
