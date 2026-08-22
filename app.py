@@ -82,11 +82,13 @@ def get_live_dashboard_data():
     except Exception:
         events = []
 
+    # Comprehensive Mapping from Forex Factory Titles -> test-c.html Indicator Names
     EVENT_NAME_MAP = {
         "USD": {
             "ISM Manufacturing PMI": "ISM Mfg PMI",
             "ISM Services PMI": "ISM Services PMI",
             "CPI m/m": "CPI MoM",
+            "Core CPI m/m": "CPI MoM",
             "Unemployment Rate": "Unemployment Rate",
             "Non-Farm Employment Change": "NFP",
             "Retail Sales m/m": "Retail Sales MoM",
@@ -96,40 +98,54 @@ def get_live_dashboard_data():
             "HCOB Manufacturing PMI": "HCOB Mfg PMI",
             "HCOB Services PMI": "HCOB Services PMI",
             "CPI m/m": "CPI MoM",
+            "German Prelim CPI m/m": "CPI MoM",
             "Unemployment Rate": "Unemployment Rate",
-            "German ifo Business Climate": "IFO Business Climate"
+            "German Unemployment Change": "Germany Unemp Change",
+            "German ifo Business Climate": "IFO Business Climate",
+            "Retail Sales m/m": "Retail Sales MoM",
+            "Industrial Production m/m": "Industrial Production MoM"
         },
         "GBP": {
             "Manufacturing PMI": "S&P Mfg PMI",
             "Services PMI": "S&P Services PMI",
             "CPI m/m": "CPI MoM",
             "Unemployment Rate": "Unemployment Rate",
+            "Claimant Count Change": "Claimant Count",
+            "Retail Sales m/m": "Retail Sales MoM",
             "GDP m/m": "Monthly GDP"
         },
         "JPY": {
             "Flash Manufacturing PMI": "Jibun Mfg PMI",
             "Tokyo Core CPI y/y": "Tokyo CPI MoM",
-            "Unemployment Rate": "Unemployment Rate"
+            "Unemployment Rate": "Unemployment Rate",
+            "Average Cash Earnings y/y": "Cash Earnings MoM",
+            "Retail Sales y/y": "Retail Sales MoM"
         },
         "AUD": {
             "Flash Manufacturing PMI": "Judo Mfg PMI",
+            "CPI m/m": "CPI Indicator MoM",
             "Unemployment Rate": "Unemployment Rate",
-            "Employment Change": "Employment Change"
+            "Employment Change": "Employment Change",
+            "Retail Sales m/m": "Retail Sales MoM"
         },
         "CAD": {
+            "Manufacturing PMI": "S&P Mfg PMI",
             "Ivey PMI": "Ivey PMI",
             "CPI m/m": "CPI MoM",
             "Unemployment Rate": "Unemployment Rate",
             "Net Change in Employment": "Net Employment Change",
+            "Retail Sales m/m": "Retail Sales MoM",
             "GDP m/m": "Monthly GDP MoM"
         },
         "CHF": {
             "procure.ch PMI": "Procure Mfg PMI",
             "CPI m/m": "CPI MoM",
-            "Unemployment Rate": "Unemp Rate"
+            "Unemployment Rate": "Unemp Rate",
+            "Real Retail Sales y/y": "Retail Sales MoM"
         },
         "NZD": {
-            "Unemployment Rate": "Unemployment Rate"
+            "Unemployment Rate": "Unemployment Rate",
+            "Food Price Index m/m": "Food Prices MoM"
         }
     }
 
