@@ -758,12 +758,52 @@
             saveToLocalStorage();
         }
 
-        // Initialize App on load
+        // ------------------ AUTOMATED LIVE DATA SYNC ENGINE ------------------
+
+        async function syncLiveMacroData() {
+            try {
+                const response = await fetch('/api/live-dashboard-data');
+                const result = await response.json();
+
+                if (result.status === 'success' && result.updates && result.updates.length > 0) {
+                    let updatedCount = 0;
+
+                    result.updates.forEach(upd => {
+                        const list = appData[upd.ccy];
+                        if (list) {
+                            const ind = list.find(i => i.name === upd.name);
+                            if (ind && upd.actual) {
+                                const parsedActual = parseInputValue(upd.actual, ind.type);
+                                if (parsedActual !== null && ind.actual !== parsedActual) {
+                                    ind.actual = parsedActual;
+                                    if (upd.forecast) ind.forecast = parseInputValue(upd.forecast, ind.type);
+                                    updatedCount++;
+                                }
+                            }
+                        }
+                    });
+
+                    if (updatedCount > 0) {
+                        refreshApp();
+                        const noticeEl = document.getElementById('lastUpdatedNotice');
+                        if (noticeEl) {
+                            noticeEl.innerText = `Data Status: Auto-Synced Live (${new Date().toLocaleTimeString()})`;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Live macro data sync connection error:", err);
+            }
+        }
+
+        // Initialize App on load and start live 60-second polling
         const isRestored = loadFromLocalStorage();
         if (isRestored) {
             document.getElementById('lastUpdatedNotice').innerText = `Data Status: Restored from Local Storage`;
         }
         refreshApp();
+        syncLiveMacroData();
+        setInterval(syncLiveMacroData, 60000);
     </script>
 </body>
 </html>
